@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.12)
 project(phoxi_camera)
 
 find_package(PhoXi REQUIRED CONFIG PATHS "$ENV{PHOXI_CONTROL_PATH}")
+find_package(Eigen3 REQUIRED)
 
 find_package(catkin REQUIRED
   COMPONENTS
@@ -19,6 +20,7 @@ find_package(catkin REQUIRED
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${PHOXI_INCLUDE_DIRS}
+  ${Eigen_INCLUDE_DIRS}
 )
 
 add_message_files(
@@ -39,6 +41,8 @@ add_service_files(
     SaveFrame.srv
     GetHardwareIdentification.srv
     GetSupportedCapturingModes.srv
+        SetCoordinatesSpace.srv
+        TransformationMatrix.srv
 )
 
 generate_messages(

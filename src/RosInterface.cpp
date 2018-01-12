@@ -27,6 +27,8 @@ RosInterface::RosInterface() : nh("~") {
     disconnectCameraService = nh.advertiseService("disconnect_camera", &RosInterface::disconnectCamera, this);
     getHardwareIdentificationService = nh.advertiseService("get_hardware_indentification", &RosInterface::getHardwareIdentification, this);
     getSupportedCapturingModesService = nh.advertiseService("get_supported_capturing_modes", &RosInterface::getSupportedCapturingModes, this);
+    setCoordianteSpaceService = nh.advertiseService("V2/set_transformation",&RosInterface::setCoordianteSpace, this);
+    setTransformationService = nh.advertiseService("V2/set_coordination_space",&RosInterface::setTransformation, this);
 
     //create publishers
     cloudPub = nh.advertise <pcl::PointCloud<pcl::PointXYZ >>("pointcloud", 1);
@@ -198,7 +200,7 @@ bool RosInterface::getSupportedCapturingModes(phoxi_camera::GetSupportedCapturin
 
 void RosInterface::publishFrame(pho::api::PFrame frame) {
     if (!frame) {
-        //todo
+        return;
     }
     if (!frame->PointCloud.Empty()){
         ROS_WARN("Empty point cloud!");
@@ -249,3 +251,34 @@ void RosInterface::publishFrame(pho::api::PFrame frame) {
     confidenceMapPub.publish(confidence_map);
     texturePub.publish(texture);
 }
+
+bool RosInterface::setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request &req, phoxi_camera::SetCoordinatesSpace::Response &res){
+    try {
+        PhoXiInterface::setCoordinateSpace(req.coordinates_space);
+        res.success = true;
+        res.message = "Ok";
+    }catch (std::runtime_error &e){
+        res.success = false;
+        res.message = e.what();
+    }
+    return true;
+}
+
+bool RosInterface::setTransformation(phoxi_camera::TransformationMatrix::Request &req, phoxi_camera::TransformationMatrix::Response &res){
+    if(req.matrix.size()!= 16){
+        res.success = false;
+        res.message = "Bad matrix dimensions!";
+        return true;
+    }
+    try {
+        PhoXiInterface::setTransformation(req.matrix,req.coordinates_space,req.set_space,req.save_settings);
+        res.success = true;
+        res.message = "Ok";
+    }catch (std::runtime_error &e){
+        res.success = false;
+        res.message = e.what();
+    }
+    return true;
+}
+
+

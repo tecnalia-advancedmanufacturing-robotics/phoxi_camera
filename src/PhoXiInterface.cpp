@@ -108,19 +108,9 @@ void PhoXiInterface::setCoordinateSpace(pho::api::PhoXiCoordinateSpace space){
     scanner->CoordinatesSettings->CoordinateSpace = space;
     return;
 }
-
-void PhoXiInterface::setTransformation(Eigen::Matrix4d transformation, pho::api::PhoXiCoordinateSpace space, bool saveSettings) {
+void PhoXiInterface::setTransformation(pho::api::PhoXiCoordinateTransformation coordinateTransformation,pho::api::PhoXiCoordinateSpace space,bool setSpace = true, bool saveSettings = true){
     this->isOk();
-    pho::api::PhoXiCoordinateTransformation coordinateTransformation;
     pho::api::PhoXiCoordinatesSettings settings = scanner->CoordinatesSettings;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            coordinateTransformation.Rotation[i][j] = transformation(i,j);
-        }
-    }
-    coordinateTransformation.Translation.x = transformation(0,3);
-    coordinateTransformation.Translation.y = transformation(1,3);
-    coordinateTransformation.Translation.z = transformation(2,3);
     switch(space){
         case pho::api::PhoXiCoordinateSpace::RobotSpace:
             if(!settings.RobotTransformation.isSupported()){
@@ -139,13 +129,14 @@ void PhoXiInterface::setTransformation(Eigen::Matrix4d transformation, pho::api:
         default:
             throw std::runtime_error("Coordination space is not supported");
     }
-
+    if(setSpace){
+        settings.CoordinateSpace = space;
+    }
     this->isOk();
     scanner->CoordinatesSettings = settings;
     if(saveSettings){
         scanner->SaveSettings();
     }
-    return;
 }
 
 std::string PhoXiInterface::getHardwareIdentification(){

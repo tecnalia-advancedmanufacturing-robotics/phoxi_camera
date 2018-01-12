@@ -19,6 +19,9 @@
 #include <phoxi_camera/SaveFrame.h>
 #include <phoxi_camera/GetHardwareIdentification.h>
 #include <phoxi_camera/GetSupportedCapturingModes.h>
+#include <phoxi_camera/SetCoordinatesSpace.h>
+#include <phoxi_camera/TransformationMatrix.h>
+
 
 class RosInterface : protected  PhoXiInterface {
 public:
@@ -44,6 +47,8 @@ private:
     bool disconnectCamera(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
     bool getHardwareIdentification(phoxi_camera::GetHardwareIdentification::Request &req, phoxi_camera::GetHardwareIdentification::Response &res);
     bool getSupportedCapturingModes(phoxi_camera::GetSupportedCapturingModes::Request &req, phoxi_camera::GetSupportedCapturingModes::Response &res);
+    bool setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request &req, phoxi_camera::SetCoordinatesSpace::Response &res);
+    bool setTransformation(phoxi_camera::TransformationMatrix::Request &req, phoxi_camera::TransformationMatrix::Response &res);
     //node handle
     ros::NodeHandle nh;
 
@@ -64,6 +69,8 @@ private:
     ros::ServiceServer disconnectCameraService;
     ros::ServiceServer getHardwareIdentificationService;
     ros::ServiceServer getSupportedCapturingModesService;
+    ros::ServiceServer setCoordianteSpaceService;
+    ros::ServiceServer setTransformationService;
 
     //ros publishers
     ros::Publisher cloudPub;
