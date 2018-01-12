@@ -2,6 +2,19 @@
 Changelog for package phoxi_camera
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+1.1.5
+-----------------
+* GetDeviceList.srv - message and success response parameters added, len response parameter will be removed in next release.
+* ConnectCamera.srv added message and success response parameters.
+* Bool.srv added to replace IsAcquiring.srv and IsConnected.srv in next release.
+* Empty.srv added to replace std_srvs/Empty in next release.
+* TriggerImage.srv added message response parameter.
+* GetFrame.srv added message response parameter.
+* SaveFrame.srv added message response parameter.
+* GetHardwareIdentification.srv added message success response parameter.
+* GetSuportedCapturingModes.srv added message success response parameter.
+* Added V2/is_connected, V2/is_acquiring, V2/start_acquisition, V2/stop_acquisition services.
+
 1.1.4 (2016-10-24)
 ------------------
 * Update README.md

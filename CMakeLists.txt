@@ -30,13 +30,15 @@ add_service_files(
   FILES
     GetDeviceList.srv
     ConnectCamera.srv
+    IsConnected.srv
     IsAcquiring.srv
+    Bool.srv
+    Empty.srv
+    TriggerImage.srv
     GetFrame.srv
     SaveFrame.srv
-    TriggerImage.srv
     GetHardwareIdentification.srv
     GetSupportedCapturingModes.srv
-    IsConnected.srv
 )
 
 generate_messages(
@@ -65,6 +67,8 @@ add_compile_options(-pthread)
 add_executable(
   ${PROJECT_NAME}
   src/phoxi_camera_node.cpp
+  src/PhoXiInterface.cpp
+  src/RosInterface.cpp
 )
 
 add_dependencies(
