@@ -19,6 +19,7 @@ public:
     pho::api::PFrame getPFrame();
     pho::api::PFrame getPFrame(int id);
     std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloud();
+    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloud(pho::api::PFrame frame);
     void isOk();
     bool isConnected();
     bool isAcquiring();

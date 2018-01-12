@@ -72,7 +72,10 @@ pho::api::PFrame PhoXiInterface::getPFrame(int id){
 }
 
 std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud() {
-    pho::api::PFrame frame = getPFrame();
+    return getPointCloud(scanner->GetFrame());
+}
+
+std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud(pho::api::PFrame frame) {
     if (!frame || !frame->Successful) {
         throw std::runtime_error("Bad frame arrived");
     }

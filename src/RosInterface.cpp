@@ -6,6 +6,8 @@
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/fill_image.h>
 RosInterface::RosInterface() : nh("~") {
 
     //create service servers
@@ -34,50 +36,216 @@ RosInterface::RosInterface() : nh("~") {
 }
 
 bool RosInterface::getDeviceList(phoxi_camera::GetDeviceList::Request &req, phoxi_camera::GetDeviceList::Response &res){
-
+    try {
+        res.out = PhoXiInterface::cameraList();
+        res.len = res.out.size();
+        res.success = true;
+        res.message = "Ok";
+    }catch (std::runtime_error &e){
+        res.success = false;
+        res.message = e.what();
+    }
+    return true;
 }
 bool RosInterface::connectCamera(phoxi_camera::ConnectCamera::Request &req, phoxi_camera::ConnectCamera::Response &res){
-
+    try {
+        PhoXiInterface::connectCamera(req.name);
+        res.success = true;
+        res.message = "Ok";
+    }catch (std::runtime_error &e){
+        res.success = false;
+        res.message = e.what();
+    }
+    return true;
 }
 bool RosInterface::isConnected(phoxi_camera::IsConnected::Request &req, phoxi_camera::IsConnected::Response &res){
-
+    res.connected = PhoXiInterface::isConnected();
+    return true;
 }
 bool RosInterface::isAcquiring(phoxi_camera::IsAcquiring::Request &req, phoxi_camera::IsAcquiring::Response &res){
-
+    res.is_acquiring = PhoXiInterface::isAcquiring();
+    return true;
 }
 bool RosInterface::isConnected(phoxi_camera::Bool::Request &req, phoxi_camera::Bool::Response &res){
-
+    res.value = PhoXiInterface::isConnected();
+    res.message = "ok"; //todo tot este premysliet
+    res.success = true;
+    return true;
 }
 bool RosInterface::isAcquiring(phoxi_camera::Bool::Request &req, phoxi_camera::Bool::Response &res){
-
+    res.value = PhoXiInterface::isAcquiring();
+    res.message = "ok"; //todo tot este premysliet
+    res.success = true;
+    return true;
 }
 bool RosInterface::startAcquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
-
+    try {
+        PhoXiInterface::startAcquisition();
+    }catch (std::runtime_error &e){
+        ROS_ERROR("%s",e.what());
+    }
+    return true;
 }
 bool RosInterface::stopAcquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
-
+    try {
+        PhoXiInterface::stopAcquisition();
+    }catch (std::runtime_error &e){
+        ROS_ERROR("%s",e.what());
+    }
+    return true;
 }
 bool RosInterface::startAcquisition(phoxi_camera::Empty::Request &req, phoxi_camera::Empty::Response &res){
-
+    try {
+        //todo
+        PhoXiInterface::startAcquisition();
+        res.message = "Ok";
+        res.success = true;
+    }catch (std::runtime_error &e){
+        res.message = e.what();
+        res.success = false;
+    }
+    return true;
 }
 bool RosInterface::stopAcquisition(phoxi_camera::Empty::Request &req, phoxi_camera::Empty::Response &res){
-
+    try {
+        PhoXiInterface::stopAcquisition();
+        res.message = "Ok";
+        res.success = true;
+    }catch (std::runtime_error &e){
+        res.message = e.what();
+        res.success = false;
+    }
+    return true;
 }
 bool RosInterface::triggerImage(phoxi_camera::TriggerImage::Request &req, phoxi_camera::TriggerImage::Response &res){
-
+    try {
+        publishFrame(PhoXiInterface::getPFrame());
+        res.success = true;
+        res.message = "Ok";
+    }catch (std::runtime_error &e){
+        res.success = false;
+        res.message = e.what();
+    }
+    return true;
 }
 bool RosInterface::getFrame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Response &res){
-
+    try {
+        publishFrame(PhoXiInterface::getPFrame(req.in));
+        res.success = true;
+        res.message = "Ok";
+    }catch (std::runtime_error &e){
+        res.success = false;
+        res.message = e.what();
+    }
+    return true;
 }
 bool RosInterface::saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera::SaveFrame::Response &res){
-
+    try {
+        if(req.in < 0){
+            //Take new frame publish it and save
+            int id = PhoXiInterface::triggerImage();
+            pho::api::PFrame frame = PhoXiInterface::getPFrame(id);
+            publishFrame(frame);
+            PhoXiInterface::saveFrame(id,req.path);
+        }
+        else{
+            PhoXiInterface::saveFrame(req.in,req.path);
+        }
+        res.success = true;
+        res.message = "Ok";
+    }catch (std::runtime_error &e){
+        res.success = false;
+        res.message = e.what();
+    }
+    return true;
 }
 bool RosInterface::disconnectCamera(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
-
+    try {
+        PhoXiInterface::disconnectCamera();
+    }catch (std::runtime_error &e){
+        //scanner is already disconnected on exception
+    }
+    return true;
 }
 bool RosInterface::getHardwareIdentification(phoxi_camera::GetHardwareIdentification::Request &req, phoxi_camera::GetHardwareIdentification::Response &res){
-
+    try {
+        PhoXiInterface::getHardwareIdentification();
+        res.success = true;
+        res.message = "Ok";
+    }catch (std::runtime_error &e){
+        res.success = false;
+        res.message = e.what();
+    }
+    return true;
 }
 bool RosInterface::getSupportedCapturingModes(phoxi_camera::GetSupportedCapturingModes::Request &req, phoxi_camera::GetSupportedCapturingModes::Response &res){
+    try {
+        std::vector<pho::api::PhoXiCapturingMode> modes = PhoXiInterface::getSupportedCapturingModes();
+        for(int i =0; i < modes.size(); i++){
+            phoxi_camera::PhoXiSize size;
+            size.Height = modes[i].Resolution.Height;
+            size.Width = modes[i].Resolution.Width;
+            res.supported_capturing_modes.push_back(size);
+        }
+        res.success = true;
+        res.message = "Ok";
+    }catch (std::runtime_error &e){
+        res.success = false;
+        res.message = e.what();
+    }
+    return true;
+}
 
+void RosInterface::publishFrame(pho::api::PFrame frame) {
+    if (!frame) {
+        //todo
+    }
+    if (!frame->PointCloud.Empty()){
+        ROS_WARN("Empty point cloud!");
+    }
+    if (!frame->DepthMap.Empty()){
+        ROS_WARN("Empty depth map!");
+    }
+    if (!frame->Texture.Empty()){
+        ROS_WARN("Empty texture!");
+    }
+    if (!frame->ConfidenceMap.Empty()){
+        ROS_WARN("Empty confidence map!");
+    }
+    sensor_msgs::Image texture, confidence_map, normal_map;
+    ros::Time timeNow = ros::Time::now();
+    texture.header.stamp = timeNow;
+    texture.header.frame_id = child_frame;
+    confidence_map.header.stamp = timeNow;
+    confidence_map.header.frame_id = child_frame;
+    normal_map.header.stamp = timeNow;
+    normal_map.header.frame_id = child_frame;
+    texture.encoding = "32FC1";
+    sensor_msgs::fillImage(texture, sensor_msgs::image_encodings::TYPE_32FC1,
+                           frame->Texture.Size.Height, // height
+                           frame->Texture.Size.Width, // width
+                           frame->Texture.Size.Width * sizeof(float), // stepSize
+                           frame->Texture.operator[](0));
+    confidence_map.encoding = "32FC1";
+    sensor_msgs::fillImage(confidence_map,
+                           sensor_msgs::image_encodings::TYPE_32FC1,
+                           frame->ConfidenceMap.Size.Height, // height
+                           frame->ConfidenceMap.Size.Width, // width
+                           frame->ConfidenceMap.Size.Width * sizeof(float), // stepSize
+                           frame->ConfidenceMap.operator[](0));
+    normal_map.encoding = "32FC3";
+    sensor_msgs::fillImage(normal_map,
+                           sensor_msgs::image_encodings::TYPE_32FC3,
+                           frame->NormalMap.Size.Height, // height
+                           frame->NormalMap.Size.Width, // width
+                           frame->NormalMap.Size.Width * sizeof(float) * 3, // stepSize
+                           frame->NormalMap.operator[](0));
+    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> cloud = PhoXiInterface::getPointCloud(frame);
+    sensor_msgs::PointCloud2 output_cloud;
+    pcl::toROSMsg(*cloud,output_cloud);
+    output_cloud.header.frame_id = "map";
+    cloudPub.publish(output_cloud);
+    normalMapPub.publish(normal_map);
+    confidenceMapPub.publish(confidence_map);
+    texturePub.publish(texture);
 }

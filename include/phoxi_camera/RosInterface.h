@@ -6,6 +6,7 @@
 #define PROJECT_ROSINTERFACE_H
 
 #include <ros/ros.h>
+#include <phoxi_camera/PhoXiInterface.h>
 #include <phoxi_camera/GetDeviceList.h>
 #include <phoxi_camera/ConnectCamera.h>
 #include <phoxi_camera/IsConnected.h>
@@ -19,11 +20,13 @@
 #include <phoxi_camera/GetHardwareIdentification.h>
 #include <phoxi_camera/GetSupportedCapturingModes.h>
 
-
-class RosInterface {
+class RosInterface : protected  PhoXiInterface {
 public:
     RosInterface();
 protected:
+    void publishFrame(pho::api::PFrame frame);
+
+    std::string parrent_frame, child_frame; //todo default initialization
 private:
     bool getDeviceList(phoxi_camera::GetDeviceList::Request &req, phoxi_camera::GetDeviceList::Response &res);
     bool connectCamera(phoxi_camera::ConnectCamera::Request &req, phoxi_camera::ConnectCamera::Response &res);
