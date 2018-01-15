@@ -3,6 +3,7 @@
 //
 
 #include "phoxi_camera/PhoXiInterface.h"
+#include <phoxi_camera/PhoXiException.h>
 PhoXiInterface::PhoXiCamera(){
 
 }
@@ -11,7 +12,7 @@ std::vector<std::string> PhoXiInterface::cameraList(){
     pho::api::PhoXiFactory phoXiFactory;
     if (!phoXiFactory.isPhoXiControlRunning()){
         scanner.Reset();
-        throw std::runtime_error("PhoXi Controll is not running");
+        throw PhoXiControllNotRunning("PhoXi Controll is not running");
     }
     std::vector<std::string> list;
     auto DeviceList = phoXiFactory.GetDeviceList();
@@ -29,7 +30,7 @@ void PhoXiInterface::connectCamera(std::string HWIdentification){
         }
     }
     if (!phoXiFactory.isPhoXiControlRunning()) {
-        throw std::runtime_error("PhoXi Controll is not running");
+        throw PhoXiControllNotRunning("PhoXi Controll is not running");
     }
     auto DeviceList = phoXiFactory.GetDeviceList();
     bool found = false;
@@ -42,18 +43,18 @@ void PhoXiInterface::connectCamera(std::string HWIdentification){
         }
     }
     if(!found){
-        throw std::runtime_error("Scanner not found");
+        throw PhoXiScannerNotFound("Scanner not found");
     }
     disconnectCamera();
     if(!(scanner = phoXiFactory.CreateAndConnect(device,5000))){
         disconnectCamera();
-        throw std::runtime_error("Scanner was not able to connect. Disconnected.");
+        throw UnableToConnect("Scanner was not able to connect. Disconnected.");
     }
     scanner->TriggerMode = pho::api::PhoXiTriggerMode::Software;
     scanner->StartAcquisition();
     if(!scanner->isAcquiring()){
         disconnectCamera();
-        throw std::runtime_error("Scanner was not able to acquire. Disconnected.");
+        throw UnableToConnect("Scanner was not able to acquire. Disconnected.");
     }
     return ;
 }
@@ -77,7 +78,7 @@ std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud
 
 std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud(pho::api::PFrame frame) {
     if (!frame || !frame->Successful) {
-        throw std::runtime_error("Bad frame arrived");
+        throw CorruptedFrame("Corrupted frame!");
     }
     std::shared_ptr <pcl::PointCloud<pcl::PointNormal>>cloud(new pcl::PointCloud<pcl::PointNormal>(frame->GetResolution().Width,frame->GetResolution().Height));
     for(int r = 0; r < frame->GetResolution().Height; r++){
@@ -98,7 +99,7 @@ std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud
 
 void PhoXiInterface::isOk(){
     if(!scanner || !scanner->isConnected()){
-        throw std::runtime_error("No scanner connected");
+        throw PhoXiScannerNotConnected("No scanner connected");
     }
     return;
 }
@@ -114,20 +115,20 @@ void PhoXiInterface::setTransformation(pho::api::PhoXiCoordinateTransformation c
     switch(space){
         case pho::api::PhoXiCoordinateSpace::RobotSpace:
             if(!settings.RobotTransformation.isSupported()){
-                throw std::runtime_error("Coordination space is not supported");
+                throw CoordinationSpaceNotSupported("Coordination space is not supported");
             }
             settings.RobotTransformation = coordinateTransformation;
             settings.CoordinateSpace = pho::api::PhoXiCoordinateSpace::RobotSpace;
             break;
         case pho::api::PhoXiCoordinateSpace::CustomSpace:
             if(!settings.CustomTransformation.isSupported()){
-                throw std::runtime_error("Coordination space is not supported");
+                throw CoordinationSpaceNotSupported("Coordination space is not supported");
             }
             settings.CustomTransformation = coordinateTransformation;
             settings.CoordinateSpace = pho::api::PhoXiCoordinateSpace::CustomSpace;
             break;
         default:
-            throw std::runtime_error("Coordination space is not supported");
+            throw CoordinationSpaceNotSupported("Coordination space is not supported");
     }
     if(setSpace){
         settings.CoordinateSpace = space;

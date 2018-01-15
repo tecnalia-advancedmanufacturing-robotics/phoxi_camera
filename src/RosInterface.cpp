@@ -8,6 +8,7 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/fill_image.h>
+#include <phoxi_camera/PhoXiException.h>
 RosInterface::RosInterface() : nh("~") {
 
     //create service servers
@@ -43,7 +44,7 @@ bool RosInterface::getDeviceList(phoxi_camera::GetDeviceList::Request &req, phox
         res.len = res.out.size();
         res.success = true;
         res.message = "Ok";
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
     }
@@ -54,7 +55,7 @@ bool RosInterface::connectCamera(phoxi_camera::ConnectCamera::Request &req, phox
         PhoXiInterface::connectCamera(req.name);
         res.success = true;
         res.message = "Ok";
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
     }
@@ -83,7 +84,7 @@ bool RosInterface::isAcquiring(phoxi_camera::Bool::Request &req, phoxi_camera::B
 bool RosInterface::startAcquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
     try {
         PhoXiInterface::startAcquisition();
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         ROS_ERROR("%s",e.what());
     }
     return true;
@@ -91,7 +92,7 @@ bool RosInterface::startAcquisition(std_srvs::Empty::Request &req, std_srvs::Emp
 bool RosInterface::stopAcquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
     try {
         PhoXiInterface::stopAcquisition();
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         ROS_ERROR("%s",e.what());
     }
     return true;
@@ -102,7 +103,7 @@ bool RosInterface::startAcquisition(phoxi_camera::Empty::Request &req, phoxi_cam
         PhoXiInterface::startAcquisition();
         res.message = "Ok";
         res.success = true;
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         res.message = e.what();
         res.success = false;
     }
@@ -113,7 +114,7 @@ bool RosInterface::stopAcquisition(phoxi_camera::Empty::Request &req, phoxi_came
         PhoXiInterface::stopAcquisition();
         res.message = "Ok";
         res.success = true;
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         res.message = e.what();
         res.success = false;
     }
@@ -124,7 +125,7 @@ bool RosInterface::triggerImage(phoxi_camera::TriggerImage::Request &req, phoxi_
         publishFrame(PhoXiInterface::getPFrame());
         res.success = true;
         res.message = "Ok";
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
     }
@@ -135,7 +136,7 @@ bool RosInterface::getFrame(phoxi_camera::GetFrame::Request &req, phoxi_camera::
         publishFrame(PhoXiInterface::getPFrame(req.in));
         res.success = true;
         res.message = "Ok";
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
     }
@@ -155,7 +156,7 @@ bool RosInterface::saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera
         }
         res.success = true;
         res.message = "Ok";
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
     }
@@ -164,7 +165,7 @@ bool RosInterface::saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera
 bool RosInterface::disconnectCamera(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
     try {
         PhoXiInterface::disconnectCamera();
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         //scanner is already disconnected on exception
     }
     return true;
@@ -174,7 +175,7 @@ bool RosInterface::getHardwareIdentification(phoxi_camera::GetHardwareIdentifica
         PhoXiInterface::getHardwareIdentification();
         res.success = true;
         res.message = "Ok";
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
     }
@@ -191,7 +192,7 @@ bool RosInterface::getSupportedCapturingModes(phoxi_camera::GetSupportedCapturin
         }
         res.success = true;
         res.message = "Ok";
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
     }
@@ -257,7 +258,7 @@ bool RosInterface::setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request
         PhoXiInterface::setCoordinateSpace(req.coordinates_space);
         res.success = true;
         res.message = "Ok";
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
     }
@@ -274,7 +275,7 @@ bool RosInterface::setTransformation(phoxi_camera::TransformationMatrix::Request
         PhoXiInterface::setTransformation(req.matrix,req.coordinates_space,req.set_space,req.save_settings);
         res.success = true;
         res.message = "Ok";
-    }catch (std::runtime_error &e){
+    }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
     }

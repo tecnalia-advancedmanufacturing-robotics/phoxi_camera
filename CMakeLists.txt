@@ -3,6 +3,7 @@ project(phoxi_camera)
 
 find_package(PhoXi REQUIRED CONFIG PATHS "$ENV{PHOXI_CONTROL_PATH}")
 find_package(Eigen3 REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system)
 
 find_package(catkin REQUIRED
   COMPONENTS
@@ -41,8 +42,8 @@ add_service_files(
     SaveFrame.srv
     GetHardwareIdentification.srv
     GetSupportedCapturingModes.srv
-        SetCoordinatesSpace.srv
-        TransformationMatrix.srv
+    SetCoordinatesSpace.srv
+    TransformationMatrix.srv
 )
 
 generate_messages(
@@ -68,6 +69,16 @@ add_compile_options(-std=c++11)
 add_compile_options(-fpermissive)
 add_compile_options(-pthread)
 
+add_library(
+  ${PROJECT_NAME}_PhoXi_Interface
+  src/PhoXiInterface.cpp
+)
+
+add_library(
+  ${PROJECT_NAME}_Ros_Interface
+  src/RosInterface.cpp
+)
+
 add_executable(
   ${PROJECT_NAME}
   src/phoxi_camera_node.cpp
@@ -76,10 +87,31 @@ add_executable(
 )
 
 add_dependencies(
+  ${PROJECT_NAME}_Ros_Interface
+  ${PROJECT_NAME}/_PhoXi_Interfece
+  ${PROJECT_NAME}_gencfgv
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+
+add_dependencies(
   ${PROJECT_NAME}
   ${PROJECT_NAME}_gencfgv
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
+)
+
+target_link_libraries(
+  ${PROJECT_NAME}_PhoXi_Interface
+  ${PHOXI_LIBRARY}
+  rt
+  ${Boost_LIBRARIES}
+)
+target_link_libraries(
+  ${PROJECT_NAME}_Ros_Interface
+  ${PROJECT_NAME}_PhoXi_Interface
+  ${catkin_LIBRARIES}
+
 )
 
 target_link_libraries(

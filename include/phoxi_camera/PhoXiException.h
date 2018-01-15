@@ -6,10 +6,9 @@
 #define PROJECT_PHOXIEXCEPTION_H
 
 #include <exception>
-
-class PhoXiException : std::runtime_error {
+class PhoXiInterfaceException : std::exception {
 public:
-    PhoXiException(std::string message) : message(message){
+    PhoXiInterfaceException(std::string message) : message(message){
     }
     virtual const char* what() const throw()
     {
@@ -17,6 +16,41 @@ public:
     }
 private:
     std::string message;
+};
+
+class PhoXiControllNotRunning : PhoXiInterfaceException {
+public:
+    PhoXiControllNotRunning(std::string message) : PhoXiInterfaceException(message){
+    }
+};
+
+class PhoXiScannerNotFound : PhoXiInterfaceException {
+public:
+    PhoXiScannerNotFound(std::string message) : PhoXiInterfaceException(message){
+    }
+};
+class UnableToConnect : PhoXiInterfaceException {
+public:
+    UnableToConnect(std::string message) : PhoXiInterfaceException(message){
+    }
+};
+
+class CorruptedFrame : PhoXiInterfaceException {
+public:
+    CorruptedFrame(std::string message) : PhoXiInterfaceException(message){
+    }
+};
+
+class  PhoXiScannerNotConnected : PhoXiInterfaceException {
+public:
+    PhoXiScannerNotConnected(std::string message) : PhoXiInterfaceException(message){
+    }
+};
+
+class  CoordinationSpaceNotSupported : PhoXiInterfaceException {
+    public:
+    CoordinationSpaceNotSupported(std::string message) : PhoXiInterfaceException(message){
+    }
 };
 
 
