@@ -1,0 +1,12 @@
+confidence: 3.0
+coordination_space: 1 # 1 = Camera, 2 =  Mounting, 3 = Marker, 4 = Robot, 5 = Custom
+resolution: 1         # 0 = Low, 1 = High
+scan_multiplier: 1
+send_confidence_map: true
+send_deapth_map: true
+send_normal_map: true
+send_point_cloud: true
+send_texture: true
+shutter_multiplier: 1
+timeout: -3          # 0 = Zero, -1 = Infinity, -2 = Last Stored, -3 = Default
+trigger_mode: 1      # 0 = FreeRun, 1 = Software
