@@ -3,7 +3,7 @@
 //
 
 #include "phoxi_camera/PhoXiInterface.h"
-#include <phoxi_camera/PhoXiException.h>
+
 PhoXiInterface::PhoXiCamera(){
 
 }
@@ -22,7 +22,7 @@ std::vector<std::string> PhoXiInterface::cameraList(){
     return list;
 }
 
-void PhoXiInterface::connectCamera(std::string HWIdentification){
+void PhoXiInterface::connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode, bool startAcquisition){
     pho::api::PhoXiFactory phoXiFactory;
     if(scanner && scanner->isConnected()){
         if(scanner->HardwareIdentification == HWIdentification){
@@ -48,35 +48,30 @@ void PhoXiInterface::connectCamera(std::string HWIdentification){
     disconnectCamera();
     if(!(scanner = phoXiFactory.CreateAndConnect(device,5000))){
         disconnectCamera();
-        throw UnableToConnect("Scanner was not able to connect. Disconnected.");
+        throw UnableToStartAcquisition("Scanner was not able to connect. Disconnected.");
     }
-    scanner->TriggerMode = pho::api::PhoXiTriggerMode::Software;
-    scanner->StartAcquisition();
-    if(!scanner->isAcquiring()){
-        disconnectCamera();
-        throw UnableToConnect("Scanner was not able to acquire. Disconnected.");
-    }
+    this->setTriggerMode(mode,startAcquisition);
     return ;
 }
 void PhoXiInterface::disconnectCamera(){
-    this->isOk();
-    scanner->Disconnect();
+    if(scanner && scanner->isConnected()){
+        scanner->Disconnect(true);
+    }
 }
 
-pho::api::PFrame PhoXiInterface::getPFrame(){
-    this->isOk();
-    return  scanner->GetSpecificFrame(scanner->TriggerFrame());
-}
 pho::api::PFrame PhoXiInterface::getPFrame(int id){
+    if(id < 0){
+        id = this->triggerImage();
+    }
     this->isOk();
-    return  scanner->GetSpecificFrame(id);
+    return  scanner->GetSpecificFrame(id,10000);
 }
 
 std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud() {
-    return getPointCloud(scanner->GetFrame());
+    return getPointCloudFromFrame(getPFrame(-1)); //todo
 }
 
-std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud(pho::api::PFrame frame) {
+static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloudFromFrame(pho::api::PFrame frame) {
     if (!frame || !frame->Successful) {
         throw CorruptedFrame("Corrupted frame!");
     }
@@ -161,19 +156,41 @@ void PhoXiInterface::stopAcquisition(){
 }
 int PhoXiInterface::triggerImage(){
     this->isOk();
+    if(scanner->TriggerMode != pho::api::PhoXiTriggerMode::Software){
+        this->setTriggerMode(pho::api::PhoXiTriggerMode::Software);
+    }
     return scanner->TriggerFrame();
 }
-void PhoXiInterface::saveFrame(int id, std::string path){
-    this->isOk();
-    pho::api::PFrame frame = scanner->GetSpecificFrame(id);
-    frame->SaveAsPly(path);
-}
-void PhoXiInterface::saveFrame(std::string path){
-    this->isOk();
-    pho::api::PFrame frame = scanner->GetSpecificFrame(scanner->TriggerFrame());
-    frame->SaveAsPly(path);
-}
+
 std::vector<pho::api::PhoXiCapturingMode> PhoXiInterface::getSupportedCapturingModes(){
     this->isOk();
     return scanner->SupportedCapturingModes;
+}
+
+void PhoXiInterface::setHighResolution(){
+    this->isOk();
+    pho::api::PhoXiCapturingMode mode = scanner->CapturingMode;
+    mode.Resolution.Width = 2064;
+    mode.Resolution.Height = 1544;
+    scanner->CapturingMode = mode;
+}
+void PhoXiInterface::setLowResolution(){
+    this->isOk();
+    pho::api::PhoXiCapturingMode mode = scanner->CapturingMode;
+    mode.Resolution.Width = 1032;
+    mode.Resolution.Height = 772;
+    scanner->CapturingMode = mode;
+}
+
+void PhoXiInterface::setTriggerMode(pho::api::PhoXiTriggerMode mode, bool startAcquisition){
+    this->isOk();
+    if((mode != scanner->TriggerMode.GetValue()) && scanner->isAcquiring()){
+        scanner->StopAcquisition();
+    }
+    scanner->TriggerMode = mode;
+    if(startAcquisition && (!scanner->isAcquiring())){
+        if(!scanner->StartAcquisition()){
+            throw UnableToStartAcquisition("Unable to start Acquisition.");
+        }
+    }
 }
