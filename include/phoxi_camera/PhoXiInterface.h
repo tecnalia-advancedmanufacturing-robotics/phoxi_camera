@@ -9,25 +9,23 @@
 #include <pcl/point_types.h>
 #include <pcl_ros/point_cloud.h>
 #include <Eigen/Core>
+#include <phoxi_camera/PhoXiException.h>
 
 class PhoXiInterface {
 public:
     PhoXiCamera();
     std::vector<std::string> cameraList();
-    void connectCamera(std::string HWIdentification);
+    void connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode = pho::api::PhoXiTriggerMode::Software, bool startAcquisition = true);
     void disconnectCamera();
-    pho::api::PFrame getPFrame();
-    pho::api::PFrame getPFrame(int id);
+    pho::api::PFrame getPFrame(int id = -1);
     std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloud();
-    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloud(pho::api::PFrame frame);
+    static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloudFromFrame(pho::api::PFrame frame);
     void isOk();
     bool isConnected();
     bool isAcquiring();
     void startAcquisition();
     void stopAcquisition();
     int triggerImage();
-    void saveFrame(std::string path);
-    void saveFrame(int id,std::string path);
     void setCoordinateSpace(pho::api::PhoXiCoordinateSpace space);
     void setTransformation(pho::api::PhoXiCoordinateTransformation coordinateTransformation,pho::api::PhoXiCoordinateSpace space,bool setSpace = true, bool saveSettings = true);
     template <typename T>
@@ -39,10 +37,10 @@ public:
         setTransformation(getPhoXiCoordinateTransformation(transformation),space,setSpace,saveSettings);
     }
     template <typename T>
-    pho::api::PhoXiCoordinateTransformation getPhoXiCoordinateTransformation(std::vector<T> vec){
+    static pho::api::PhoXiCoordinateTransformation getPhoXiCoordinateTransformation(std::vector<T> vec){
         pho::api::PhoXiCoordinateTransformation coordinateTransformation;
         if(vec.size() != 16){
-            throw std::runtime_error("Bad vector size!");
+            throw InvalidTransformationMatrix("Bad vector size!");
         }
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -55,7 +53,7 @@ public:
         return coordinateTransformation;
     }
     template <typename T>
-    pho::api::PhoXiCoordinateTransformation getPhoXiCoordinateTransformation(Eigen::Matrix<T,4,4> mat){
+    static pho::api::PhoXiCoordinateTransformation getPhoXiCoordinateTransformation(Eigen::Matrix<T,4,4> mat){
         pho::api::PhoXiCoordinateTransformation coordinateTransformation;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
@@ -68,7 +66,10 @@ public:
         return coordinateTransformation;
     }
     std::string getHardwareIdentification();
-    std::vector<pho::api::PhoXiCapturingMode> getSupportedCapturingModes(); //todo
+    std::vector<pho::api::PhoXiCapturingMode> getSupportedCapturingModes();
+    void setHighResolution();
+    void setLowResolution();
+    void setTriggerMode(pho::api::PhoXiTriggerMode mode, bool startAcquisition = true);
 protected:
     pho::api::PPhoXi scanner;
 private:

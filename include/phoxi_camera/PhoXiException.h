@@ -6,7 +6,7 @@
 #define PROJECT_PHOXIEXCEPTION_H
 
 #include <exception>
-class PhoXiInterfaceException : std::exception {
+class PhoXiInterfaceException : public std::exception {
 public:
     PhoXiInterfaceException(std::string message) : message(message){
     }
@@ -18,38 +18,50 @@ private:
     std::string message;
 };
 
-class PhoXiControllNotRunning : PhoXiInterfaceException {
+class PhoXiControllNotRunning : public PhoXiInterfaceException {
 public:
     PhoXiControllNotRunning(std::string message) : PhoXiInterfaceException(message){
     }
 };
 
-class PhoXiScannerNotFound : PhoXiInterfaceException {
+class PhoXiScannerNotFound : public PhoXiInterfaceException {
 public:
     PhoXiScannerNotFound(std::string message) : PhoXiInterfaceException(message){
     }
 };
-class UnableToConnect : PhoXiInterfaceException {
+class UnableToConnect : public PhoXiInterfaceException {
 public:
     UnableToConnect(std::string message) : PhoXiInterfaceException(message){
     }
 };
 
-class CorruptedFrame : PhoXiInterfaceException {
+class UnableToStartAcquisition : public PhoXiInterfaceException {
+public:
+    UnableToStartAcquisition(std::string message) : PhoXiInterfaceException(message){
+    }
+};
+
+class CorruptedFrame : public PhoXiInterfaceException {
 public:
     CorruptedFrame(std::string message) : PhoXiInterfaceException(message){
     }
 };
 
-class  PhoXiScannerNotConnected : PhoXiInterfaceException {
+class  PhoXiScannerNotConnected : public PhoXiInterfaceException {
 public:
     PhoXiScannerNotConnected(std::string message) : PhoXiInterfaceException(message){
     }
 };
 
-class  CoordinationSpaceNotSupported : PhoXiInterfaceException {
+class  CoordinationSpaceNotSupported : public PhoXiInterfaceException {
     public:
     CoordinationSpaceNotSupported(std::string message) : PhoXiInterfaceException(message){
+    }
+};
+
+class  InvalidTransformationMatrix : public PhoXiInterfaceException {
+public:
+    InvalidTransformationMatrix(std::string message) : PhoXiInterfaceException(message){
     }
 };
 

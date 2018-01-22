@@ -22,12 +22,18 @@
 #include <phoxi_camera/SetCoordinatesSpace.h>
 #include <phoxi_camera/TransformationMatrix.h>
 
+#include <dynamic_reconfigure/server.h>
+#include <phoxi_camera/phoxi_cameraConfig.h>
+#include <boost/thread/mutex.hpp>
+
 
 class RosInterface : protected  PhoXiInterface {
 public:
     RosInterface();
 protected:
     void publishFrame(pho::api::PFrame frame);
+    pho::api::PFrame getPFrame(int id = -1);
+    int triggerImage();
 
     std::string parrent_frame, child_frame; //todo default initialization
 private:
@@ -49,7 +55,9 @@ private:
     bool getSupportedCapturingModes(phoxi_camera::GetSupportedCapturingModes::Request &req, phoxi_camera::GetSupportedCapturingModes::Response &res);
     bool setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request &req, phoxi_camera::SetCoordinatesSpace::Response &res);
     bool setTransformation(phoxi_camera::TransformationMatrix::Request &req, phoxi_camera::TransformationMatrix::Response &res);
-    //node handle
+    void dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &config, uint32_t level);
+
+        //node handle
     ros::NodeHandle nh;
 
     //ros service servers
@@ -77,6 +85,11 @@ private:
     ros::Publisher normalMapPub;
     ros::Publisher confidenceMapPub;
     ros::Publisher texturePub;
+
+    //dynamic reconfigure
+    boost::recursive_mutex dynamicReconfigureMutex;
+    dynamic_reconfigure::Server <phoxi_camera::phoxi_cameraConfig> dynamicReconfigureServer;
+    phoxi_camera::phoxi_cameraConfig dynamicReconfigureConfig;
 };
 
 
