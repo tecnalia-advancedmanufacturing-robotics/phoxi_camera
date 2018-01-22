@@ -17,8 +17,8 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
     connectCameraService =nh.advertiseService("connect_camera", &RosInterface::connectCamera, this);
     isConnectedService = nh.advertiseService("is_connected", (bool (RosInterface::*)(phoxi_camera::IsConnected::Request&, phoxi_camera::IsConnected::Response&))&RosInterface::isConnected, this);
     isAcquiringService = nh.advertiseService("is_acquiring", (bool (RosInterface::*)(phoxi_camera::IsAcquiring::Request&, phoxi_camera::IsAcquiring::Response&))&RosInterface::isAcquiring, this);
-    isConnectedServiceV2 = nh.advertiseService("V2/is_connected", (bool (RosInterface::*)(phoxi_camera::Bool::Request&, phoxi_camera::Bool::Response&))&RosInterface::isConnected, this);
-    isAcquiringServiceV2 = nh.advertiseService("V2/is_acquiring", (bool (RosInterface::*)(phoxi_camera::Bool::Request&, phoxi_camera::Bool::Response&))&RosInterface::isAcquiring, this);
+    isConnectedServiceV2 = nh.advertiseService("V2/is_connected", (bool (RosInterface::*)(phoxi_camera::GetBool::Request&, phoxi_camera::GetBool::Response&))&RosInterface::isConnected, this);
+    isAcquiringServiceV2 = nh.advertiseService("V2/is_acquiring", (bool (RosInterface::*)(phoxi_camera::GetBool::Request&, phoxi_camera::GetBool::Response&))&RosInterface::isAcquiring, this);
     startAcquisitionService = nh.advertiseService("start_acquisition", (bool (RosInterface::*)(std_srvs::Empty::Request&, std_srvs::Empty::Response&))&RosInterface::startAcquisition, this);
     stopAcquisitionService = nh.advertiseService("stop_acquisition", (bool (RosInterface::*)(std_srvs::Empty::Request&, std_srvs::Empty::Response&))&RosInterface::stopAcquisition, this);
     startAcquisitionServiceV2 = nh.advertiseService("V2/start_acquisition", (bool (RosInterface::*)(phoxi_camera::Empty::Request&, phoxi_camera::Empty::Response&))&RosInterface::startAcquisition, this);
@@ -76,13 +76,13 @@ bool RosInterface::isAcquiring(phoxi_camera::IsAcquiring::Request &req, phoxi_ca
     res.is_acquiring = PhoXiInterface::isAcquiring();
     return true;
 }
-bool RosInterface::isConnected(phoxi_camera::Bool::Request &req, phoxi_camera::Bool::Response &res){
+bool RosInterface::isConnected(phoxi_camera::GetBool::Request &req, phoxi_camera::GetBool::Response &res){
     res.value = PhoXiInterface::isConnected();
     res.message = "ok"; //todo tot este premysliet
     res.success = true;
     return true;
 }
-bool RosInterface::isAcquiring(phoxi_camera::Bool::Request &req, phoxi_camera::Bool::Response &res){
+bool RosInterface::isAcquiring(phoxi_camera::GetBool::Request &req, phoxi_camera::GetBool::Response &res){
     res.value = PhoXiInterface::isAcquiring();
     res.message = "ok"; //todo tot este premysliet
     res.success = true;
@@ -286,7 +286,7 @@ bool RosInterface::setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request
     return true;
 }
 
-bool RosInterface::setTransformation(phoxi_camera::TransformationMatrix::Request &req, phoxi_camera::TransformationMatrix::Response &res){
+bool RosInterface::setTransformation(phoxi_camera::SetTransformationMatrix::Request &req, phoxi_camera::SetTransformationMatrix::Response &res){
     if(req.matrix.size()!= 16){
         res.success = false;
         res.message = "Bad matrix dimensions!";

@@ -31,19 +31,19 @@ add_message_files(
 
 add_service_files(
   FILES
-    GetDeviceList.srv
+    Deprecated/Empty.srv        #depricated
+    Deprecated/IsConnected.srv  #depricated
+    Deprecated/IsAcquiring.srv  #depricated
     ConnectCamera.srv
-    IsConnected.srv
-    IsAcquiring.srv
-    Bool.srv
-    Empty.srv
     TriggerImage.srv
+    GetDeviceList.srv
+    GetBool.srv
     GetFrame.srv
-    SaveFrame.srv
     GetHardwareIdentification.srv
     GetSupportedCapturingModes.srv
+    SaveFrame.srv
     SetCoordinatesSpace.srv
-    TransformationMatrix.srv
+    SetTransformationMatrix.srv
 )
 
 generate_messages(

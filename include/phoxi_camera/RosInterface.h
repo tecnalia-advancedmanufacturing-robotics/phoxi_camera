@@ -11,7 +11,7 @@
 #include <phoxi_camera/ConnectCamera.h>
 #include <phoxi_camera/IsConnected.h>
 #include <phoxi_camera/IsAcquiring.h>
-#include <phoxi_camera/Bool.h>
+#include <phoxi_camera/GetBool.h>
 #include <std_srvs/Empty.h>
 #include <phoxi_camera/Empty.h>
 #include <phoxi_camera/TriggerImage.h>
@@ -20,7 +20,7 @@
 #include <phoxi_camera/GetHardwareIdentification.h>
 #include <phoxi_camera/GetSupportedCapturingModes.h>
 #include <phoxi_camera/SetCoordinatesSpace.h>
-#include <phoxi_camera/TransformationMatrix.h>
+#include <phoxi_camera/SetTransformationMatrix.h>
 
 #include <dynamic_reconfigure/server.h>
 #include <phoxi_camera/phoxi_cameraConfig.h>
@@ -41,8 +41,8 @@ private:
     bool connectCamera(phoxi_camera::ConnectCamera::Request &req, phoxi_camera::ConnectCamera::Response &res);
     bool isConnected(phoxi_camera::IsConnected::Request &req, phoxi_camera::IsConnected::Response &res);
     bool isAcquiring(phoxi_camera::IsAcquiring::Request &req, phoxi_camera::IsAcquiring::Response &res);
-    bool isConnected(phoxi_camera::Bool::Request &req, phoxi_camera::Bool::Response &res);
-    bool isAcquiring(phoxi_camera::Bool::Request &req, phoxi_camera::Bool::Response &res);
+    bool isConnected(phoxi_camera::GetBool::Request &req, phoxi_camera::GetBool::Response &res);
+    bool isAcquiring(phoxi_camera::GetBool::Request &req, phoxi_camera::GetBool::Response &res);
     bool startAcquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
     bool stopAcquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
     bool startAcquisition(phoxi_camera::Empty::Request &req, phoxi_camera::Empty::Response &res);
@@ -54,7 +54,7 @@ private:
     bool getHardwareIdentification(phoxi_camera::GetHardwareIdentification::Request &req, phoxi_camera::GetHardwareIdentification::Response &res);
     bool getSupportedCapturingModes(phoxi_camera::GetSupportedCapturingModes::Request &req, phoxi_camera::GetSupportedCapturingModes::Response &res);
     bool setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request &req, phoxi_camera::SetCoordinatesSpace::Response &res);
-    bool setTransformation(phoxi_camera::TransformationMatrix::Request &req, phoxi_camera::TransformationMatrix::Response &res);
+    bool setTransformation(phoxi_camera::SetTransformationMatrix::Request &req, phoxi_camera::SetTransformationMatrix::Response &res);
     void dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &config, uint32_t level);
 
         //node handle
