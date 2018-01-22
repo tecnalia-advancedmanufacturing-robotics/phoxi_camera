@@ -40,6 +40,16 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
 
     //set dynamic reconfigure callback
     dynamicReconfigureServer.setCallback(boost::bind(&RosInterface::dynamicReconfigureCallback,this, _1, _2));
+
+    //connect to default scanner
+    std::string scannerId;
+    nh.param<std::string>("scanner_id", scannerId, "PhoXiTemp(0)(File3DCamera)");
+    try {
+        RosInterface::connectCamera(scannerId);
+        ROS_INFO("Connected to %s",scannerId.c_str());
+    }catch(PhoXiInterfaceException& e) {
+        ROS_WARN("Connection to default scanner %s failed. %s ",scannerId.c_str(),e.what());
+    }
 }
 
 bool RosInterface::getDeviceList(phoxi_camera::GetDeviceList::Request &req, phoxi_camera::GetDeviceList::Response &res){
@@ -56,10 +66,7 @@ bool RosInterface::getDeviceList(phoxi_camera::GetDeviceList::Request &req, phox
 }
 bool RosInterface::connectCamera(phoxi_camera::ConnectCamera::Request &req, phoxi_camera::ConnectCamera::Response &res){
     try {
-        PhoXiInterface::connectCamera(req.name);
-        dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
-        dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
-        this->dynamicReconfigureCallback(dynamicReconfigureConfig,std::numeric_limits<uint32_t>::max());
+        RosInterface::connectCamera(req.name);
         res.success = true;
         res.message = "Ok";
     }catch (PhoXiInterfaceException &e){
@@ -307,9 +314,7 @@ bool RosInterface::setTransformation(phoxi_camera::SetTransformationMatrix::Requ
 }
 
 void RosInterface::dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &config, uint32_t level) {
-    ROS_INFO("Reconfigure Request");
     if(!PhoXiInterface::isConnected()){
-        ROS_WARN("Scanner not connected!");
         return;
     }
     if (level & (1 << 1)) {
@@ -435,5 +440,13 @@ int RosInterface::triggerImage(){
     dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
     return id;
 }
+
+void RosInterface::connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode, bool startAcquisition){
+    PhoXiInterface::connectCamera(HWIdentification,mode,startAcquisition);
+    dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
+    dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
+    this->dynamicReconfigureCallback(dynamicReconfigureConfig,std::numeric_limits<uint32_t>::max());
+}
+
 
 

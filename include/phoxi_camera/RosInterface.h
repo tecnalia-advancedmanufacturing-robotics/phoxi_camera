@@ -34,6 +34,7 @@ protected:
     void publishFrame(pho::api::PFrame frame);
     pho::api::PFrame getPFrame(int id = -1);
     int triggerImage();
+    void connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode = pho::api::PhoXiTriggerMode::Software, bool startAcquisition = true);
 
     std::string parrent_frame, child_frame; //todo default initialization
 private:
