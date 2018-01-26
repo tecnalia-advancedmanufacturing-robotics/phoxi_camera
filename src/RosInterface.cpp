@@ -475,7 +475,6 @@ void RosInterface::connectCamera(std::string HWIdentification, pho::api::PhoXiTr
 }
 
 void RosInterface::diagnosticCallback(diagnostic_updater::DiagnosticStatusWrapper& status){
-    ROS_ERROR("diagnostika");
     if(PhoXiInterface::isConnected()){
         if(PhoXiInterface::isAcquiring()){
             status.summary(diagnostic_msgs::DiagnosticStatus::OK,"Ready");
