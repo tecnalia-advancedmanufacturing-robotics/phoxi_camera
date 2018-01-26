@@ -18,6 +18,7 @@ Changelog for package phoxi_camera
 * get_frame service will take new frane on negative number input and publish it, on invalid frame number success will be false and message filled with error
 * V2/set_transformation and V2/set_coordination_space services added
 * TriggerImage.srv id parameter added
+* PhoXi 3D Scanner urdf
 
 1.1.4 (2016-10-24)
 ------------------

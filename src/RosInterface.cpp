@@ -10,7 +10,7 @@
 #include <sensor_msgs/fill_image.h>
 #include <phoxi_camera/PhoXiException.h>
 
-RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex), child_frame("base_link")  {
+RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex)  {
 
     //create service servers
     getDeviceListService = nh.advertiseService("get_device_list", &RosInterface::getDeviceList, this);
@@ -44,6 +44,8 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
     //connect to default scanner
     std::string scannerId;
     nh.param<std::string>("scanner_id", scannerId, "PhoXiTemp(0)(File3DCamera)");
+    nh.param<std::string>("frame_id", frameId, "PhoXi3Dscanner_sensor");
+
     try {
         RosInterface::connectCamera(scannerId);
         ROS_INFO("Connected to %s",scannerId.c_str());
@@ -241,13 +243,20 @@ void RosInterface::publishFrame(pho::api::PFrame frame) {
     }
     sensor_msgs::Image texture, confidence_map, normal_map;
     ros::Time timeNow = ros::Time::now();
+
     texture.header.stamp = timeNow;
-    texture.header.frame_id = child_frame;
-    confidence_map.header.stamp = timeNow;
-    confidence_map.header.frame_id = child_frame;
-    normal_map.header.stamp = timeNow;
-    normal_map.header.frame_id = child_frame;
+    texture.header.frame_id = frameId;
+    texture.header.seq = frame->Info.FrameIndex;
     texture.encoding = "32FC1";
+
+    confidence_map.header.stamp = timeNow;
+    confidence_map.header.frame_id = frameId;
+    confidence_map.header.seq = frame->Info.FrameIndex;
+
+    normal_map.header.stamp = timeNow;
+    normal_map.header.frame_id = frameId;
+    normal_map.header.seq = frame->Info.FrameIndex;
+
     sensor_msgs::fillImage(texture, sensor_msgs::image_encodings::TYPE_32FC1,
                            frame->Texture.Size.Height, // height
                            frame->Texture.Size.Width, // width
@@ -268,10 +277,13 @@ void RosInterface::publishFrame(pho::api::PFrame frame) {
                            frame->NormalMap.Size.Width * sizeof(float) * 3, // stepSize
                            frame->NormalMap.operator[](0));
     std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> cloud = PhoXiInterface::getPointCloudFromFrame(frame);
+
     sensor_msgs::PointCloud2 output_cloud;
     pcl::toROSMsg(*cloud,output_cloud);
-    output_cloud.header.frame_id = "base_link";
-    output_cloud.header.stamp = ros::Time::now();
+    output_cloud.header.frame_id = frameId;
+    output_cloud.header.stamp = timeNow;
+    output_cloud.header.seq = frame->Info.FrameIndex;
+
     cloudPub.publish(output_cloud);
     normalMapPub.publish(normal_map);
     confidenceMapPub.publish(confidence_map);

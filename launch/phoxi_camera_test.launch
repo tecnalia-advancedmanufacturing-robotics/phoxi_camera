@@ -1,5 +1,4 @@
 <launch>
-    <node pkg="phoxi_camera" type="phoxi_camera" name="phoxi_camera" output="screen">
-        <rosparam file="$(find phoxi_camera)/config/config.yaml" command="load"/>
-    </node>
+    <include file="$(find phoxi_camera)/launch/display_urdf.launch"/>
+    <include file="$(find phoxi_camera)/launch/phoxi_camera.launch"/>
 </launch>

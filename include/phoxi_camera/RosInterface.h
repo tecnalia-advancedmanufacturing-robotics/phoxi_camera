@@ -36,7 +36,7 @@ protected:
     int triggerImage();
     void connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode = pho::api::PhoXiTriggerMode::Software, bool startAcquisition = true);
 
-    std::string parrent_frame, child_frame; //todo default initialization
+    std::string frameId;
 private:
     bool getDeviceList(phoxi_camera::GetDeviceList::Request &req, phoxi_camera::GetDeviceList::Response &res);
     bool connectCamera(phoxi_camera::ConnectCamera::Request &req, phoxi_camera::ConnectCamera::Response &res);

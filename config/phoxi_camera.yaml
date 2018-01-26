@@ -1,4 +1,5 @@
 scanner_id: "PhoXiTemp(0)(File3DCamera)"
+frame_id: "PhoXi3Dscanner_sensor"
 confidence: 3.0
 coordination_space: 1 # 1 = Camera, 2 =  Mounting, 3 = Marker, 4 = Robot, 5 = Custom
 resolution: 1         # 0 = Low, 1 = High
