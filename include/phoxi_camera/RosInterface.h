@@ -5,7 +5,19 @@
 #ifndef PROJECT_ROSINTERFACE_H
 #define PROJECT_ROSINTERFACE_H
 
+//ros
 #include <ros/ros.h>
+#include <ros/callback_queue.h>
+
+//dynamic reconfigure
+#include <dynamic_reconfigure/server.h>
+#include <phoxi_camera/phoxi_cameraConfig.h>
+
+//diagnstic updater
+#include <boost/thread/mutex.hpp>
+#include <diagnostic_updater/diagnostic_updater.h>
+
+//messages
 #include <phoxi_camera/PhoXiInterface.h>
 #include <phoxi_camera/GetDeviceList.h>
 #include <phoxi_camera/ConnectCamera.h>
@@ -21,10 +33,6 @@
 #include <phoxi_camera/GetSupportedCapturingModes.h>
 #include <phoxi_camera/SetCoordinatesSpace.h>
 #include <phoxi_camera/SetTransformationMatrix.h>
-
-#include <dynamic_reconfigure/server.h>
-#include <phoxi_camera/phoxi_cameraConfig.h>
-#include <boost/thread/mutex.hpp>
 
 
 class RosInterface : protected  PhoXiInterface {
@@ -57,8 +65,10 @@ private:
     bool setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request &req, phoxi_camera::SetCoordinatesSpace::Response &res);
     bool setTransformation(phoxi_camera::SetTransformationMatrix::Request &req, phoxi_camera::SetTransformationMatrix::Response &res);
     void dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &config, uint32_t level);
+    void diagnosticCallback(diagnostic_updater::DiagnosticStatusWrapper& status);
+    void diagnosticTimerCallback(const ros::TimerEvent&);
 
-        //node handle
+    //node handle
     ros::NodeHandle nh;
 
     //ros service servers
@@ -91,6 +101,16 @@ private:
     boost::recursive_mutex dynamicReconfigureMutex;
     dynamic_reconfigure::Server <phoxi_camera::phoxi_cameraConfig> dynamicReconfigureServer;
     phoxi_camera::phoxi_cameraConfig dynamicReconfigureConfig;
+
+    //diagnostic
+    diagnostic_updater::Updater diagnosticUpdater;
+    diagnostic_updater::FunctionDiagnosticTask PhoXi3DscannerDiagnosticTask;
+    ros::Timer diagnosticTimer;
+
+    //callback queue
+    ros::CallbackQueue queue;
+    ros::AsyncSpinner spinner;
+
 };
 
 

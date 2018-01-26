@@ -35,6 +35,6 @@ int main(int argc, char **argv) {
 
     RosInterface interface;
 
-    ros::spin();
+    ros::waitForShutdown();
     return 0;
 }

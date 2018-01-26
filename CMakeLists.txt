@@ -15,7 +15,7 @@ find_package(catkin REQUIRED
     pcl_ros
     pcl_conversions
     dynamic_reconfigure
-    tf
+    diagnostic_updater
 )
 
 include_directories(include

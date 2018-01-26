@@ -10,7 +10,9 @@
 #include <sensor_msgs/fill_image.h>
 #include <phoxi_camera/PhoXiException.h>
 
-RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex)  {
+RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex), PhoXi3DscannerDiagnosticTask("PhoXi3Dscanner",boost::bind(&RosInterface::diagnosticCallback, this, _1)), spinner(1, &queue) {
+
+    nh.setCallbackQueue(&queue);
 
     //create service servers
     getDeviceListService = nh.advertiseService("get_device_list", &RosInterface::getDeviceList, this);
@@ -41,6 +43,12 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
     //set dynamic reconfigure callback
     dynamicReconfigureServer.setCallback(boost::bind(&RosInterface::dynamicReconfigureCallback,this, _1, _2));
 
+    //set diagnostic Hw id
+    diagnosticUpdater.setHardwareID("none");
+    diagnosticUpdater.add(PhoXi3DscannerDiagnosticTask);
+    diagnosticTimer  = nh.createTimer(ros::Duration(5.0),&RosInterface::diagnosticTimerCallback, this);
+    diagnosticTimer.start();
+
     //connect to default scanner
     std::string scannerId;
     nh.param<std::string>("scanner_id", scannerId, "PhoXiTemp(0)(File3DCamera)");
@@ -52,6 +60,8 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
     }catch(PhoXiInterfaceException& e) {
         ROS_WARN("Connection to default scanner %s failed. %s ",scannerId.c_str(),e.what());
     }
+
+    spinner.start();
 }
 
 bool RosInterface::getDeviceList(phoxi_camera::GetDeviceList::Request &req, phoxi_camera::GetDeviceList::Response &res){
@@ -100,6 +110,7 @@ bool RosInterface::isAcquiring(phoxi_camera::GetBool::Request &req, phoxi_camera
 bool RosInterface::startAcquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
     try {
         PhoXiInterface::startAcquisition();
+        diagnosticUpdater.force_update();
     }catch (PhoXiInterfaceException &e){
         ROS_ERROR("%s",e.what());
     }
@@ -108,6 +119,7 @@ bool RosInterface::startAcquisition(std_srvs::Empty::Request &req, std_srvs::Emp
 bool RosInterface::stopAcquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
     try {
         PhoXiInterface::stopAcquisition();
+        diagnosticUpdater.force_update();
     }catch (PhoXiInterfaceException &e){
         ROS_ERROR("%s",e.what());
     }
@@ -187,6 +199,7 @@ bool RosInterface::saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera
 bool RosInterface::disconnectCamera(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
     try {
         PhoXiInterface::disconnectCamera();
+        diagnosticUpdater.force_update();
     }catch (PhoXiInterfaceException &e){
         //scanner is already disconnected on exception
     }
@@ -458,7 +471,30 @@ void RosInterface::connectCamera(std::string HWIdentification, pho::api::PhoXiTr
     dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
     dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
     this->dynamicReconfigureCallback(dynamicReconfigureConfig,std::numeric_limits<uint32_t>::max());
+    diagnosticUpdater.force_update();
 }
+
+void RosInterface::diagnosticCallback(diagnostic_updater::DiagnosticStatusWrapper& status){
+    ROS_ERROR("diagnostika");
+    if(PhoXiInterface::isConnected()){
+        if(PhoXiInterface::isAcquiring()){
+            status.summary(diagnostic_msgs::DiagnosticStatus::OK,"Ready");
+        }
+        else{
+            status.summary(diagnostic_msgs::DiagnosticStatus::WARN,"Acquisition not started");
+        }
+        status.add("Device",std::string(scanner->HardwareIdentification));
+    }
+    else{
+        status.summary(diagnostic_msgs::DiagnosticStatus::ERROR,"Not connected. ");
+    }
+}
+
+void RosInterface::diagnosticTimerCallback(const ros::TimerEvent&){
+    diagnosticUpdater.force_update();
+}
+
+
 
 
 
