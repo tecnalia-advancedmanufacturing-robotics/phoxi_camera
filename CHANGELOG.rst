@@ -19,6 +19,7 @@ Changelog for package phoxi_camera
 * V2/set_transformation and V2/set_coordination_space services added
 * TriggerImage.srv id parameter added
 * PhoXi 3D Scanner urdf
+* Diagnostic messages added
 
 1.1.4 (2016-10-24)
 ------------------

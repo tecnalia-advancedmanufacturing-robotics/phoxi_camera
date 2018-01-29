@@ -43,6 +43,7 @@ protected:
     pho::api::PFrame getPFrame(int id = -1);
     int triggerImage();
     void connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode = pho::api::PhoXiTriggerMode::Software, bool startAcquisition = true);
+    std::string getTriggerMode(pho::api::PhoXiTriggerMode mode);
 
     std::string frameId;
 private:

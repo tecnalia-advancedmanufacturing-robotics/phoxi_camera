@@ -482,7 +482,9 @@ void RosInterface::diagnosticCallback(diagnostic_updater::DiagnosticStatusWrappe
         else{
             status.summary(diagnostic_msgs::DiagnosticStatus::WARN,"Acquisition not started");
         }
-        status.add("Device",std::string(scanner->HardwareIdentification));
+        status.add("HardwareIdentification",std::string(scanner->HardwareIdentification));
+        status.add("Trigger mode",getTriggerMode(scanner->TriggerMode));
+
     }
     else{
         status.summary(diagnostic_msgs::DiagnosticStatus::ERROR,"Not connected. ");
@@ -492,6 +494,23 @@ void RosInterface::diagnosticCallback(diagnostic_updater::DiagnosticStatusWrappe
 void RosInterface::diagnosticTimerCallback(const ros::TimerEvent&){
     diagnosticUpdater.force_update();
 }
+
+std::string RosInterface::getTriggerMode(pho::api::PhoXiTriggerMode mode){
+    switch (mode){
+        case pho::api::PhoXiTriggerMode::Freerun:
+            return "Freerun";
+        case pho::api::PhoXiTriggerMode::Software:
+            return "Freerun";
+        case pho::api::PhoXiTriggerMode::Hardware:
+            return "Freerun";
+        case pho::api::PhoXiTriggerMode::NoValue:
+            return "Freerun";
+        default:
+            return "Undefined";
+    }
+}
+
+
 
 
 
