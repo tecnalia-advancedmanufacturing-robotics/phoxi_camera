@@ -24,6 +24,8 @@ include_directories(include
 add_message_files(
   FILES
     PhoXiSize.msg
+    row.msg
+    matrix.msg
 )
 
 add_service_files(

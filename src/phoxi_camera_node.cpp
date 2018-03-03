@@ -306,6 +306,26 @@ bool get_frame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Res
     CurrentFrame = EvaluationScanner->GetFrame(req.in);
     if(CurrentFrame){
         publish_frame(CurrentFrame);
+        std::cout <<"TRANSLACIA:"<< std::endl;
+        std::cout <<"X:"<< CurrentFrame->Info.SensorPosition.x << std::endl;
+        std::cout <<"Y:"<< CurrentFrame->Info.SensorPosition.y << std::endl;
+        std::cout <<"Z:"<< CurrentFrame->Info.SensorPosition.z << std::endl;
+        std::cout <<"ROTACIA"<< std::endl;
+        std::cout <<"1: "<< CurrentFrame->Info.SensorXAxis.x <<" "<< CurrentFrame->Info.SensorYAxis.x <<" "<< CurrentFrame->Info.SensorZAxis.x <<" "<< std::endl;
+        std::cout <<"2: "<< CurrentFrame->Info.SensorXAxis.y <<" "<< CurrentFrame->Info.SensorYAxis.y <<" "<< CurrentFrame->Info.SensorZAxis.y <<" "<< std::endl;
+        std::cout <<"3: "<< CurrentFrame->Info.SensorXAxis.z <<" "<< CurrentFrame->Info.SensorYAxis.z <<" "<< CurrentFrame->Info.SensorZAxis.z <<" "<< std::endl;
+        res.translation_vec[0] = CurrentFrame->Info.SensorPosition.x;
+        res.translation_vec[1] = CurrentFrame->Info.SensorPosition.y;
+        res.translation_vec[2] = CurrentFrame->Info.SensorPosition.z;
+        res.rotation_matrix.matrix[0].row[0] = CurrentFrame->Info.SensorXAxis.x;
+        res.rotation_matrix.matrix[0].row[1] = CurrentFrame->Info.SensorYAxis.x;
+        res.rotation_matrix.matrix[0].row[2] = CurrentFrame->Info.SensorZAxis.x;
+        res.rotation_matrix.matrix[1].row[0] = CurrentFrame->Info.SensorXAxis.y;
+        res.rotation_matrix.matrix[1].row[1] = CurrentFrame->Info.SensorYAxis.y;
+        res.rotation_matrix.matrix[1].row[2] = CurrentFrame->Info.SensorZAxis.y;
+        res.rotation_matrix.matrix[2].row[0] = CurrentFrame->Info.SensorXAxis.z;
+        res.rotation_matrix.matrix[2].row[1] = CurrentFrame->Info.SensorYAxis.z;
+        res.rotation_matrix.matrix[2].row[2] = CurrentFrame->Info.SensorZAxis.z;
         res.success = true;
     }
     else{
@@ -369,7 +389,7 @@ int main(int argc, char **argv) {
     ros::ServiceServer service_get_hardware_identification = nh.advertiseService("get_hardware_indentification", get_hardware_identification);
     ros::ServiceServer service_get_supported_capturing_modes = nh.advertiseService("get_supported_capturing_modes", get_supported_capturing_modes);
 
-    pub_cloud = nh.advertise < pcl::PointCloud < pcl::PointXYZ >> ("pointcloud", 1);
+    pub_cloud = nh.advertise < sensor_msgs::PointCloud2> ("pointcloud", 1);
     pub_normal_map = nh.advertise < sensor_msgs::Image > ("normal_map", 1);
     pub_confidence_map = nh.advertise < sensor_msgs::Image > ("confidence_map", 1);
     pub_texture = nh.advertise < sensor_msgs::Image > ("texture", 1);

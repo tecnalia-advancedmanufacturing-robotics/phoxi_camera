@@ -1,3 +1,5 @@
 int64 in
 ---
 bool success
+float64[] translation_vec
+matrix rotation_matrix
