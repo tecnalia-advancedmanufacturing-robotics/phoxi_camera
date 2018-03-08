@@ -314,9 +314,17 @@ bool get_frame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Res
         std::cout <<"1: "<< CurrentFrame->Info.SensorXAxis.x <<" "<< CurrentFrame->Info.SensorYAxis.x <<" "<< CurrentFrame->Info.SensorZAxis.x <<" "<< std::endl;
         std::cout <<"2: "<< CurrentFrame->Info.SensorXAxis.y <<" "<< CurrentFrame->Info.SensorYAxis.y <<" "<< CurrentFrame->Info.SensorZAxis.y <<" "<< std::endl;
         std::cout <<"3: "<< CurrentFrame->Info.SensorXAxis.z <<" "<< CurrentFrame->Info.SensorYAxis.z <<" "<< CurrentFrame->Info.SensorZAxis.z <<" "<< std::endl;
+
+        res.translation_vec.resize(3);
+
         res.translation_vec[0] = CurrentFrame->Info.SensorPosition.x;
         res.translation_vec[1] = CurrentFrame->Info.SensorPosition.y;
         res.translation_vec[2] = CurrentFrame->Info.SensorPosition.z;
+
+        res.rotation_matrix.matrix.resize(3);
+        res.rotation_matrix.matrix[0].row.resize(3);
+        res.rotation_matrix.matrix[1].row.resize(3);
+        res.rotation_matrix.matrix[2].row.resize(3);
         res.rotation_matrix.matrix[0].row[0] = CurrentFrame->Info.SensorXAxis.x;
         res.rotation_matrix.matrix[0].row[1] = CurrentFrame->Info.SensorYAxis.x;
         res.rotation_matrix.matrix[0].row[2] = CurrentFrame->Info.SensorZAxis.x;
