@@ -18,6 +18,10 @@ find_package(catkin REQUIRED
     diagnostic_updater
 )
 
+catkin_python_setup()
+
+
+
 include_directories(include
   ${catkin_INCLUDE_DIRS}
   ${PHOXI_INCLUDE_DIRS}
@@ -145,4 +149,9 @@ install(
     ${PHOXI_LIB_RELEASE_PER_COMPILER}.${PHO_SOFTWARE_VERSION}
   DESTINATION
     ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
+install(PROGRAMS
+  tests/interfaces/ros_utils.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
