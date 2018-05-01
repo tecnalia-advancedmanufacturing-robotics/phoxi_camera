@@ -8,6 +8,7 @@ node_name = "/phoxi_camera"
 srv_timeout = 1
 
 class topic:
+    diagnostics         = "/diagnostics"   #TODO?? namespace
     confidence_map      = node_name + "/confidence_map"
     normal_map          = node_name + "/normal_map"
     param_description   = node_name + "/parameter_descriptions"
@@ -31,6 +32,13 @@ class service:
     start_acquisition   = node_name + "/start_acquisition"
     stop_acquisition    = node_name + "/stop_acquisition"
     trigger_image       = node_name + "/trigger_image"
+    # V2
+    V2_is_acquiring         = node_name + "/V2/is_acquiring"
+    V2_is_connected         = node_name + "/V2/is_connected"
+    V2_set_coordination_space = node_name + "/V2/set_coordination_space"
+    V2_set_transformation   = node_name + "/V2/set_transformation"
+    V2_start_acquisition    = node_name + "/V2/start_acquisition"
+    V2_stop_acquisition     = node_name + "/V2/stop_acquisition"
 
 class param:
     confidence          = node_name + "/confidence"

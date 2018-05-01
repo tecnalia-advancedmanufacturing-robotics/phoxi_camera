@@ -22,6 +22,12 @@ catkin_make
 
 #### Available ROS services
 ```
+/phoxi_camera/V2/is_acquiring
+/phoxi_camera/V2/is_connected
+/phoxi_camera/V2/set_coordination_space
+/phoxi_camera/V2/set_transformation
+/phoxi_camera/V2/start_acquisition
+/phoxi_camera/V2/stop_acquisition
 /phoxi_camera/connect_camera
 /phoxi_camera/disconnect_camera
 /phoxi_camera/get_device_list
@@ -49,10 +55,10 @@ catkin_make
 /phoxi_camera/texture
 ```
 ### Test PhoXi ROS interface 
-We perform rostests for test node interfaces. This test ty to connect to 
-scanner and check if exist topics, services and some base parameters.
+We perform rostests for test ROS node interfaces.  This test will try to connect 
+and check if there are topics, services, and some basic parameters.
 
-In config file **tests/config.py** set camera ID. You can set real scanner or file camera. 
+In config file **tests/interfaces/config.py** set camera ID. You can set up real scanner or file camera. 
 For more information read **tests/README.md**
 
 Launch test for phoxi_camera node interfaces:

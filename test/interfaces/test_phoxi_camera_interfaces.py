@@ -9,7 +9,7 @@ from unittest import TestCase
 from config import *
 import rospy
 import phoxi_camera.srv as phoxi_camera_srv
-from interfaces.ros_utils import *
+from ros_utils import *
 
 class Test_phoxi_camera_interfaces(TestCase):
     def setUp(self):
@@ -45,6 +45,9 @@ class Test_phoxi_camera_interfaces(TestCase):
 
         assert topic_is_running(topic.confidence_map) == True, \
             "Topic %s, not exist" % (topic.confidence_map)
+
+        assert topic_is_running(topic.diagnostics) == True, \
+            "Topic %s, not exist" % (topic.diagnostics)
 
         assert topic_is_running(topic.normal_map) == True, \
             "Topic %s, not exist" % (topic.normal_map)
@@ -111,41 +114,25 @@ class Test_phoxi_camera_interfaces(TestCase):
         assert service_is_running(service.trigger_image) == True, \
             "Service %s is not exist" % service.trigger_image
 
-    # def test5_services_call(self):
-    #     """
-    #     test call services without arguments, in this way we check if are there some crashes
-    #     """
-    #     assert_call_service(service.connect_camera,phoxi_camera_srv.ConnectCamera)
-    #
-    #     assert_call_service(service.get_device_list, phoxi_camera_srv.GetDeviceList)
-    #
-    #     assert_call_service(service.get_frame, phoxi_camera_srv.GetFrame)
-    #
-    #     assert_call_service(service.get_hardware_indentification, phoxi_camera_srv.GetHardwareIdentification)
-    #
-    #     assert_call_service(service.get_loggers, roscpp.srv.GetLoggers)
-    #
-    #     assert_call_service(service.get_supported_capturing_modes, phoxi_camera_srv.GetSupportedCapturingModes)
-    #
-    #     assert_call_service(service.is_acquiring, phoxi_camera_srv.IsAcquiring)
-    #
-    #     assert_call_service(service.is_connected, phoxi_camera_srv.IsConnected)
-    #
-    #     assert_call_service(service.save_frame, phoxi_camera_srv.SaveFrame)
-    #
-    #     assert_call_service(service.set_logger_level, roscpp.srv.SetLoggerLevel)
-    #
-    #     #assert_call_service(service.set_parameters, phoxi_camera_srv #TODO PARAMeters??)
-    #
-    #     assert_call_service(service.start_acquisition, std_srvs.srv.Empty)
-    #
-    #     assert_call_service(service.stop_acquisition, std_srvs.srv.Empty)
-    #
-    #     assert_call_service(service.trigger_image, phoxi_camera_srv.TriggerImage)
-    #
-    #     assert_call_service(service.disconnect_camera, std_srvs.srv.Empty)
+        assert service_is_running(service.V2_is_acquiring) == True, \
+            "Service %s is not exist" % service.V2_is_acquiring
 
-    def test6_parameter_server_variables_exist(self):
+        assert service_is_running(service.V2_is_connected) == True, \
+            "Service %s is not exist" % service.V2_is_connected
+
+        assert service_is_running(service.V2_set_coordination_space) == True, \
+            "Service %s is not exist" % service.V2_set_coordination_space
+
+        assert service_is_running(service.V2_set_transformation) == True, \
+            "Service %s is not exist" % service.V2_set_transformation
+
+        assert service_is_running(service.V2_start_acquisition) == True, \
+            "Service %s is not exist" % service.V2_start_acquisition
+
+        assert service_is_running(service.V2_stop_acquisition) == True, \
+            "Service %s is not exist" % service.V2_stop_acquisition
+
+    def test5_parameter_server_variables_exist(self):
         """
         test if variables exist in parameter server
         """
@@ -191,6 +178,7 @@ class Test_phoxi_camera_interfaces(TestCase):
 
         assert rospy.has_param(param.trigger_mode) == True, \
             "Parameter %s is not exist" % param.trigger_mode
+
 
 if __name__ == '__main__':
     import rostest
