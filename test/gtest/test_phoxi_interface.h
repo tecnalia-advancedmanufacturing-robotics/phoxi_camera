@@ -7,6 +7,9 @@
 
 #include <string>
 
-std::string camera_ID = "InstalledExamples-PhoXi-example";
+namespace config{
 
+    std::string camera_ID = "InstalledExamples-PhoXi-example";
+
+}
 #endif //PROJECT_PHOXI_INTERFACE_H
