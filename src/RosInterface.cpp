@@ -340,6 +340,7 @@ bool RosInterface::setTransformation(phoxi_camera::SetTransformationMatrix::Requ
 
 void RosInterface::dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &config, uint32_t level) {
     if(!PhoXiInterface::isConnected()){
+        config = this->dynamicReconfigureConfig;
         return;
     }
     if (level & (1 << 1)) {
