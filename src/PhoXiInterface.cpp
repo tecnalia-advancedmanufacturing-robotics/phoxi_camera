@@ -12,7 +12,7 @@ std::vector<std::string> PhoXiInterface::cameraList(){
     pho::api::PhoXiFactory phoXiFactory;
     if (!phoXiFactory.isPhoXiControlRunning()){
         scanner.Reset();
-        throw PhoXiControllNotRunning("PhoXi Controll is not running");
+        throw PhoXiControlNotRunning("PhoXi Control is not running");
     }
     std::vector<std::string> list;
     auto DeviceList = phoXiFactory.GetDeviceList();
@@ -30,7 +30,7 @@ void PhoXiInterface::connectCamera(std::string HWIdentification, pho::api::PhoXi
         }
     }
     if (!phoXiFactory.isPhoXiControlRunning()) {
-        throw PhoXiControllNotRunning("PhoXi Controll is not running");
+        throw PhoXiControlNotRunning("PhoXi Control is not running");
     }
     auto DeviceList = phoXiFactory.GetDeviceList();
     bool found = false;

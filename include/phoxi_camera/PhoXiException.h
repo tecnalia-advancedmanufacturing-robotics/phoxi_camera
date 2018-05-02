@@ -18,9 +18,9 @@ private:
     std::string message;
 };
 
-class PhoXiControllNotRunning : public PhoXiInterfaceException {
+class PhoXiControlNotRunning : public PhoXiInterfaceException {
 public:
-    PhoXiControllNotRunning(std::string message) : PhoXiInterfaceException(message){
+    PhoXiControlNotRunning(std::string message) : PhoXiInterfaceException(message){
     }
 };
 
