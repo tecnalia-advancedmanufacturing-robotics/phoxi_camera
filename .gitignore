@@ -45,3 +45,5 @@ doc/
 # Tests
 .cache/
 *.pyc
+
+cmake-build-debug/
