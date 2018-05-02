@@ -1,4 +1,4 @@
 ---
-int32 id
+int32 id            #id of taken scan
 string message
 bool success
