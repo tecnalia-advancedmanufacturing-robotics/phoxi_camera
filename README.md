@@ -19,43 +19,62 @@ chmod +x install_prerequisities.sh
 cd ../..
 catkin_make
 ```
+#### Parameters
+
+```
+~/scanner_id          - Default PhoXi 3D Scannet to connect after startup. Default value: "PhoXiTemp(0)(File3DCamera)"
+~/frame_id:           - Frame id to which captured data relies to. Default value: "PhoXi3Dscanner_sensor"
+# All folowing parameters are for PhoXi Control and they can override all dynamic_reconfigure parameters in cfg file.
+# This values are set to scanner after startup of node.
+~/confidence          - Default value 3.0
+~/coordination_space  - Default value 1 # 1 = Camera, 2 =  Mounting, 3 = Marker, 4 = Robot, 5 = Custom
+~/resolution          - Default value 1         # 0 = Low, 1 = High
+~/scan_multiplier     - Default value 1
+~/send_confidence_map - Default value true
+~/send_deapth_map     - Default value true
+~/send_normal_map     - Default value true
+~/send_point_cloud    - Default value true
+~/send_texture        - Default valuetrue
+~/shutter_multiplier  - Default value 1
+~/timeout             - Default value -3          # in ms, special parameters: 0 = Zero, -1 = Infinity, -2 = Last stored, -3 = Default
+~/trigger_mode        - Default value 1      # 0 = Free run, 1 = Software
+```
 
 #### Available ROS services
+
+For input and output parameters of each service please see coresponding service file in srv folder.
 ```
-/phoxi_camera/V2/is_acquiring
-/phoxi_camera/V2/is_connected
-/phoxi_camera/V2/set_coordination_space
-/phoxi_camera/V2/set_transformation
-/phoxi_camera/V2/start_acquisition
-/phoxi_camera/V2/stop_acquisition
-/phoxi_camera/connect_camera
-/phoxi_camera/disconnect_camera
-/phoxi_camera/get_device_list
-/phoxi_camera/get_frame
-/phoxi_camera/get_hardware_indentification
-/phoxi_camera/get_loggers
-/phoxi_camera/get_supported_capturing_modes
-/phoxi_camera/is_acquiring
-/phoxi_camera/is_connected
-/phoxi_camera/save_frame
-/phoxi_camera/set_logger_level
-/phoxi_camera/set_parameters
-/phoxi_camera/start_acquisition
-/phoxi_camera/stop_acquisition
-/phoxi_camera/trigger_image
+~/V2/is_acquiring
+~/V2/is_connected
+~/V2/set_coordination_space
+~/V2/set_transformation
+~/V2/start_acquisition
+~/V2/stop_acquisition
+~/connect_camera
+~/disconnect_camera
+~/get_device_list
+~/get_frame
+~/get_hardware_indentification
+~/get_supported_capturing_modes
+~/is_acquiring
+~/is_connected
+~/save_frame
+~/set_parameters
+~/start_acquisition
+~/stop_acquisition
+~/trigger_image
 ```
 
 #### Available ROS topics
 ```
-/phoxi_camera/confidence_map
-/phoxi_camera/normal_map
-/phoxi_camera/parameter_descriptions
-/phoxi_camera/parameter_updates
-/phoxi_camera/pointcloud
-/phoxi_camera/texture
+~/confidence_map
+~/normal_map
+~/parameter_updates
+~/pointcloud
+~/texture
 ```
 ### Test PhoXi ROS interface 
-We perform rostests for test ROS node interfaces.  This test will try to connect 
+Rostests are used to test ROS node interfaces. These tests will try to connect 
 and check if there are topics, services, and some basic parameters.
 
 In config file **tests/interfaces/config.py** set camera ID. You can set up real scanner or file camera. 
