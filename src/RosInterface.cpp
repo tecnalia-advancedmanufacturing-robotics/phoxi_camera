@@ -31,8 +31,8 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
     disconnectCameraService = nh.advertiseService("disconnect_camera", &RosInterface::disconnectCamera, this);
     getHardwareIdentificationService = nh.advertiseService("get_hardware_indentification", &RosInterface::getHardwareIdentification, this);
     getSupportedCapturingModesService = nh.advertiseService("get_supported_capturing_modes", &RosInterface::getSupportedCapturingModes, this);
-    setCoordianteSpaceService = nh.advertiseService("V2/set_transformation",&RosInterface::setCoordianteSpace, this);
-    setTransformationService = nh.advertiseService("V2/set_coordination_space",&RosInterface::setTransformation, this);
+    setCoordianteSpaceService = nh.advertiseService("V2/set_transformation",&RosInterface::setTransformation, this);
+    setTransformationService = nh.advertiseService("V2/set_coordination_space",&RosInterface::setCoordianteSpace, this);
 
     //create publishers
     cloudPub = nh.advertise <pcl::PointCloud<pcl::PointXYZ >>("pointcloud", 1);
