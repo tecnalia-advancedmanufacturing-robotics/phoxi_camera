@@ -22,7 +22,7 @@ catkin_make
 #### Parameters
 
 ```
-~/scanner_id          - Default PhoXi 3D Scannet to connect after startup. Default value: "PhoXiTemp(0)(File3DCamera)"
+~/scanner_id          - Default PhoXi 3D Scannet to connect after startup. Default value: "InstalledExamples-PhoXi-example"
 ~/frame_id:           - Frame id to which captured data relies to. Default value: "PhoXi3Dscanner_sensor"
 # All folowing parameters are for PhoXi Control and they can override all dynamic_reconfigure parameters in cfg file.
 # This values are set to scanner after startup of node.
