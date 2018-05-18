@@ -10,9 +10,7 @@
 #include <sensor_msgs/fill_image.h>
 #include <phoxi_camera/PhoXiException.h>
 
-RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex), PhoXi3DscannerDiagnosticTask("PhoXi3Dscanner",boost::bind(&RosInterface::diagnosticCallback, this, _1)), spinner(1, &queue) {
-
-    nh.setCallbackQueue(&queue);
+RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex,nh), PhoXi3DscannerDiagnosticTask("PhoXi3Dscanner",boost::bind(&RosInterface::diagnosticCallback, this, _1)) {
 
     //create service servers
     getDeviceListService = nh.advertiseService("get_device_list", &RosInterface::getDeviceList, this);
@@ -61,7 +59,6 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
         ROS_WARN("Connection to default scanner %s failed. %s ",scannerId.c_str(),e.what());
     }
 
-    spinner.start();
 }
 
 bool RosInterface::getDeviceList(phoxi_camera::GetDeviceList::Request &req, phoxi_camera::GetDeviceList::Response &res){

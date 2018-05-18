@@ -108,10 +108,6 @@ private:
     diagnostic_updater::FunctionDiagnosticTask PhoXi3DscannerDiagnosticTask;
     ros::Timer diagnosticTimer;
 
-    //callback queue
-    ros::CallbackQueue queue;
-    ros::AsyncSpinner spinner;
-
 };
 
 
