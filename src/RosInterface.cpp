@@ -498,11 +498,11 @@ std::string RosInterface::getTriggerMode(pho::api::PhoXiTriggerMode mode){
         case pho::api::PhoXiTriggerMode::Freerun:
             return "Freerun";
         case pho::api::PhoXiTriggerMode::Software:
-            return "Freerun";
+            return "Software";
         case pho::api::PhoXiTriggerMode::Hardware:
-            return "Freerun";
+            return "Hardware";
         case pho::api::PhoXiTriggerMode::NoValue:
-            return "Freerun";
+            return "NoValue";
         default:
             return "Undefined";
     }
