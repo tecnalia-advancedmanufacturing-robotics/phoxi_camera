@@ -50,7 +50,10 @@ void PhoXiInterface::connectCamera(std::string HWIdentification, pho::api::PhoXi
         disconnectCamera();
         throw UnableToStartAcquisition("Scanner was not able to connect. Disconnected.");
     }
-    this->setTriggerMode(mode,startAcquisition);
+    this->setTriggerMode(mode);
+    if(startAcquisition){
+        this->startAcquisition();
+    }
     return ;
 }
 void PhoXiInterface::disconnectCamera(){
@@ -159,6 +162,7 @@ int PhoXiInterface::triggerImage(){
     if(scanner->TriggerMode != pho::api::PhoXiTriggerMode::Software){
         this->setTriggerMode(pho::api::PhoXiTriggerMode::Software);
     }
+    this->startAcquisition();
     return scanner->TriggerFrame();
 }
 
@@ -182,15 +186,10 @@ void PhoXiInterface::setLowResolution(){
     scanner->CapturingMode = mode;
 }
 
-void PhoXiInterface::setTriggerMode(pho::api::PhoXiTriggerMode mode, bool startAcquisition){
+void PhoXiInterface::setTriggerMode(pho::api::PhoXiTriggerMode mode){
     this->isOk();
     if((mode != scanner->TriggerMode.GetValue()) && scanner->isAcquiring()){
         scanner->StopAcquisition();
     }
     scanner->TriggerMode = mode;
-    if(startAcquisition && (!scanner->isAcquiring())){
-        if(!scanner->StartAcquisition()){
-            throw UnableToStartAcquisition("Unable to start Acquisition.");
-        }
-    }
 }

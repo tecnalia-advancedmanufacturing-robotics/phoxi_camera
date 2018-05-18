@@ -378,7 +378,7 @@ void RosInterface::dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &
 
     if (level & (1 << 4)) {
         try{
-           PhoXiInterface::setTriggerMode(config.trigger_mode,false);
+           PhoXiInterface::setTriggerMode(config.trigger_mode);
         }catch (PhoXiInterfaceException &e){
             ROS_WARN("%s",e.what());
         }

@@ -69,7 +69,7 @@ public:
     std::vector<pho::api::PhoXiCapturingMode> getSupportedCapturingModes();
     void setHighResolution();
     void setLowResolution();
-    void setTriggerMode(pho::api::PhoXiTriggerMode mode, bool startAcquisition = true);
+    void setTriggerMode(pho::api::PhoXiTriggerMode mode);
 protected:
     pho::api::PPhoXi scanner;
 private:
