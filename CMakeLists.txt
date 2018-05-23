@@ -157,6 +157,9 @@ install(PROGRAMS
 )
 
 if (CATKIN_ENABLE_TESTING)
+    find_package(rostest REQUIRED)
+    add_rostest(test/interfaces/launch/phoxi_camera_interfaces.test)
+        
     add_rostest_gtest(${PROJECT_NAME}_unittest launch/phoxi_camera_unittest.test
             test/gtest/test_phoxi_interface.cpp
             test/gtest/test_ros_interface.cpp
@@ -166,7 +169,4 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${PROJECT_NAME}_Ros_Interface
             ${PROJECT_NAME}_PhoXi_Interface)
-
-  find_package(rostest REQUIRED)
-  add_rostest(test/interfaces/launch/phoxi_camera_interfaces.test)
 endif()

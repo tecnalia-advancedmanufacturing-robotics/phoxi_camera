@@ -134,59 +134,40 @@ TEST_F (PhoXiInterfaceTest, acquisition) {
     // when it is not acquiring, it is not able to trig
     ASSERT_EQ(phoxi_interface.triggerImage(), -1);
 
-
     //TODO try it without connected camera
 }
 
 TEST_F (PhoXiInterfaceTest, setTriggerMode) {
     pho::api::PhoXiTriggerMode triggerMode;
+    phoxi_interface.startAcquisition();
 
     // freerun
     triggerMode = pho::api::PhoXiTriggerMode::Freerun;
-    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode, true));
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode));
     EXPECT_TRUE(phoxi_interface.isAcquiring());
-
-    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode, false));
-    EXPECT_FALSE(phoxi_interface.isAcquiring());
-    EXPECT_EQ(-1, phoxi_interface.triggerImage());
 
     // software
     triggerMode = pho::api::PhoXiTriggerMode::Software;
-    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode, true));
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode));
     EXPECT_TRUE(phoxi_interface.isAcquiring());
-
-    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode, false));
-    EXPECT_FALSE(phoxi_interface.isAcquiring());
-    EXPECT_EQ(-1, phoxi_interface.triggerImage());
 
     // hardware
     triggerMode = pho::api::PhoXiTriggerMode::Hardware;
-    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode, true));
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode));
     EXPECT_TRUE(phoxi_interface.isAcquiring());
-
-    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode, false));
-    EXPECT_FALSE(phoxi_interface.isAcquiring());
-    EXPECT_EQ(-1, phoxi_interface.triggerImage());
 
     // no value
     triggerMode = pho::api::PhoXiTriggerMode::NoValue;
-    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode, true));
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode));
     EXPECT_TRUE(phoxi_interface.isAcquiring());
 
-    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode, false));
-    EXPECT_FALSE(phoxi_interface.isAcquiring());
-    EXPECT_EQ(-1, phoxi_interface.triggerImage());
-
     // incorrect parameters
-    ASSERT_ANY_THROW(phoxi_interface.setTriggerMode(-1, true));
-    EXPECT_EQ(-1, phoxi_interface.triggerImage());
-
-    ASSERT_ANY_THROW(phoxi_interface.setTriggerMode(-1, false));
+    ASSERT_ANY_THROW(phoxi_interface.setTriggerMode(-1));
     EXPECT_EQ(-1, phoxi_interface.triggerImage());
 
     // try it without connection to camera
     phoxi_interface.disconnectCamera();
-    ASSERT_THROW(phoxi_interface.setTriggerMode(0, false), PhoXiScannerNotConnected);
+    ASSERT_THROW(phoxi_interface.setTriggerMode(0), PhoXiScannerNotConnected);
 }
 
 TEST_F (PhoXiInterfaceTest, setResolution) {
@@ -208,23 +189,23 @@ TEST_F (PhoXiInterfaceTest, triggerImage) {
 
     // freerun
     triggerMode = pho::api::PhoXiTriggerMode::Freerun;
-    phoxi_interface.setTriggerMode(triggerMode, true);
+    phoxi_interface.setTriggerMode(triggerMode);
     imageCount = phoxi_interface.triggerImage();
     ASSERT_EQ(imageCount, 1);
 
     // software
     triggerMode = pho::api::PhoXiTriggerMode::Software;
-    phoxi_interface.setTriggerMode(triggerMode, true);
+    phoxi_interface.setTriggerMode(triggerMode);
     ASSERT_EQ(++imageCount, phoxi_interface.triggerImage());
 
     // hardware
     triggerMode = pho::api::PhoXiTriggerMode::Hardware;
-    phoxi_interface.setTriggerMode(triggerMode, true);
+    phoxi_interface.setTriggerMode(triggerMode);
     ASSERT_EQ(++imageCount, phoxi_interface.triggerImage());
 
     // no value
     triggerMode = pho::api::PhoXiTriggerMode::NoValue;
-    phoxi_interface.setTriggerMode(triggerMode, true);
+    phoxi_interface.setTriggerMode(triggerMode);
     ASSERT_EQ(++imageCount, phoxi_interface.triggerImage());
 
     // try it without connection to camera

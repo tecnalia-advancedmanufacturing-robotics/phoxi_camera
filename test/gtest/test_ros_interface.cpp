@@ -84,15 +84,15 @@ public:
     static void SetUpTestCase(){}
 };
 
-
-TEST_F (RosInterfaceServicesTest, getDeviceList) {
-    RosInterface ros_interface;
-    phoxi_camera::GetDeviceList srv;
-
-    ASSERT_EQ(getDeviceListService.call(srv), true);
-    ASSERT_EQ(srv.response.success, true);
-    ASSERT_EQ(srv.response.message, "Ok");
-}
+//
+//TEST_F (RosInterfaceServicesTest, getDeviceList) {
+//    RosInterface ros_interface;
+//    phoxi_camera::GetDeviceList srv;
+//    //ros_interface.
+//    ASSERT_EQ(getDeviceListService.call(srv), true);
+//    ASSERT_EQ(srv.response.success, true);
+//    ASSERT_EQ(srv.response.message, "Ok");
+//}
 
 
 

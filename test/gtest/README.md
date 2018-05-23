@@ -7,7 +7,7 @@ sudo apt-get install libgtest-dev
 
 ## Compile + Run
 ```bash
-catkin_make run_tests phoxi_camera
+catkin_make run_tests_phoxi_camera
 ```
 
 after compilation executable file is created and it can be run
@@ -15,12 +15,10 @@ after compilation executable file is created and it can be run
 rosrun phoxi_camera phoxi_camera_unittest
 ```
 
-or run
+or for all tests run
 ```
 catkin_make run_tests
 ```
-for all tests
-
 
 ## Some additional informations:
 ```
