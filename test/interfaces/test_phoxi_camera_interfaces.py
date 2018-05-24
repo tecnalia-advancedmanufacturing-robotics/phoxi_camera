@@ -11,16 +11,17 @@ import rospy
 import phoxi_camera.srv as phoxi_camera_srv
 from ros_utils import *
 
+
 class Test_phoxi_camera_interfaces(TestCase):
     def setUp(self):
         rospy.init_node('test_interfaces')
 
-    def test1_calibration_node_exist(self):
+    def test1_phoxi_camera_node_exist(self):
         """
         test if phoxi_camera node running
         """
 
-        assert node_is_running(node_name) == True, "Node %s is not running" %node_name
+        assert node_is_running(node_name) == True, "Node %s is not running" % node_name
 
     def test2_connect_camera(self):
         """
@@ -34,9 +35,9 @@ class Test_phoxi_camera_interfaces(TestCase):
             response = connect_camera(camera_id)
             assert response.success == True, "Connection to the camera was unsuccessful, success != True"
         except rospy.ROSException as e:
-            self.fail("Service %s not exist, %s " %(service.connect_camera, e))
+            self.fail("Service %s not exist, %s " % (service.connect_camera, e))
         except rospy.ServiceException as e:
-            self.fail("Service %s call failed, %s" %(service.connect_camera, e))
+            self.fail("Service %s call failed, %s" % (service.connect_camera, e))
 
     def test3_topics_running(self):
         """
@@ -138,7 +139,7 @@ class Test_phoxi_camera_interfaces(TestCase):
         """
 
         assert rospy.has_param(param.confidence) == True, \
-            "Parameter %s is not exist" %param.confidence
+            "Parameter %s is not exist" % param.confidence
 
         assert rospy.has_param(param.coordination_space) == True, \
             "Parameter %s is not exist" % param.coordination_space
@@ -182,4 +183,5 @@ class Test_phoxi_camera_interfaces(TestCase):
 
 if __name__ == '__main__':
     import rostest
+
     rostest.rosrun(PKG, 'Test_interfaces', Test_phoxi_camera_interfaces)

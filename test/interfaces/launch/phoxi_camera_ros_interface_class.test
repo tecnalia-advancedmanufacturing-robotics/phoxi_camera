@@ -6,6 +6,6 @@
     <!-- Launch phoxi_camera launch file -->
     <include file="$(find phoxi_camera)/launch/phoxi_camera.launch"/>
 
-    <!-- Run interface tests -->
-    <test test-name="Interfaces" pkg="phoxi_camera" type="test_phoxi_camera_interfaces.py" />
+    <!-- Run ROS interface class tests -->
+    <test test-name="Ros_interface_class" pkg="phoxi_camera" type="test_ros_interface_class.py" />
 </launch>
