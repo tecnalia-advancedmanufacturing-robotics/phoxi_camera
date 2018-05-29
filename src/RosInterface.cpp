@@ -204,7 +204,7 @@ bool RosInterface::disconnectCamera(std_srvs::Empty::Request &req, std_srvs::Emp
 }
 bool RosInterface::getHardwareIdentification(phoxi_camera::GetHardwareIdentification::Request &req, phoxi_camera::GetHardwareIdentification::Response &res){
     try {
-        PhoXiInterface::getHardwareIdentification();
+        res.hardware_identification = PhoXiInterface::getHardwareIdentification();
         res.success = true;
         res.message = "Ok";
     }catch (PhoXiInterfaceException &e){
