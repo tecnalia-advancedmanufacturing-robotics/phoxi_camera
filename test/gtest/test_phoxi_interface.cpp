@@ -123,7 +123,7 @@ TEST_F (PhoXiInterfaceTest, isOK) {
     // TODO call isOK when PhoXi is off
 }
 
-TEST_F (PhoXiInterfaceTest, acquisition) {
+TEST_F (PhoXiInterfaceTest, isAcquiring) {
     // is acquiring
     phoxi_interface.startAcquisition();
     ASSERT_TRUE(phoxi_interface.isAcquiring());
@@ -131,10 +131,28 @@ TEST_F (PhoXiInterfaceTest, acquisition) {
     // is not acquiring
     phoxi_interface.stopAcquisition();
     ASSERT_FALSE(phoxi_interface.isAcquiring());
+
+    // after disconnect
+    phoxi_interface.startAcquisition();
+    phoxi_interface.disconnectCamera();
+    ASSERT_FALSE(phoxi_interface.isAcquiring());
+}
+
+TEST_F (PhoXiInterfaceTest, start_stopAcquisition) {
+    ASSERT_NO_THROW(phoxi_interface.startAcquisition());
+    ASSERT_TRUE(phoxi_interface.isAcquiring());
+
     // when it is not acquiring, it is not able to trig
+    ASSERT_NO_THROW(phoxi_interface.stopAcquisition());
+    ASSERT_FALSE(phoxi_interface.isAcquiring());
+    EXPECT_EQ(phoxi_interface.triggerImage(), -1);
+    EXPECT_EQ(phoxi_interface.triggerImage(), -1);
     ASSERT_EQ(phoxi_interface.triggerImage(), -1);
 
-    //TODO try it without connected camera
+    // after disconnect
+    phoxi_interface.disconnectCamera();
+    ASSERT_THROW(phoxi_interface.startAcquisition(), PhoXiScannerNotConnected);
+    ASSERT_THROW(phoxi_interface.stopAcquisition(), PhoXiScannerNotConnected);
 }
 
 TEST_F (PhoXiInterfaceTest, setTriggerMode) {
@@ -235,6 +253,7 @@ TEST_F (PhoXiInterfaceTest, setTransformation) {
 
     transformation.Rotation[1][0] = -5;
     transformation.Rotation[1][1] = -1;
+    transformation.Rotation[1][2] = 0;
     transformation.Rotation[1][2] = 0;
 
     transformation.Rotation[2][0] = 1;
