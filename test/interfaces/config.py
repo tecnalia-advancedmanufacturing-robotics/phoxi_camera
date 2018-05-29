@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# camera ID for example "1711002" for real scanner, "InstalledExamples-PhoXi-example" for file camera
+# camera ID for example "InstalledExamples-PhoXi-example" for file camera, "1711002" for real scanner
 camera_id = "InstalledExamples-PhoXi-example"
 
 node_name = "/phoxi_camera"
@@ -8,7 +8,7 @@ node_name = "/phoxi_camera"
 srv_timeout = 1
 
 class topic:
-    diagnostics         = "/diagnostics"   #TODO?? namespace
+    diagnostics         = "/diagnostics"
     confidence_map      = node_name + "/confidence_map"
     normal_map          = node_name + "/normal_map"
     param_description   = node_name + "/parameter_descriptions"

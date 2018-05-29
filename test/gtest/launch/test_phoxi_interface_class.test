@@ -3,5 +3,5 @@
     <node name="PhoXiControl" pkg="phoxi_camera" type="run_phoxi_control.sh" />
 
     <!-- Run Google unittest -->
-	<test test-name="phoxi_camera_unittest" pkg="phoxi_camera" type="phoxi_camera_unittest" time-limit="200"/>
+  <test test-name="PhoXiInterfaceClassUnittest" pkg="phoxi_camera" type="phoxi_camera_unittest" time-limit="200"/>
 </launch>

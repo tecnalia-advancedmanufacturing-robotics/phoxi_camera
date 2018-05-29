@@ -10,6 +10,7 @@ from config import *
 import rospy
 import std_srvs.srv
 import sensor_msgs.msg
+from ros_utils import *
 import phoxi_camera.srv as phoxi_camera_srv
 
 published_topics_num = 0
@@ -276,6 +277,79 @@ class Test_phoxi_camera_services(TestCase):
         res = srv_transform([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], 5, True, False)
         assert True == res.success
         assert "Ok" == res.message
+
+    def test_topics_running(self):
+        """
+        test if there are all the necessary topics that have been published
+        """
+
+        assert topic_is_running(topic.confidence_map) == True, \
+            "Topic %s, not exist" % (topic.confidence_map)
+
+        assert topic_is_running(topic.diagnostics) == True, \
+            "Topic %s, not exist" % (topic.diagnostics)
+
+        assert topic_is_running(topic.normal_map) == True, \
+            "Topic %s, not exist" % (topic.normal_map)
+
+        assert topic_is_running(topic.param_description) == True, \
+            "Topic %s, not exist" % (topic.param_description)
+
+        assert topic_is_running(topic.param_update) == True, \
+            "Topic %s, not exist" % (topic.param_update)
+
+        assert topic_is_running(topic.point_cloud) == True, \
+            "Topic %s, not exist" % (topic.point_cloud)
+
+        assert topic_is_running(topic.texture) == True, \
+            "Topic %s, not exist" % (topic.texture)
+
+    def test_parameter_server_variables_exist(self):
+        """
+        test if variables exist in parameter server
+        """
+
+        assert rospy.has_param(param.confidence) == True, \
+            "Parameter %s is not exist" % param.confidence
+
+        assert rospy.has_param(param.coordination_space) == True, \
+            "Parameter %s is not exist" % param.coordination_space
+
+        assert rospy.has_param(param.frame_id) == True, \
+            "Parameter %s is not exist" % param.frame_id
+
+        assert rospy.has_param(param.resolution) == True, \
+            "Parameter %s is not exist" % param.resolution
+
+        assert rospy.has_param(param.scan_multiplier) == True, \
+            "Parameter %s is not exist" % param.scan_multiplier
+
+        assert rospy.has_param(param.scanner_id) == True, \
+            "Parameter %s is not exist" % param.scanner_id
+
+        assert rospy.has_param(param.send_confidence_map) == True, \
+            "Parameter %s is not exist" % param.send_confidence_map
+
+        assert rospy.has_param(param.send_deapth_map) == True, \
+            "Parameter %s is not exist" % param.send_deapth_map
+
+        assert rospy.has_param(param.send_normal_map) == True, \
+            "Parameter %s is not exist" % param.send_normal_map
+
+        assert rospy.has_param(param.send_point_cloud) == True, \
+            "Parameter %s is not exist" % param.send_point_cloud
+
+        assert rospy.has_param(param.send_texture) == True, \
+            "Parameter %s is not exist" % param.send_texture
+
+        assert rospy.has_param(param.shutter_multiplier) == True, \
+            "Parameter %s is not exist" % param.shutter_multiplier
+
+        assert rospy.has_param(param.timeout) == True, \
+            "Parameter %s is not exist" % param.timeout
+
+        assert rospy.has_param(param.trigger_mode) == True, \
+            "Parameter %s is not exist" % param.trigger_mode
 
 if __name__ == '__main__':
     import rostest

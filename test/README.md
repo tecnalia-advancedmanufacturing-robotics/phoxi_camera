@@ -6,18 +6,21 @@
 Before run of tests set scanner ID or file camera ID in the **interfaces/config.py**, 
 it is needed for connect to camera. Default camera ID for testing is "InstalledExamples-PhoXi-example".
 
-Run test: 
+Compile and run all test: 
 ```bash
-rostest -t phoxi_camera phoxi_camera_interfaces.test 
+catkin_make run_tests_phoxi_camera_rostest 
 ```
+
+If you have compiled tests, you can only run them via rostest:
+```bash
+rostest phoxi_camera test_phoxi_interface_class.test            # unittest for PhoXiInterface class
+rostest phoxi_camera test_phoxi_camera_interfaces_exist.test    # this test check if all interfaces exist
+rostest phoxi_camera test_phoxi_camera_ros_interfaces.test      # this test interact with phoxi_camera node and test it 
+```
+
 Find more options of rostest:
 ```bash
 rostest -h
-```
-
-or you can run it with all tests by command:
-```
-catkin_make run_tests
 ```
 
 ## Output of test
