@@ -9,8 +9,10 @@ from unittest import TestCase
 from config import *
 import rospy
 import std_srvs.srv
+import sensor_msgs.msg
 import phoxi_camera.srv as phoxi_camera_srv
 
+published_topics_num = 0
 
 def connect():
     rospy.wait_for_service(service.connect_camera)
@@ -154,15 +156,30 @@ class Test_phoxi_camera_services(TestCase):
         assert "Ok" != res.message
 
     def test_getFrame(self):
+        global published_topics_num
+        import time
+
+        def callback(data):
+            global published_topics_num
+            published_topics_num = published_topics_num + 1
+
+        # create subscribers
+        rospy.Subscriber(topic.point_cloud, sensor_msgs.msg.PointCloud2, callback)
+        rospy.Subscriber(topic.normal_map, sensor_msgs.msg.Image, callback)
+        rospy.Subscriber(topic.confidence_map, sensor_msgs.msg.Image, callback)
+        rospy.Subscriber(topic.texture, sensor_msgs.msg.Image, callback)
+
         srv_getFrame = rospy.ServiceProxy(service.get_frame, phoxi_camera_srv.GetFrame)
-        res = srv_getFrame()
+        res = srv_getFrame(-1)
+        time.sleep(5)
 
         assert True == res.success
         assert "Ok" == res.message
+        assert published_topics_num == 4, "Some topic was not published after get_frame service"
 
         # disconnected
         disconnect()
-        res = srv_getFrame()
+        res = srv_getFrame(-1)
 
         assert False == res.success
         assert "Ok" != res.message
@@ -171,6 +188,8 @@ class Test_phoxi_camera_services(TestCase):
         import os
         path = os.getcwd()  # it should be ~/.ros
         filename = "/file.ply"
+        os.system("rm " + path + filename)  # remove old file
+
         dir = os.listdir(path)
 
         srv_saveFrame = rospy.ServiceProxy(service.save_frame, phoxi_camera_srv.SaveFrame)
@@ -222,7 +241,7 @@ class Test_phoxi_camera_services(TestCase):
     def test_setCoordianteSpace(self):
         srv_setSpace = rospy.ServiceProxy(service.V2_set_coordination_space, phoxi_camera_srv.SetCoordinatesSpace)
 
-        # 0 - 5 cpp enum, pho::api::PhoXiCoordinateSpace::...
+        # 0 - 5 c++ enum, pho::api::PhoXiCoordinateSpace::...
         res = srv_setSpace(0)
         assert True == res.success
         assert "Ok" == res.message
@@ -257,7 +276,6 @@ class Test_phoxi_camera_services(TestCase):
         res = srv_transform([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], 5, True, False)
         assert True == res.success
         assert "Ok" == res.message
-
 
 if __name__ == '__main__':
     import rostest
