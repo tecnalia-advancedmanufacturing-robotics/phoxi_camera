@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+import pytest
+
+@pytest.fixture()
+def init_node_interfaces_exist():
+    rospy.init_node('Test_interfaces_exist')
+
+@pytest.fixture()
+def init_node_ros_interface():
+    rospy.init_node('Test_ROS_interfaces')
+    connect()
 
 # camera ID for example "InstalledExamples-PhoXi-example" for file camera, "1711002" for real scanner
 camera_id = "InstalledExamples-PhoXi-example"
