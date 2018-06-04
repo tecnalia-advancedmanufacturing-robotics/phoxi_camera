@@ -50,10 +50,7 @@ void PhoXiInterface::connectCamera(std::string HWIdentification, pho::api::PhoXi
         disconnectCamera();
         throw UnableToStartAcquisition("Scanner was not able to connect. Disconnected.");
     }
-    this->setTriggerMode(mode);
-    if(startAcquisition){
-        this->startAcquisition();
-    }
+    this->setTriggerMode(mode,startAcquisition);
     return ;
 }
 void PhoXiInterface::disconnectCamera(){
@@ -151,18 +148,29 @@ bool PhoXiInterface::isAcquiring(){
 }
 void PhoXiInterface::startAcquisition(){
     this->isOk();
+    if(scanner->isAcquiring()){
+        return;
+    }
     scanner->StartAcquisition();
+    if(!scanner->isAcquiring()){
+        throw UnableToStartAcquisition("Unable to start acquisition.");
+    }
 }
 void PhoXiInterface::stopAcquisition(){
     this->isOk();
+    if(!scanner->isAcquiring()){
+        return;
+    }
     scanner->StopAcquisition();
+    if(scanner->isAcquiring()){
+        throw UnableToStopAcquisition("Unable to stop acquisition.");
+    }
 }
 int PhoXiInterface::triggerImage(){
     this->isOk();
     if(scanner->TriggerMode != pho::api::PhoXiTriggerMode::Software){
-        this->setTriggerMode(pho::api::PhoXiTriggerMode::Software);
+        this->setTriggerMode(pho::api::PhoXiTriggerMode::Software,true);
     }
-    this->startAcquisition();
     return scanner->TriggerFrame();
 }
 
@@ -186,10 +194,20 @@ void PhoXiInterface::setLowResolution(){
     scanner->CapturingMode = mode;
 }
 
-void PhoXiInterface::setTriggerMode(pho::api::PhoXiTriggerMode mode){
+void PhoXiInterface::setTriggerMode(pho::api::PhoXiTriggerMode mode, bool startAcquisition){
     this->isOk();
-    if((mode != scanner->TriggerMode.GetValue()) && scanner->isAcquiring()){
-        scanner->StopAcquisition();
+    if(mode == scanner->TriggerMode.GetValue()){
+        if(startAcquisition){
+            this->startAcquisition();
+        }
+        else{
+            this->stopAcquisition();
+        }
+        return;
     }
+    this->stopAcquisition();
     scanner->TriggerMode = mode;
+    if(startAcquisition){
+        this->startAcquisition();
+    }
 }

@@ -179,7 +179,6 @@ bool RosInterface::saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera
         pho::api::PFrame frame = RosInterface::getPFrame(req.in);
         if(!frame){
             res.success = false;
-            ROS_INFO("aaa");
             res.message = "Null frame!";
             return true;
         }
@@ -188,7 +187,6 @@ bool RosInterface::saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera
         res.success = true;
     }catch (PhoXiInterfaceException &e){
         res.success = false;
-        ROS_INFO("rrr %s",e.what());
         res.message = e.what();
     }
     return true;
@@ -378,7 +376,7 @@ void RosInterface::dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &
 
     if (level & (1 << 4)) {
         try{
-           PhoXiInterface::setTriggerMode(config.trigger_mode);
+            PhoXiInterface::setTriggerMode(config.trigger_mode,config.start_acquisition);
         }catch (PhoXiInterfaceException &e){
             ROS_WARN("%s",e.what());
         }

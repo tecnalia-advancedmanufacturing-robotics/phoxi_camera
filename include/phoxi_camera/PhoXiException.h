@@ -41,6 +41,12 @@ public:
     }
 };
 
+class UnableToStopAcquisition : public PhoXiInterfaceException {
+public:
+    UnableToStopAcquisition(std::string message) : PhoXiInterfaceException(message){
+    }
+};
+
 class CorruptedFrame : public PhoXiInterfaceException {
 public:
     CorruptedFrame(std::string message) : PhoXiInterfaceException(message){
