@@ -66,7 +66,7 @@ bool RosInterface::getDeviceList(phoxi_camera::GetDeviceList::Request &req, phox
         res.out = PhoXiInterface::cameraList();
         res.len = res.out.size();
         res.success = true;
-        res.message = "Ok";
+        res.message = OKRESPONSE;
     }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
@@ -77,7 +77,7 @@ bool RosInterface::connectCamera(phoxi_camera::ConnectCamera::Request &req, phox
     try {
         RosInterface::connectCamera(req.name);
         res.success = true;
-        res.message = "Ok";
+        res.message = OKRESPONSE;
     }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
@@ -94,13 +94,13 @@ bool RosInterface::isAcquiring(phoxi_camera::IsAcquiring::Request &req, phoxi_ca
 }
 bool RosInterface::isConnected(phoxi_camera::GetBool::Request &req, phoxi_camera::GetBool::Response &res){
     res.value = PhoXiInterface::isConnected();
-    res.message = "ok"; //todo tot este premysliet
+    res.message = OKRESPONSE; //todo tot este premysliet
     res.success = true;
     return true;
 }
 bool RosInterface::isAcquiring(phoxi_camera::GetBool::Request &req, phoxi_camera::GetBool::Response &res){
     res.value = PhoXiInterface::isAcquiring();
-    res.message = "ok"; //todo tot este premysliet
+    res.message = OKRESPONSE; //todo tot este premysliet
     res.success = true;
     return true;
 }
@@ -126,7 +126,7 @@ bool RosInterface::startAcquisition(phoxi_camera::Empty::Request &req, phoxi_cam
     try {
         //todo
         PhoXiInterface::startAcquisition();
-        res.message = "Ok";
+        res.message = OKRESPONSE;
         res.success = true;
     }catch (PhoXiInterfaceException &e){
         res.message = e.what();
@@ -137,7 +137,7 @@ bool RosInterface::startAcquisition(phoxi_camera::Empty::Request &req, phoxi_cam
 bool RosInterface::stopAcquisition(phoxi_camera::Empty::Request &req, phoxi_camera::Empty::Response &res){
     try {
         PhoXiInterface::stopAcquisition();
-        res.message = "Ok";
+        res.message = OKRESPONSE;
         res.success = true;
     }catch (PhoXiInterfaceException &e){
         res.message = e.what();
@@ -149,7 +149,7 @@ bool RosInterface::triggerImage(phoxi_camera::TriggerImage::Request &req, phoxi_
     try {
         res.id = RosInterface::triggerImage();
         res.success = true;
-        res.message = "Ok";
+        res.message = OKRESPONSE;
     }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
@@ -166,7 +166,7 @@ bool RosInterface::getFrame(phoxi_camera::GetFrame::Request &req, phoxi_camera::
         }
         else{
             res.success = true;
-            res.message = "Ok";
+            res.message = OKRESPONSE;
         }
     }catch (PhoXiInterfaceException &e){
         res.success = false;
@@ -183,7 +183,7 @@ bool RosInterface::saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera
             return true;
         }
         frame->SaveAsPly(req.path);
-        res.message = "Ok";
+        res.message = OKRESPONSE;
         res.success = true;
     }catch (PhoXiInterfaceException &e){
         res.success = false;
@@ -204,7 +204,7 @@ bool RosInterface::getHardwareIdentification(phoxi_camera::GetHardwareIdentifica
     try {
         res.hardware_identification = PhoXiInterface::getHardwareIdentification();
         res.success = true;
-        res.message = "Ok";
+        res.message = OKRESPONSE;
     }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
@@ -221,7 +221,7 @@ bool RosInterface::getSupportedCapturingModes(phoxi_camera::GetSupportedCapturin
             res.supported_capturing_modes.push_back(size);
         }
         res.success = true;
-        res.message = "Ok";
+        res.message = OKRESPONSE;
     }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
@@ -305,7 +305,7 @@ bool RosInterface::setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request
         dynamicReconfigureConfig.coordination_space = req.coordinates_space;
         dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
         res.success = true;
-        res.message = "Ok";
+        res.message = OKRESPONSE;
     }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();
@@ -325,7 +325,7 @@ bool RosInterface::setTransformation(phoxi_camera::SetTransformationMatrix::Requ
         dynamicReconfigureConfig.coordination_space = req.coordinates_space;
         dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
         res.success = true;
-        res.message = "Ok";
+        res.message = OKRESPONSE;
     }catch (PhoXiInterfaceException &e){
         res.success = false;
         res.message = e.what();

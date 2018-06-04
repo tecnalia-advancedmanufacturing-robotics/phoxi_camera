@@ -5,6 +5,7 @@
 #ifndef PROJECT_ROSINTERFACE_H
 #define PROJECT_ROSINTERFACE_H
 
+#define OKRESPONSE "Ok"
 //ros
 #include <ros/ros.h>
 #include <ros/callback_queue.h>
