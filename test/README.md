@@ -1,14 +1,15 @@
 # Test interfaces for phoxi_camera node
 ## Requirements
 * Installed PhoXi Control
+* Installed pytest: sudo apt-get install python-pytest
 
 ## How to run tests
 Before run of tests set scanner ID or file camera ID in the **interfaces/config.py**, 
 it is needed for connect to camera. Default camera ID for testing is "InstalledExamples-PhoXi-example".
 
-Compile and run all test: 
+Compile tests: 
 ```bash
-catkin_make run_tests_phoxi_camera_rostest 
+catkin_make -DCATKIN_ENABLE_TESTING=TRUE
 ```
 
 If you have compiled tests, you can only run them via rostest:

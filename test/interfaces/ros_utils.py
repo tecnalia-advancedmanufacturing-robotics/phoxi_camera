@@ -14,7 +14,7 @@ def node_is_running(node_name):
 
 def service_is_running(service_name):
     import rospy
-    from conftest import srv_timeout
+    from config import srv_timeout
 
     try:
         rospy.wait_for_service(service_name, srv_timeout)

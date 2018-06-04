@@ -6,13 +6,12 @@ this testing script calls all services of phoxi_camera node
 PKG = 'phoxi_camera'
 
 from unittest import TestCase
-from conftest import *
+from config import *
 import rospy
 import std_srvs.srv
 import sensor_msgs.msg
 from ros_utils import *
 import phoxi_camera.srv as phoxi_camera_srv
-import pytest
 
 published_topics_num = 0
 
@@ -21,14 +20,15 @@ def connect():
     srv_connect = rospy.ServiceProxy(service.connect_camera, phoxi_camera_srv.ConnectCamera)
     srv_connect(camera_id)
 
-
 def disconnect():
     rospy.wait_for_service(service.disconnect_camera)
     srv_disconnect = rospy.ServiceProxy(service.disconnect_camera, std_srvs.srv.Empty)
     srv_disconnect()
 
-@pytest.mark.usefixtures("init_node_ros_interface")
 class Test_phoxi_camera_ros_interface(TestCase):
+    def setUp(self):
+        rospy.init_node('Test_ROS_interfaces')
+        connect()
 
     def test_getDeviceList(self):
         srv = rospy.ServiceProxy(service.get_device_list, phoxi_camera_srv.GetDeviceList)

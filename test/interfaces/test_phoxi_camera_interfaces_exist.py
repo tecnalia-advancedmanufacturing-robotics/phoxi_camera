@@ -6,14 +6,21 @@ this script tests base interfaces of phoxi_camera node
 PKG = 'phoxi_camera'
 
 from unittest import TestCase
-from conftest import *
+from config import *
 import rospy
 import phoxi_camera.srv as phoxi_camera_srv
 from ros_utils import *
-import pytest
 
-@pytest.mark.usefixtures("init_node_interfaces_exist")
+def connect():
+    rospy.wait_for_service(service.connect_camera)
+    srv_connect = rospy.ServiceProxy(service.connect_camera, phoxi_camera_srv.ConnectCamera)
+    srv_connect(camera_id)
+
 class Test_phoxi_camera_interfaces(TestCase):
+    def setUp(self):
+        rospy.init_node('Test_ROS_interfaces')
+        connect()
+
     def test1_phoxi_camera_node_exist(self):
         """
         test if phoxi_camera node running
