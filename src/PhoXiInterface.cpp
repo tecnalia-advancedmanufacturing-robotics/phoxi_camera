@@ -195,6 +195,9 @@ void PhoXiInterface::setLowResolution(){
 }
 
 void PhoXiInterface::setTriggerMode(pho::api::PhoXiTriggerMode mode, bool startAcquisition){
+    if(!((mode == pho::api::PhoXiTriggerMode::Software) || (mode == pho::api::PhoXiTriggerMode::Hardware) || (mode == pho::api::PhoXiTriggerMode::Freerun) || (mode == pho::api::PhoXiTriggerMode::NoValue))){
+        throw InvalidTriggerMode("Invalid trigger mode " + std::to_string(mode) +".");
+    }
     this->isOk();
     if(mode == scanner->TriggerMode.GetValue()){
         if(startAcquisition){

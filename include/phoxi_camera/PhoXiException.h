@@ -71,5 +71,11 @@ public:
     }
 };
 
+class  InvalidTriggerMode : public PhoXiInterfaceException {
+public:
+    InvalidTriggerMode(std::string message) : PhoXiInterfaceException(message){
+    }
+};
+
 
 #endif //PROJECT_PHOXIEXCEPTION_H

@@ -161,27 +161,46 @@ TEST_F (PhoXiInterfaceTest, setTriggerMode) {
 
     // freerun
     triggerMode = pho::api::PhoXiTriggerMode::Freerun;
-    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode));
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode,false));
+    EXPECT_FALSE(phoxi_interface.isAcquiring());
+
+    // software
+    triggerMode = pho::api::PhoXiTriggerMode::Software;
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode,false));
+    EXPECT_FALSE(phoxi_interface.isAcquiring());
+
+    // hardware
+    triggerMode = pho::api::PhoXiTriggerMode::Hardware;
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode,false));
+    EXPECT_FALSE(phoxi_interface.isAcquiring());
+
+    // no value
+    triggerMode = pho::api::PhoXiTriggerMode::NoValue;
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode,false));
+    EXPECT_FALSE(phoxi_interface.isAcquiring());
+
+    // freerun
+    triggerMode = pho::api::PhoXiTriggerMode::Freerun;
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode,true));
     EXPECT_TRUE(phoxi_interface.isAcquiring());
 
     // software
     triggerMode = pho::api::PhoXiTriggerMode::Software;
-    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode));
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode,true));
     EXPECT_TRUE(phoxi_interface.isAcquiring());
 
     // hardware
     triggerMode = pho::api::PhoXiTriggerMode::Hardware;
-    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode));
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode,true));
     EXPECT_TRUE(phoxi_interface.isAcquiring());
 
     // no value
     triggerMode = pho::api::PhoXiTriggerMode::NoValue;
-    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode));
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(triggerMode,true));
     EXPECT_TRUE(phoxi_interface.isAcquiring());
 
     // incorrect parameters
     ASSERT_ANY_THROW(phoxi_interface.setTriggerMode(-1));
-    EXPECT_EQ(-1, phoxi_interface.triggerImage());
 
     // try it without connection to camera
     phoxi_interface.disconnectCamera();
