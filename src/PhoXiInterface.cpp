@@ -167,10 +167,7 @@ void PhoXiInterface::stopAcquisition(){
     }
 }
 int PhoXiInterface::triggerImage(){
-    this->isOk();
-    if(scanner->TriggerMode != pho::api::PhoXiTriggerMode::Software){
-        this->setTriggerMode(pho::api::PhoXiTriggerMode::Software,true);
-    }
+    this->setTriggerMode(pho::api::PhoXiTriggerMode::Software,true);
     return scanner->TriggerFrame();
 }
 
