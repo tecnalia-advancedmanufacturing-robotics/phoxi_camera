@@ -33,36 +33,16 @@ public:
         setTransformation(getPhoXiCoordinateTransformation(transformation),space,setSpace,saveSettings);
     }
     template <typename T>
-    void setTransformation(std::vector<T> transformation,pho::api::PhoXiCoordinateSpace space,bool setSpace = true, bool saveSettings = true){
-        setTransformation(getPhoXiCoordinateTransformation(transformation),space,setSpace,saveSettings);
-    }
-    template <typename T>
-    static pho::api::PhoXiCoordinateTransformation getPhoXiCoordinateTransformation(std::vector<T> vec){
-        pho::api::PhoXiCoordinateTransformation coordinateTransformation;
-        if(vec.size() != 16){
-            throw InvalidTransformationMatrix("Bad vector size!");
-        }
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                coordinateTransformation.Rotation[i][j] = vec[i*+j];
-            }
-        }
-        coordinateTransformation.Translation.x = vec[3];
-        coordinateTransformation.Translation.y = vec[7];
-        coordinateTransformation.Translation.z = vec[11];
-        return coordinateTransformation;
-    }
-    template <typename T>
     static pho::api::PhoXiCoordinateTransformation getPhoXiCoordinateTransformation(Eigen::Matrix<T,4,4> mat){
         pho::api::PhoXiCoordinateTransformation coordinateTransformation;
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                coordinateTransformation.Rotation[i][j] = transformation(i,j);
+                coordinateTransformation.Rotation[i][j] = mat(i,j);
             }
         }
-        coordinateTransformation.Translation.x = transformation(0,3);
-        coordinateTransformation.Translation.y = transformation(1,3);
-        coordinateTransformation.Translation.z = transformation(2,3);
+        coordinateTransformation.Translation.x = mat(0,3);
+        coordinateTransformation.Translation.y = mat(1,3);
+        coordinateTransformation.Translation.z = mat(2,3);
         return coordinateTransformation;
     }
     std::string getHardwareIdentification();

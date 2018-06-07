@@ -9,6 +9,7 @@
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/fill_image.h>
 #include <phoxi_camera/PhoXiException.h>
+#include <eigen_conversions/eigen_msg.h>
 
 RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex,nh), PhoXi3DscannerDiagnosticTask("PhoXi3Dscanner",boost::bind(&RosInterface::diagnosticCallback, this, _1)) {
 
@@ -314,13 +315,10 @@ bool RosInterface::setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request
 }
 
 bool RosInterface::setTransformation(phoxi_camera::SetTransformationMatrix::Request &req, phoxi_camera::SetTransformationMatrix::Response &res){
-    if(req.matrix.size()!= 16){
-        res.success = false;
-        res.message = "Bad matrix dimensions!";
-        return true;
-    }
     try {
-        PhoXiInterface::setTransformation(req.matrix,req.coordinates_space,req.set_space,req.save_settings);
+        Eigen::Affine3d transform;
+        tf::transformMsgToEigen(req.transform,transform);
+        PhoXiInterface::setTransformation(transform.matrix(),req.coordinates_space,req.set_space,req.save_settings);
         //update dynamic reconfigure
         dynamicReconfigureConfig.coordination_space = req.coordinates_space;
         dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);

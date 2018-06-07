@@ -16,6 +16,8 @@ find_package(catkin REQUIRED
     pcl_conversions
     dynamic_reconfigure
     diagnostic_updater
+    geometry_msgs
+    eigen_conversions
 )
 
 catkin_python_setup()

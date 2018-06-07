@@ -7,7 +7,8 @@
 
 #include <PhoXi.h>
 namespace phoxi_camera{
-    typedef pho::api::PhoXiCoordinateSpace CoordinatesSpace;
+    typedef pho::api::PhoXiCoordinateSpace CoordinateSpace;
+    typedef pho::api::PhoXiTriggerMode TriggerMode;
 }
 
 #endif //PROJECT_COORDINATESSPACE_H
