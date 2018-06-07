@@ -4,10 +4,9 @@
   <version>1.1.4</version>
   <description>The phoxi_camera is a package that enables interfacing Photoneo Phoxi Scanner/Camera from ROS</description>
 
-  <author>Matej Sladek</author>
-  <author>Filip Sladek</author>
+  <author>Photoneo s.r.o</author>
 
-  <maintainer email="msladek@photoneo.com">Matej Sladek</maintainer>
+  <maintainer email="support@photoneo.com">Photoneo</maintainer>
 
   <license>BSD</license>
 
