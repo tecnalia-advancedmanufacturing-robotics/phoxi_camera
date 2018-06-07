@@ -142,12 +142,20 @@ TEST_F (PhoXiInterfaceTest, start_stopAcquisition) {
     ASSERT_NO_THROW(phoxi_interface.startAcquisition());
     ASSERT_TRUE(phoxi_interface.isAcquiring());
 
-    // when it is not acquiring, it is not able to trig
     ASSERT_NO_THROW(phoxi_interface.stopAcquisition());
     ASSERT_FALSE(phoxi_interface.isAcquiring());
-    EXPECT_EQ(phoxi_interface.triggerImage(), -1);
-    EXPECT_EQ(phoxi_interface.triggerImage(), -1);
-    ASSERT_EQ(phoxi_interface.triggerImage(), -1);
+
+    ASSERT_NO_THROW(phoxi_interface.setTriggerMode(pho::api::PhoXiTriggerMode::NoValue,false));
+    ASSERT_FALSE(phoxi_interface.isAcquiring());
+    ASSERT_EQ(phoxi_interface.getTriggerMode(),pho::api::PhoXiTriggerMode::NoValue);
+
+    EXPECT_GE(phoxi_interface.triggerImage(),0);
+    ASSERT_TRUE(phoxi_interface.isAcquiring());
+    ASSERT_EQ(phoxi_interface.getTriggerMode(),pho::api::PhoXiTriggerMode::Software);
+
+
+    EXPECT_GE(phoxi_interface.triggerImage(),0);
+    EXPECT_GE(phoxi_interface.triggerImage(),0);
 
     // after disconnect
     phoxi_interface.disconnectCamera();
