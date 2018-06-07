@@ -70,6 +70,7 @@ public:
     void setHighResolution();
     void setLowResolution();
     void setTriggerMode(pho::api::PhoXiTriggerMode mode, bool startAcquisition = false);
+    pho::api::PhoXiTriggerMode getTriggerMode();
 protected:
     pho::api::PPhoXi scanner;
 private:

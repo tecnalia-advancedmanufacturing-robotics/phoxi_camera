@@ -211,3 +211,8 @@ void PhoXiInterface::setTriggerMode(pho::api::PhoXiTriggerMode mode, bool startA
         this->startAcquisition();
     }
 }
+
+pho::api::PhoXiTriggerMode PhoXiInterface::getTriggerMode(){
+    this->isOk();
+    return scanner->TriggerMode;
+}
