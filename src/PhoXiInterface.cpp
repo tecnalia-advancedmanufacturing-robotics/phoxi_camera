@@ -24,8 +24,9 @@ std::vector<std::string> PhoXiInterface::cameraList(){
 
 void PhoXiInterface::connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode, bool startAcquisition){
     pho::api::PhoXiFactory phoXiFactory;
-    if(scanner && scanner->isConnected()){
+    if(this->isConnected()){
         if(scanner->HardwareIdentification == HWIdentification){
+            this->setTriggerMode(mode,startAcquisition);
             return;
         }
     }
@@ -68,7 +69,7 @@ pho::api::PFrame PhoXiInterface::getPFrame(int id){
 }
 
 std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud() {
-    return getPointCloudFromFrame(getPFrame(-1)); //todo
+    return getPointCloudFromFrame(getPFrame(-1));
 }
 
 static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloudFromFrame(pho::api::PFrame frame) {
