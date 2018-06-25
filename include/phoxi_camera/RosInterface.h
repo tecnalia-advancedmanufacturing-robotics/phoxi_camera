@@ -69,6 +69,7 @@ private:
     void dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &config, uint32_t level);
     void diagnosticCallback(diagnostic_updater::DiagnosticStatusWrapper& status);
     void diagnosticTimerCallback(const ros::TimerEvent&);
+    void initFromPhoXi();
 
     //node handle
     ros::NodeHandle nh;

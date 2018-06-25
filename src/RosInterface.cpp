@@ -462,7 +462,14 @@ int RosInterface::triggerImage(){
 
 void RosInterface::connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode, bool startAcquisition){
     PhoXiInterface::connectCamera(HWIdentification,mode,startAcquisition);
-    dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
+    bool initFromConfig = false;
+    nh.getParam("init_from_config",initFromConfig);
+    if(initFromConfig){
+        dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
+    }
+    else{
+        initFromPhoXi();
+    }
     dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
     this->dynamicReconfigureCallback(dynamicReconfigureConfig,std::numeric_limits<uint32_t>::max());
     diagnosticUpdater.force_update();
@@ -502,6 +509,34 @@ std::string RosInterface::getTriggerMode(pho::api::PhoXiTriggerMode mode){
         default:
             return "Undefined";
     }
+}
+
+void RosInterface::initFromPhoXi(){
+    dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
+    if(!scanner->isConnected()){
+        ROS_WARN("Scanner not connected.");
+        dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
+        return;
+    }
+    ///resolution
+    pho::api::PhoXiCapturingMode mode = scanner->CapturingMode;
+    if((mode.Resolution.Width == 2064) && (mode.Resolution.Height = 1544)){
+        this->dynamicReconfigureConfig.resolution = 1;
+    }
+    else{
+        this->dynamicReconfigureConfig.resolution = 0;
+    }
+    this->dynamicReconfigureConfig.scan_multiplier = scanner->CapturingSettings->ScanMultiplier;
+    this->dynamicReconfigureConfig.shutter_multiplier = scanner->CapturingSettings->ShutterMultiplier;
+    this->dynamicReconfigureConfig.trigger_mode = scanner->TriggerMode.GetValue();
+    this->dynamicReconfigureConfig.start_acquisition = scanner->isAcquiring();
+    this->dynamicReconfigureConfig.timeout = scanner->Timeout.GetValue();
+    this->dynamicReconfigureConfig.confidence = scanner->ProcessingSettings->Confidence;
+    this->dynamicReconfigureConfig.send_point_cloud = scanner->OutputSettings->SendPointCloud;
+    this->dynamicReconfigureConfig.send_normal_map = scanner->OutputSettings->SendNormalMap;
+    this->dynamicReconfigureConfig.send_confidence_map = scanner->OutputSettings->SendConfidenceMap;
+    this->dynamicReconfigureConfig.send_deapth_map = scanner->OutputSettings->SendDepthMap;
+    this->dynamicReconfigureConfig.send_texture = scanner->OutputSettings->SendTexture;
 }
 
 
