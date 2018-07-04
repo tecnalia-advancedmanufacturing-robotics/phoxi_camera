@@ -18,6 +18,7 @@ find_package(catkin REQUIRED
     diagnostic_updater
     geometry_msgs
     eigen_conversions
+    cv_bridge
 )
 
 catkin_python_setup()

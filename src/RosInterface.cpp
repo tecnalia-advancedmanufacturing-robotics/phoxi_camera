@@ -10,6 +10,7 @@
 #include <sensor_msgs/fill_image.h>
 #include <phoxi_camera/PhoXiException.h>
 #include <eigen_conversions/eigen_msg.h>
+#include <cv_bridge/cv_bridge.h>
 
 RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex,nh), PhoXi3DscannerDiagnosticTask("PhoXi3Dscanner",boost::bind(&RosInterface::diagnosticCallback, this, _1)) {
 
@@ -37,7 +38,8 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
     cloudPub = nh.advertise <pcl::PointCloud<pcl::PointXYZ >>("pointcloud", 1);
     normalMapPub = nh.advertise < sensor_msgs::Image > ("normal_map", 1);
     confidenceMapPub = nh.advertise < sensor_msgs::Image > ("confidence_map", 1);
-    texturePub = nh.advertise < sensor_msgs::Image > ("texture", 1);
+    rawTexturePub = nh.advertise < sensor_msgs::Image > ("texture", 1);
+    rgbTexturePub = nh.advertise < sensor_msgs::Image > ("rgb_texture", 1);
 
     //set dynamic reconfigure callback
     dynamicReconfigureServer.setCallback(boost::bind(&RosInterface::dynamicReconfigureCallback,this, _1, _2));
@@ -256,7 +258,6 @@ void RosInterface::publishFrame(pho::api::PFrame frame) {
     texture.header.stamp = timeNow;
     texture.header.frame_id = frameId;
     texture.header.seq = frame->Info.FrameIndex;
-    texture.encoding = "32FC1";
 
     confidence_map.header.stamp = timeNow;
     confidence_map.header.frame_id = frameId;
@@ -266,19 +267,28 @@ void RosInterface::publishFrame(pho::api::PFrame frame) {
     normal_map.header.frame_id = frameId;
     normal_map.header.seq = frame->Info.FrameIndex;
 
+    cv::Mat cvGreyTexture(frame->Texture.Size.Height, frame->Texture.Size.Width, CV_32FC1, frame->Texture.operator[](0));
+    cv::normalize(cvGreyTexture, cvGreyTexture, 0, 255, CV_MINMAX);
+    cvGreyTexture.convertTo(cvGreyTexture,CV_8U);
+    cv::equalizeHist(cvGreyTexture, cvGreyTexture);
+    cv::Mat cvRgbTexture;
+    cv::cvtColor(cvGreyTexture,cvRgbTexture,CV_GRAY2RGB);
+    cv_bridge::CvImage rgbTexture(texture.header,sensor_msgs::image_encodings::BGR8,cvRgbTexture);
+
+    texture.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
     sensor_msgs::fillImage(texture, sensor_msgs::image_encodings::TYPE_32FC1,
                            frame->Texture.Size.Height, // height
                            frame->Texture.Size.Width, // width
                            frame->Texture.Size.Width * sizeof(float), // stepSize
                            frame->Texture.operator[](0));
-    confidence_map.encoding = "32FC1";
+    confidence_map.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
     sensor_msgs::fillImage(confidence_map,
                            sensor_msgs::image_encodings::TYPE_32FC1,
                            frame->ConfidenceMap.Size.Height, // height
                            frame->ConfidenceMap.Size.Width, // width
                            frame->ConfidenceMap.Size.Width * sizeof(float), // stepSize
                            frame->ConfidenceMap.operator[](0));
-    normal_map.encoding = "32FC3";
+    normal_map.encoding = sensor_msgs::image_encodings::TYPE_32FC3;
     sensor_msgs::fillImage(normal_map,
                            sensor_msgs::image_encodings::TYPE_32FC3,
                            frame->NormalMap.Size.Height, // height
@@ -296,7 +306,8 @@ void RosInterface::publishFrame(pho::api::PFrame frame) {
     cloudPub.publish(output_cloud);
     normalMapPub.publish(normal_map);
     confidenceMapPub.publish(confidence_map);
-    texturePub.publish(texture);
+    rawTexturePub.publish(texture);
+    rgbTexturePub.publish(rgbTexture.toImageMsg());
 }
 
 bool RosInterface::setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request &req, phoxi_camera::SetCoordinatesSpace::Response &res){

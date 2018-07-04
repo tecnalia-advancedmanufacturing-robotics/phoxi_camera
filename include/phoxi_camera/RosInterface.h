@@ -98,7 +98,8 @@ private:
     ros::Publisher cloudPub;
     ros::Publisher normalMapPub;
     ros::Publisher confidenceMapPub;
-    ros::Publisher texturePub;
+    ros::Publisher rawTexturePub;
+    ros::Publisher rgbTexturePub;
 
     //dynamic reconfigure
     boost::recursive_mutex dynamicReconfigureMutex;
