@@ -23,6 +23,9 @@ public:
     * Default constructor.
     */
     PhoXiCamera();
+
+    pho::api::PhoXiFactory phoXiFactory;
+
     /**
     * Return all PhoXi 3D Scanners ids connected on netwok.
     *

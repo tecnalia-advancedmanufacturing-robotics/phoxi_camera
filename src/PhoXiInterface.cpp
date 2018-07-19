@@ -9,7 +9,6 @@ PhoXiInterface::PhoXiCamera(){
 }
 
 std::vector<std::string> PhoXiInterface::cameraList(){
-    pho::api::PhoXiFactory phoXiFactory;
     if (!phoXiFactory.isPhoXiControlRunning()){
         scanner.Reset();
         throw PhoXiControlNotRunning("PhoXi Control is not running");
@@ -23,7 +22,6 @@ std::vector<std::string> PhoXiInterface::cameraList(){
 }
 
 void PhoXiInterface::connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode, bool startAcquisition){
-    pho::api::PhoXiFactory phoXiFactory;
     if(this->isConnected()){
         if(scanner->HardwareIdentification == HWIdentification){
             this->setTriggerMode(mode,startAcquisition);
