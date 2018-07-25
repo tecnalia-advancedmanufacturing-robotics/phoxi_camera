@@ -17,7 +17,7 @@ PhoXiInterface phoxi_interface;
 
 class PhoXiInterfaceTest : public testing::Test {
 public:
-    const string camera_ID = "1711011";
+    const string camera_ID = "InstalledExamples-PhoXi-example";
 
     static void SetUpTestCase(){
         //test constructor only once
@@ -340,27 +340,27 @@ TEST_F (PhoXiInterfaceTest, setCoordinateSpace) {
     // try to set some space and next trig
     EXPECT_NO_THROW(phoxi_interface.setCoordinateSpace(pho::api::PhoXiCoordinateSpace::CameraSpace));
     ASSERT_EQ(phoxi_interface.getCoordinateSpace(),pho::api::PhoXiCoordinateSpace::CameraSpace);
-    ASSERT_GE(0, phoxi_interface.triggerImage());
+    ASSERT_GE(phoxi_interface.triggerImage(), 0);
 
     EXPECT_NO_THROW(phoxi_interface.setCoordinateSpace(pho::api::PhoXiCoordinateSpace::CustomSpace));
     ASSERT_EQ(phoxi_interface.getCoordinateSpace(),pho::api::PhoXiCoordinateSpace::CustomSpace);
-    ASSERT_GE(0, phoxi_interface.triggerImage());
+    ASSERT_GE(phoxi_interface.triggerImage(), 0);
 
     EXPECT_NO_THROW(phoxi_interface.setCoordinateSpace(pho::api::PhoXiCoordinateSpace::MarkerSpace));
     ASSERT_EQ(phoxi_interface.getCoordinateSpace(),pho::api::PhoXiCoordinateSpace::MarkerSpace);
-    ASSERT_GE(0, phoxi_interface.triggerImage());
+    ASSERT_GE(phoxi_interface.triggerImage(), 0);
 
     EXPECT_NO_THROW(phoxi_interface.setCoordinateSpace(pho::api::PhoXiCoordinateSpace::MountingSpace));
     ASSERT_EQ(phoxi_interface.getCoordinateSpace(),pho::api::PhoXiCoordinateSpace::MountingSpace);
-    ASSERT_GE(0, phoxi_interface.triggerImage());
+    ASSERT_GE(phoxi_interface.triggerImage() ,0);
 
     EXPECT_NO_THROW(phoxi_interface.setCoordinateSpace(pho::api::PhoXiCoordinateSpace::NoValue));
     ASSERT_EQ(phoxi_interface.getCoordinateSpace(),pho::api::PhoXiCoordinateSpace::NoValue);
-    ASSERT_GE(0, phoxi_interface.triggerImage());
+    ASSERT_GE(phoxi_interface.triggerImage(),  0);
 
     EXPECT_NO_THROW(phoxi_interface.setCoordinateSpace(pho::api::PhoXiCoordinateSpace::RobotSpace));
     ASSERT_EQ(phoxi_interface.getCoordinateSpace(),pho::api::PhoXiCoordinateSpace::RobotSpace);
-    ASSERT_GE(0, phoxi_interface.triggerImage());
+    ASSERT_GE(phoxi_interface.triggerImage(), 0);
 
     // try it without connection to camera
     phoxi_interface.disconnectCamera();
