@@ -1,12 +1,14 @@
 scanner_id: "InstalledExamples-PhoXi-example"
 frame_id: "PhoXi3Dscanner_sensor"
-confidence: 3.0
+latch_tipics: true
+topic_queue_size: 1
 init_from_config: false # if true all following parameters will be inicialized from this config otherwise from PohXi control application.
 # All following parameters are for PhoXi Control and they can override all dynamic_reconfigure parameters in cfg file.
 # This values are set to scanner after successful connection only if init_from_config parameter is true.
 coordination_space: 1 # 1 = Camera, 2 =  Mounting, 3 = Marker, 4 = Robot, 5 = Custom
 resolution: 1         # 0 = Low, 1 = High
 scan_multiplier: 1
+confidence: 3.0
 send_confidence_map: true
 send_deapth_map: true
 send_normal_map: true
