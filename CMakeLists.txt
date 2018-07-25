@@ -164,7 +164,7 @@ if (CATKIN_ENABLE_TESTING)
     add_rostest(test/interfaces/launch/test_phoxi_camera_interfaces_exist.test)
     add_rostest(test/interfaces/launch/test_phoxi_camera_ros_interfaces.test)
 
-    add_rostest_gtest(phoxi_camera_unittest
+    add_rostest_gtest(${PROJECT_NAME}_unittest
             test/gtest/launch/test_phoxi_interface_class.test
             test/gtest/test_phoxi_interface.cpp)
 
