@@ -103,6 +103,12 @@ void PhoXiInterface::setCoordinateSpace(pho::api::PhoXiCoordinateSpace space){
     scanner->CoordinatesSettings->CoordinateSpace = space;
     return;
 }
+
+pho::api::PhoXiCoordinateSpace PhoXiInterface::getCoordinateSpace(){
+    this->isOk();
+    return scanner->CoordinatesSettings->CoordinateSpace;
+}
+
 void PhoXiInterface::setTransformation(pho::api::PhoXiCoordinateTransformation coordinateTransformation,pho::api::PhoXiCoordinateSpace space,bool setSpace = true, bool saveSettings = true){
     this->isOk();
     pho::api::PhoXiCoordinatesSettings settings = scanner->CoordinatesSettings;

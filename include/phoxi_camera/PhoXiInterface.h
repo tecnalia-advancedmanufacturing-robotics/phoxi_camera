@@ -24,8 +24,6 @@ public:
     */
     PhoXiCamera();
 
-    pho::api::PhoXiFactory phoXiFactory;
-
     /**
     * Return all PhoXi 3D Scanners ids connected on netwok.
     *
@@ -97,7 +95,7 @@ public:
     /**
     * Trigger new Image
     *
-    * \return id of new PFrame
+    * \return @return positive id on success, negative number on failure (-1 Trigger not accepted, -2 Device is not running, -3 Communication Error, -4 WaitForGrabbingEnd is not supported)
     * \note id can be passed to getPFrame method
     */
     int triggerImage();
@@ -108,6 +106,12 @@ public:
     * \throw PhoXiScannerNotConnected when no scanner is connected
     */
     void setCoordinateSpace(pho::api::PhoXiCoordinateSpace space);
+    /**
+    * Get coordination space
+    *
+    * \throw PhoXiScannerNotConnected when no scanner is connected
+    */
+    pho::api::PhoXiCoordinateSpace getCoordinateSpace();
     /**
     * Set transformation matrix space
     *
@@ -193,6 +197,7 @@ public:
     pho::api::PhoXiTriggerMode getTriggerMode();
 protected:
     pho::api::PPhoXi scanner;
+    pho::api::PhoXiFactory phoXiFactory;
 private:
 
 
