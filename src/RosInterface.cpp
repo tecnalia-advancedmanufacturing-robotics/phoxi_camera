@@ -44,6 +44,7 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
     confidenceMapPub = nh.advertise < sensor_msgs::Image > ("confidence_map", topic_queue_size,latch_tipics);
     rawTexturePub = nh.advertise < sensor_msgs::Image > ("texture", topic_queue_size,latch_tipics);
     rgbTexturePub = nh.advertise < sensor_msgs::Image > ("rgb_texture", topic_queue_size,latch_tipics);
+    depthMapPub = nh.advertise < sensor_msgs::Image > ("depth_map", topic_queue_size,latch_tipics);
 
     //set dynamic reconfigure callback
     dynamicReconfigureServer.setCallback(boost::bind(&RosInterface::dynamicReconfigureCallback,this, _1, _2));
@@ -256,20 +257,18 @@ void RosInterface::publishFrame(pho::api::PFrame frame) {
     if (frame->NormalMap.Empty()){
         ROS_WARN("Empty normal map!");
     }
-    sensor_msgs::Image texture, confidence_map, normal_map;
+    sensor_msgs::Image texture, confidence_map, normal_map, depth_map;
     ros::Time timeNow = ros::Time::now();
 
-    texture.header.stamp = timeNow;
-    texture.header.frame_id = frameId;
-    texture.header.seq = frame->Info.FrameIndex;
+    std_msgs::Header header;
+    header.stamp = timeNow;
+    header.frame_id = frameId;
+    header.seq = frame->Info.FrameIndex;
 
-    confidence_map.header.stamp = timeNow;
-    confidence_map.header.frame_id = frameId;
-    confidence_map.header.seq = frame->Info.FrameIndex;
-
-    normal_map.header.stamp = timeNow;
-    normal_map.header.frame_id = frameId;
-    normal_map.header.seq = frame->Info.FrameIndex;
+    texture.header = header;
+    confidence_map.header = header;
+    normal_map.header = header;
+    depth_map.header = header;
 
     cv::Mat cvGreyTexture(frame->Texture.Size.Height, frame->Texture.Size.Width, CV_32FC1, frame->Texture.operator[](0));
     cv::normalize(cvGreyTexture, cvGreyTexture, 0, 255, CV_MINMAX);
@@ -277,7 +276,7 @@ void RosInterface::publishFrame(pho::api::PFrame frame) {
     cv::equalizeHist(cvGreyTexture, cvGreyTexture);
     cv::Mat cvRgbTexture;
     cv::cvtColor(cvGreyTexture,cvRgbTexture,CV_GRAY2RGB);
-    cv_bridge::CvImage rgbTexture(texture.header,sensor_msgs::image_encodings::BGR8,cvRgbTexture);
+    cv_bridge::CvImage rgbTexture(header,sensor_msgs::image_encodings::BGR8,cvRgbTexture);
 
     texture.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
     sensor_msgs::fillImage(texture, sensor_msgs::image_encodings::TYPE_32FC1,
@@ -299,6 +298,13 @@ void RosInterface::publishFrame(pho::api::PFrame frame) {
                            frame->NormalMap.Size.Width, // width
                            frame->NormalMap.Size.Width * sizeof(float) * 3, // stepSize
                            frame->NormalMap.operator[](0));
+    depth_map.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
+    sensor_msgs::fillImage(depth_map,
+                           sensor_msgs::image_encodings::TYPE_32FC1,
+                           frame->DepthMap.Size.Height, // height
+                           frame->DepthMap.Size.Width, // width
+                           frame->DepthMap.Size.Width * sizeof(float), // stepSize
+                           frame->DepthMap.operator[](0));
     std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> cloud = PhoXiInterface::getPointCloudFromFrame(frame);
 
     sensor_msgs::PointCloud2 output_cloud;
@@ -312,6 +318,7 @@ void RosInterface::publishFrame(pho::api::PFrame frame) {
     confidenceMapPub.publish(confidence_map);
     rawTexturePub.publish(texture);
     rgbTexturePub.publish(rgbTexture.toImageMsg());
+    depthMapPub.publish(depth_map);
 }
 
 bool RosInterface::setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request &req, phoxi_camera::SetCoordinatesSpace::Response &res){
