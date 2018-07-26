@@ -100,6 +100,7 @@ private:
     ros::Publisher confidenceMapPub;
     ros::Publisher rawTexturePub;
     ros::Publisher rgbTexturePub;
+    ros::Publisher depthMapPub;
 
     //dynamic reconfigure
     boost::recursive_mutex dynamicReconfigureMutex;
