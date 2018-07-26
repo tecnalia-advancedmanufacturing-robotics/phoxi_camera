@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>phoxi_camera</name>
-  <version>1.1.4</version>
+  <version>2.0.0</version>
   <description>The phoxi_camera is a package that enables interfacing Photoneo Phoxi Scanner/Camera from ROS</description>
 
   <author>Photoneo s.r.o</author>
