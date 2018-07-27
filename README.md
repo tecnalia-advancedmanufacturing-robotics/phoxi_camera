@@ -4,7 +4,12 @@ This package enables interfacing Photoneo PhoXi 3D Scanner/Camera from ROS.
 
 <img src="http://photoneo.com/images/photoneo_scanner.png" width="640">
 
-### Install
+### Installation of latest version 2.*.*
+*phoxi_camera* package depends on:
+- ROS (we are using Kinetic)
+- PhoXiControl driver software which you can [download here](https://drive.google.com/file/d/1QvUtMUR2Np9aBF7uns01ncxZzx8Xince/view?usp=sharing)
+
+### Installation of version 1.*.*
 *phoxi_camera* package depends on several state-of-the-art libraries and latest version 
 of g++ compiler. Script *install_prerequisities.sh* which is available in main repo folder
  install all packages and libraries required for successful phoxi_camera compilation. 
