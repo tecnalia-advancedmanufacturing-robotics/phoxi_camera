@@ -470,7 +470,7 @@ void RosInterface::dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &
     if (level & (1 << 11)) {
         try{
             this->isOk();
-            scanner->OutputSettings->SendTexture = config.send_deapth_map;
+            scanner->OutputSettings->SendDepthMap = config.send_deapth_map;
         }catch (PhoXiInterfaceException &e){
             ROS_WARN("%s",e.what());
         }
