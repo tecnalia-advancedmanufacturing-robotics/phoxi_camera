@@ -336,7 +336,7 @@ bool RosInterface::setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request
     try {
         PhoXiInterface::setCoordinateSpace(req.coordinates_space);
         //update dynamic reconfigure
-        dynamicReconfigureConfig.coordination_space = req.coordinates_space;
+        dynamicReconfigureConfig.coordinate_space = req.coordinates_space;
         dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
         res.success = true;
         res.message = OKRESPONSE;
@@ -353,7 +353,7 @@ bool RosInterface::setTransformation(phoxi_camera::SetTransformationMatrix::Requ
         tf::transformMsgToEigen(req.transform,transform);
         PhoXiInterface::setTransformation(transform.matrix(),req.coordinates_space,req.set_space,req.save_settings);
         //update dynamic reconfigure
-        dynamicReconfigureConfig.coordination_space = req.coordinates_space;
+        dynamicReconfigureConfig.coordinate_space = req.coordinates_space;
         dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
         res.success = true;
         res.message = OKRESPONSE;
@@ -475,12 +475,21 @@ void RosInterface::dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &
             ROS_WARN("%s",e.what());
         }
     }
+
+    if (level & (1 << 12)) {
+        try{
+            this->isOk();
+            scanner->CoordinatesSettings->CoordinateSpace = config.coordinate_space;
+        }catch (PhoXiInterfaceException &e){
+            ROS_WARN("%s",e.what());
+        }
+    }
 }
 
 pho::api::PFrame RosInterface::getPFrame(int id){
     pho::api::PFrame frame = PhoXiInterface::getPFrame(id);
     //update dynamic reconfigure
-    dynamicReconfigureConfig.coordination_space = pho::api::PhoXiTriggerMode::Software;
+    dynamicReconfigureConfig.coordinate_space = pho::api::PhoXiTriggerMode::Software;
     dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
     return frame;
 }
@@ -488,7 +497,7 @@ pho::api::PFrame RosInterface::getPFrame(int id){
 int RosInterface::triggerImage(){
     int id = PhoXiInterface::triggerImage();
     //update dynamic reconfigure
-    dynamicReconfigureConfig.coordination_space = pho::api::PhoXiTriggerMode::Software;
+    dynamicReconfigureConfig.coordinate_space = pho::api::PhoXiTriggerMode::Software;
     dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
     return id;
 }
@@ -570,6 +579,7 @@ void RosInterface::initFromPhoXi(){
     this->dynamicReconfigureConfig.send_confidence_map = scanner->OutputSettings->SendConfidenceMap;
     this->dynamicReconfigureConfig.send_deapth_map = scanner->OutputSettings->SendDepthMap;
     this->dynamicReconfigureConfig.send_texture = scanner->OutputSettings->SendTexture;
+    this->dynamicReconfigureConfig.coordinate_space = scanner->CoordinatesSettings->CoordinateSpace;
 }
 
 
