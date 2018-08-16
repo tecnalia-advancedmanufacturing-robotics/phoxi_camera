@@ -10,7 +10,7 @@ resolution: 1         # 0 = Low, 1 = High
 scan_multiplier: 1
 confidence: 3.0
 send_confidence_map: true
-send_deapth_map: true
+send_depth_map: true
 send_normal_map: true
 send_point_cloud: true
 send_texture: true
