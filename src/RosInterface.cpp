@@ -190,6 +190,17 @@ bool RosInterface::saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera
             res.message = "Null frame!";
             return true;
         }
+        size_t pos = req.path.find("~");
+        if(pos != std::string::npos){
+            char* home = std::getenv("HOME");
+            if(!home){
+                res.message = "'~' found in 'path' parameter but environment variable 'HOME' not found. Export' HOME' variable or pass absolute value to 'path' parameter.";
+                res.success = false;
+                return true;
+            }
+            req.path.replace(pos,1,home);
+        }
+        ROS_INFO("path: %s",req.path.c_str());
         frame->SaveAsPly(req.path);
         res.message = OKRESPONSE;
         res.success = true;
