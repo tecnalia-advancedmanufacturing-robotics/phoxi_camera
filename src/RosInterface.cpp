@@ -57,7 +57,7 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
 
     //connect to default scanner
     std::string scannerId;
-    nh.param<std::string>("scanner_id", scannerId, "InstalledExamples-PhoXi-example");
+    nh.param<std::string>("scanner_id", scannerId, "InstalledExamples-basic-example");
     nh.param<std::string>("frame_id", frameId, "PhoXi3Dscanner_sensor");
 
     try {
