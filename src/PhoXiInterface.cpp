@@ -50,7 +50,6 @@ void PhoXiInterface::connectCamera(std::string HWIdentification, pho::api::PhoXi
         throw UnableToStartAcquisition("Scanner was not able to connect. Disconnected.");
     }
     this->setTriggerMode(mode,startAcquisition);
-    return ;
 }
 void PhoXiInterface::disconnectCamera(){
     if(scanner && scanner->isConnected()){
@@ -95,13 +94,11 @@ void PhoXiInterface::isOk(){
     if(!scanner || !scanner->isConnected()){
         throw PhoXiScannerNotConnected("No scanner connected");
     }
-    return;
 }
 
 void PhoXiInterface::setCoordinateSpace(pho::api::PhoXiCoordinateSpace space){
     this->isOk();
     scanner->CoordinatesSettings->CoordinateSpace = space;
-    return;
 }
 
 pho::api::PhoXiCoordinateSpace PhoXiInterface::getCoordinateSpace(){
