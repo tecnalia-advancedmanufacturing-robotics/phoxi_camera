@@ -266,6 +266,9 @@ void RosInterface::publishFrame(pho::api::PFrame frame) {
             ROS_WARN("Empty point cloud!");
         } else {
             auto cloud = PhoXiInterface::getPointCloudFromFrame(frame);
+            dynamicReconfigureConfig.min_intensity = getMinIntensity();
+            dynamicReconfigureConfig.max_intensity = getMaxIntensity();
+            dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
             sensor_msgs::PointCloud2 output_cloud;
             pcl::toROSMsg(*cloud,output_cloud);
             output_cloud.header = header;
@@ -512,6 +515,26 @@ void RosInterface::dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &
             this->isOk();
             PhoXiInterface::setCoordinateSpace(config.coordination_space);
             this->dynamicReconfigureConfig.coordination_space = config.coordination_space;
+        }catch (PhoXiInterfaceException &e){
+            ROS_WARN("%s",e.what());
+        }
+    }
+
+    if (level & (1 << 13)) {
+        try{
+            this->isOk();
+            PhoXiInterface::setMinIntensity((float)config.min_intensity);
+            this->dynamicReconfigureConfig.min_intensity = config.min_intensity;
+        }catch (PhoXiInterfaceException &e){
+            ROS_WARN("%s",e.what());
+        }
+    }
+
+    if (level & (1 << 14)) {
+        try{
+            this->isOk();
+            PhoXiInterface::setMaxIntensity((float)config.max_intensity);
+            this->dynamicReconfigureConfig.max_intensity = config.max_intensity;
         }catch (PhoXiInterfaceException &e){
             ROS_WARN("%s",e.what());
         }

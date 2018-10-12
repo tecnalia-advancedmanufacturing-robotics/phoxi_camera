@@ -10,6 +10,8 @@
 #include <pcl_ros/point_cloud.h>
 #include <Eigen/Core>
 #include <phoxi_camera/PhoXiException.h>
+#include <cstdint>
+#include <limits>
 
 //* PhoXiInterface
 /**
@@ -22,7 +24,7 @@ public:
     /**
     * Default constructor.
     */
-    PhoXiCamera();
+    PhoXiInterface();
 
     /**
     * Return all PhoXi 3D Scanners ids connected on netwok.
@@ -59,11 +61,11 @@ public:
     *
     * \throw PhoXiScannerNotConnected when no scanner is connected
     */
-    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloud();
+    std::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBNormal>> getPointCloud();
     /**
     * Convert PFrame to point cloud
     */
-    static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloudFromFrame(pho::api::PFrame frame);
+    std::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBNormal>> getPointCloudFromFrame(pho::api::PFrame frame);
     /**
     * Test if connection to PhoXi 3D Scanner is working
     *
@@ -195,9 +197,35 @@ public:
     * \throw PhoXiScannerNotConnected when no scanner is connected
     */
     pho::api::PhoXiTriggerMode getTriggerMode();
+    /**
+     * Gets the minimum intensity when coloring point cloud from the image texture
+     */
+    float getMinIntensity() const {
+        return minIntensity;
+    }
+    /**
+     * Sets the minimum intensity when coloring point cloud from the image texture
+     */
+    void setMinIntensity(float minIntensity) {
+        PhoXiInterface::minIntensity = minIntensity;
+    }
+    /**
+     * Gets the maximum intensity when coloring point cloud from the image texture
+     */
+    float getMaxIntensity() const {
+        return maxIntensity;
+    }
+    /**
+     * Gets the maximum intensity when coloring point cloud from the image texture
+     */
+    void setMaxIntensity(float maxIntensity) {
+        PhoXiInterface::maxIntensity = maxIntensity;
+    }
 protected:
     pho::api::PPhoXi scanner;
     pho::api::PhoXiFactory phoXiFactory;
+    float minIntensity;
+    float maxIntensity;
 private:
 
 

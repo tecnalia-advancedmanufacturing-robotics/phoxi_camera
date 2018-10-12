@@ -4,7 +4,7 @@
 
 #include "phoxi_camera/PhoXiInterface.h"
 
-PhoXiInterface::PhoXiCamera(){
+PhoXiInterface::PhoXiInterface() : minIntensity(0.0f), maxIntensity(0.0f) {
 
 }
 
@@ -65,27 +65,62 @@ pho::api::PFrame PhoXiInterface::getPFrame(int id){
     return  scanner->GetSpecificFrame(id,10000);
 }
 
-std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud() {
+std::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBNormal>> PhoXiInterface::getPointCloud() {
     return getPointCloudFromFrame(getPFrame(-1));
 }
 
-static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloudFromFrame(pho::api::PFrame frame) {
+std::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBNormal>> PhoXiInterface::getPointCloudFromFrame(pho::api::PFrame frame) {
     if (!frame || !frame->Successful) {
         throw CorruptedFrame("Corrupted frame!");
     }
-    std::shared_ptr <pcl::PointCloud<pcl::PointNormal>>cloud(new pcl::PointCloud<pcl::PointNormal>(frame->GetResolution().Width,frame->GetResolution().Height));
+    bool autoMinMaxIntensityUsed = false;
+    bool textureAvailable = scanner->OutputSettings->SendTexture && !frame->Texture.Empty();
+    if (textureAvailable) {
+        if (minIntensity < 0.0f || maxIntensity <= 0.0f || minIntensity >= maxIntensity) {
+            minIntensity = std::numeric_limits<float>::max();
+            maxIntensity = std::numeric_limits<float>::min();
+            autoMinMaxIntensityUsed = true;
+            for(int r = 0; r < frame->Texture.Size.Height; r++) {
+                for (int c = 0; c < frame->Texture.Size.Width; c++) {
+                    auto point = frame->PointCloud.At(r,c);
+                    if (point.x > 0 && point.y > 0 && point.z > 0) {
+                        float intensity = frame->Texture.At(r,c);
+                        if (intensity > maxIntensity)
+                            maxIntensity = intensity;
+                        if (intensity < minIntensity)
+                            minIntensity = intensity;
+                    }
+                }
+            }
+        }
+    }
+    std::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBNormal>> cloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>(frame->GetResolution().Width,frame->GetResolution().Height));
     for(int r = 0; r < frame->GetResolution().Height; r++){
         for (int c = 0; c < frame->GetResolution().Width; c++){
-            //todo
             auto point = frame->PointCloud.At(r,c);
             auto normal = frame->NormalMap.At(r,c);
-            Eigen::Vector3f eigenPoint(point.x, point.y, point.z);
-            Eigen::Vector3f eigenNormal(point.x, point.y, point.z);
-            pcl::PointNormal pclPoint;
-            pclPoint.getVector3fMap() = eigenPoint/1000;  //to [m]
-            pclPoint.getNormalVector3fMap() = eigenNormal/1000; //to [m]
+            uint8_t intensity8Bits = 0;
+            if (textureAvailable) {
+                float intensityMaxTruncated = std::min((float)frame->Texture.At(r,c), maxIntensity);
+                float intensityMinTruncated = std::max(intensityMaxTruncated, minIntensity);
+                intensity8Bits = (uint8_t)((intensityMinTruncated - minIntensity) / (maxIntensity - minIntensity) * std::numeric_limits<uint8_t>::max());
+            }
+            pcl::PointXYZRGBNormal pclPoint;
+            pclPoint.x = point.x / 1000.0;
+            pclPoint.y = point.y / 1000.0;
+            pclPoint.z = point.z / 1000.0;
+            pclPoint.normal_x = normal.x;
+            pclPoint.normal_y = normal.y;
+            pclPoint.normal_z = normal.z;
+            pclPoint.r = intensity8Bits;
+            pclPoint.g = intensity8Bits;
+            pclPoint.b = intensity8Bits;
             cloud->at(c,r) = pclPoint;
         }
+    }
+    if (autoMinMaxIntensityUsed) {
+        minIntensity = 0.0f;
+        maxIntensity = 0.0f;
     }
     return cloud;
 }

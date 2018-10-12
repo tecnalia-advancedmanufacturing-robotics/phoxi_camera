@@ -1,5 +1,10 @@
 <launch>
-    <node pkg="phoxi_camera" type="phoxi_camera" name="phoxi_camera" output="screen">
+    <node pkg="phoxi_camera" type="phoxi_camera" name="phoxi_camera" output="screen" clear_params="true">
         <rosparam file="$(find phoxi_camera)/config/phoxi_camera.yaml" command="load"/>
+    </node>
+
+    <node name="$(anon dynparam)" pkg="dynamic_reconfigure" type="dynparam" args="set_from_parameters phoxi_camera">
+        <param name="min_intensity" type="double" value="0.0" />
+        <param name="max_intensity" type="double" value="0.0" />
     </node>
 </launch>
