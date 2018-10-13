@@ -94,11 +94,11 @@ std::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBNormal>> PhoXiInterface::getPoin
             }
         }
     }
+    bool normalMapAvailable = scanner->OutputSettings->SendNormalMap && !frame->NormalMap.Empty();
     std::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBNormal>> cloud(new pcl::PointCloud<pcl::PointXYZRGBNormal>(frame->GetResolution().Width,frame->GetResolution().Height));
     for(int r = 0; r < frame->GetResolution().Height; r++){
         for (int c = 0; c < frame->GetResolution().Width; c++){
             auto point = frame->PointCloud.At(r,c);
-            auto normal = frame->NormalMap.At(r,c);
             uint8_t intensity8Bits = 0;
             if (textureAvailable) {
                 float intensityMaxTruncated = std::min((float)frame->Texture.At(r,c), maxIntensity);
@@ -109,9 +109,12 @@ std::shared_ptr<pcl::PointCloud<pcl::PointXYZRGBNormal>> PhoXiInterface::getPoin
             pclPoint.x = point.x / 1000.0;
             pclPoint.y = point.y / 1000.0;
             pclPoint.z = point.z / 1000.0;
-            pclPoint.normal_x = normal.x;
-            pclPoint.normal_y = normal.y;
-            pclPoint.normal_z = normal.z;
+            if (normalMapAvailable) {
+                auto normal = frame->NormalMap.At(r,c);
+                pclPoint.normal_x = normal.x;
+                pclPoint.normal_y = normal.y;
+                pclPoint.normal_z = normal.z;
+            }
             pclPoint.r = intensity8Bits;
             pclPoint.g = intensity8Bits;
             pclPoint.b = intensity8Bits;
