@@ -17,7 +17,7 @@ PhoXiInterface phoxi_interface;
 
 class PhoXiInterfaceTest : public testing::Test {
 public:
-    const string camera_ID = "InstalledExamples-PhoXi-example";
+    const string camera_ID = "InstalledExamples-basic-example";
 
     static void SetUpTestCase(){
         //test constructor only once
@@ -35,7 +35,7 @@ public:
 
 class PhoXiInterfaceTestConnection : public testing::Test {
 public:
-    const string camera_ID = "InstalledExamples-PhoXi-example";
+    const string camera_ID = "InstalledExamples-basic-example";
     //PhoXiInterface phoxi_interface;
 
     static void SetUpTestCase(){
@@ -324,15 +324,10 @@ TEST_F (PhoXiInterfaceTest, setTransformation) {
                                                    true, false), CoordinationSpaceNotSupported);
     ASSERT_NO_THROW(phoxi_interface.triggerImage());
 
-    EXPECT_THROW(phoxi_interface.setTransformation(transformation,
-                                                   pho::api::PhoXiCoordinateSpace::MountingSpace,
-                                                   true, false), CoordinationSpaceNotSupported);
-    ASSERT_NO_THROW(phoxi_interface.triggerImage());
-
     // try it without connected camera
     phoxi_interface.disconnectCamera();
     ASSERT_THROW(phoxi_interface.setTransformation(transformation,
-                                                   pho::api::PhoXiCoordinateSpace::MountingSpace,
+                                                   pho::api::PhoXiCoordinateSpace::CustomSpace,
                                                    true, false), PhoXiScannerNotConnected);
 }
 
@@ -349,10 +344,6 @@ TEST_F (PhoXiInterfaceTest, setCoordinateSpace) {
     EXPECT_NO_THROW(phoxi_interface.setCoordinateSpace(pho::api::PhoXiCoordinateSpace::MarkerSpace));
     ASSERT_EQ(phoxi_interface.getCoordinateSpace(),pho::api::PhoXiCoordinateSpace::MarkerSpace);
     ASSERT_GE(phoxi_interface.triggerImage(), 0);
-
-    EXPECT_NO_THROW(phoxi_interface.setCoordinateSpace(pho::api::PhoXiCoordinateSpace::MountingSpace));
-    ASSERT_EQ(phoxi_interface.getCoordinateSpace(),pho::api::PhoXiCoordinateSpace::MountingSpace);
-    ASSERT_GE(phoxi_interface.triggerImage() ,0);
 
     EXPECT_NO_THROW(phoxi_interface.setCoordinateSpace(pho::api::PhoXiCoordinateSpace::NoValue));
     ASSERT_EQ(phoxi_interface.getCoordinateSpace(),pho::api::PhoXiCoordinateSpace::NoValue);

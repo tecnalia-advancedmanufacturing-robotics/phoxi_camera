@@ -7,5 +7,5 @@
     <include file="$(find phoxi_camera)/launch/phoxi_camera.launch"/>
 
     <!-- Run interface tests -->
-    <test test-name="InterfacesExist" pkg="phoxi_camera" type="test_phoxi_camera_interfaces_exist.py" />
+    <test test-name="InterfacesExist" pkg="phoxi_camera" type="test_phoxi_camera_interfaces_exist.py" time-limit="200"/>
 </launch>

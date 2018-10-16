@@ -7,25 +7,33 @@ PKG = 'phoxi_camera'
 
 from unittest import TestCase
 from config import *
-import rospy
+import rospy, time
 import std_srvs.srv
 import sensor_msgs.msg
+import geometry_msgs.msg._Transform as transform
 from ros_utils import *
 import phoxi_camera.srv as phoxi_camera_srv
 
 published_topics_num = 0
+
 
 def connect():
     rospy.wait_for_service(service.connect_camera)
     srv_connect = rospy.ServiceProxy(service.connect_camera, phoxi_camera_srv.ConnectCamera)
     srv_connect(camera_id)
 
+
 def disconnect():
     rospy.wait_for_service(service.disconnect_camera)
     srv_disconnect = rospy.ServiceProxy(service.disconnect_camera, std_srvs.srv.Empty)
     srv_disconnect()
 
+
 class Test_phoxi_camera_ros_interface(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        time.sleep(5)
+
     def setUp(self):
         rospy.init_node('Test_ROS_interfaces')
         connect()
@@ -268,11 +276,8 @@ class Test_phoxi_camera_ros_interface(TestCase):
     def test_setTransformation(self):
         srv_transform = rospy.ServiceProxy(service.V2_set_transformation, phoxi_camera_srv.SetTransformationMatrix)
 
-        res = srv_transform([], 5, True, False)
-        assert False == res.success
-        assert "Bad matrix dimensions!" == res.message
-
-        res = srv_transform([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16], 5, True, False)
+        trans = transform.Transform()
+        res = srv_transform(trans, 4, True, False)
         assert True == res.success
         assert "Ok" == res.message
 
@@ -348,6 +353,7 @@ class Test_phoxi_camera_ros_interface(TestCase):
 
         assert rospy.has_param(param.trigger_mode) == True, \
             "Parameter %s is not exist" % param.trigger_mode
+
 
 if __name__ == '__main__':
     import rostest

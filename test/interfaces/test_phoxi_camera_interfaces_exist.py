@@ -7,7 +7,7 @@ PKG = 'phoxi_camera'
 
 from unittest import TestCase
 from config import *
-import rospy
+import rospy, time
 import phoxi_camera.srv as phoxi_camera_srv
 from ros_utils import *
 
@@ -17,6 +17,10 @@ def connect():
     srv_connect(camera_id)
 
 class Test_phoxi_camera_interfaces(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        time.sleep(5)
+
     def setUp(self):
         rospy.init_node('Test_ROS_interfaces')
         connect()

@@ -7,5 +7,5 @@
     <include file="$(find phoxi_camera)/launch/phoxi_camera.launch"/>
 
     <!-- Run ROS interface class tests -->
-    <test test-name="RosInterfaces" pkg="phoxi_camera" type="test_phoxi_camera_ros_interfaces.py" />
+    <test test-name="RosInterfaces" pkg="phoxi_camera" type="test_phoxi_camera_ros_interfaces.py" time-limit="400"/>
 </launch>
