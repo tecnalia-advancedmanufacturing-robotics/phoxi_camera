@@ -64,6 +64,11 @@ generate_dynamic_reconfigure_options(
 )
 
 catkin_package(
+  INCLUDE_DIRS
+    include
+  LIBRARIES
+    ${PROJECT_NAME}_PhoXi_Interface
+    ${PROJECT_NAME}_Ros_Interface
   CATKIN_DEPENDS
     roscpp
     message_runtime
