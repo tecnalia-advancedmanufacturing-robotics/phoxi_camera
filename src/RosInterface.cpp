@@ -46,9 +46,6 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
     rgbTexturePub = nh.advertise < sensor_msgs::Image > ("rgb_texture", topic_queue_size,latch_topics);
     depthMapPub = nh.advertise < sensor_msgs::Image > ("depth_map", topic_queue_size,latch_topics);
 
-    //set dynamic reconfigure callback
-    dynamicReconfigureServer.setCallback(boost::bind(&RosInterface::dynamicReconfigureCallback,this, _1, _2));
-
     //set diagnostic Hw id
     diagnosticUpdater.setHardwareID("none");
     diagnosticUpdater.add(PhoXi3DscannerDiagnosticTask);
@@ -65,8 +62,10 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
         ROS_INFO("Connected to %s",scannerId.c_str());
     }catch(PhoXiInterfaceException& e) {
         ROS_WARN("Connection to default scanner %s failed. %s ",scannerId.c_str(),e.what());
+        dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
     }
-
+    //set dynamic reconfigure callback
+    dynamicReconfigureServer.setCallback(boost::bind(&RosInterface::dynamicReconfigureCallback,this, _1, _2));
 }
 
 bool RosInterface::getDeviceList(phoxi_camera::GetDeviceList::Request &req, phoxi_camera::GetDeviceList::Response &res){
