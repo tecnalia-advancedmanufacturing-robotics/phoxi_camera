@@ -38,9 +38,9 @@ add_message_files(
 
 add_service_files(
   FILES
-    Deprecated/Empty.srv        #depricated
-    Deprecated/IsConnected.srv  #depricated
-    Deprecated/IsAcquiring.srv  #depricated
+    Deprecated/Empty.srv        #deprecated
+    Deprecated/IsConnected.srv  #deprecated
+    Deprecated/IsAcquiring.srv  #deprecated
     ConnectCamera.srv
     TriggerImage.srv
     GetDeviceList.srv
@@ -93,15 +93,15 @@ add_executable(
 
 add_dependencies(
   ${PROJECT_NAME}_Ros_Interface
-  ${PROJECT_NAME}_gencfgv
+  ${PROJECT_NAME}_PhoXi_Interface
+  ${PROJECT_NAME}_gencfg
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
-  ${PROJECT_NAME}_PhoXi_Interface
 )
 
 add_dependencies(
   ${PROJECT_NAME}
-  ${PROJECT_NAME}_gencfgv
+  ${PROJECT_NAME}_gencfg
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   ${PROJECT_NAME}_Ros_Interface
