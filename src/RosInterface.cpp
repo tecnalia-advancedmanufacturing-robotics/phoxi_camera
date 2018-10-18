@@ -35,16 +35,16 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
     setTransformationService = nh.advertiseService("V2/set_coordination_space",&RosInterface::setCoordianteSpace, this);
 
     //create publishers
-    bool latch_tipics;
+    bool latch_topics;
     int topic_queue_size;
-    nh.param<bool>("latch_tipics", latch_tipics, false);
+    nh.param<bool>("latch_topics", latch_topics, false);
     nh.param<int>("topic_queue_size", topic_queue_size, 1);
-    cloudPub = nh.advertise < sensor_msgs::PointCloud2 >("pointcloud", 1,latch_tipics);
-    normalMapPub = nh.advertise < sensor_msgs::Image > ("normal_map", topic_queue_size,latch_tipics);
-    confidenceMapPub = nh.advertise < sensor_msgs::Image > ("confidence_map", topic_queue_size,latch_tipics);
-    rawTexturePub = nh.advertise < sensor_msgs::Image > ("texture", topic_queue_size,latch_tipics);
-    rgbTexturePub = nh.advertise < sensor_msgs::Image > ("rgb_texture", topic_queue_size,latch_tipics);
-    depthMapPub = nh.advertise < sensor_msgs::Image > ("depth_map", topic_queue_size,latch_tipics);
+    cloudPub = nh.advertise < sensor_msgs::PointCloud2 >("pointcloud", 1,latch_topics);
+    normalMapPub = nh.advertise < sensor_msgs::Image > ("normal_map", topic_queue_size,latch_topics);
+    confidenceMapPub = nh.advertise < sensor_msgs::Image > ("confidence_map", topic_queue_size,latch_topics);
+    rawTexturePub = nh.advertise < sensor_msgs::Image > ("texture", topic_queue_size,latch_topics);
+    rgbTexturePub = nh.advertise < sensor_msgs::Image > ("rgb_texture", topic_queue_size,latch_topics);
+    depthMapPub = nh.advertise < sensor_msgs::Image > ("depth_map", topic_queue_size,latch_topics);
 
     //set dynamic reconfigure callback
     dynamicReconfigureServer.setCallback(boost::bind(&RosInterface::dynamicReconfigureCallback,this, _1, _2));
