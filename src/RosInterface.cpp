@@ -39,7 +39,7 @@ RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfig
     int topic_queue_size;
     nh.param<bool>("latch_tipics", latch_tipics, false);
     nh.param<int>("topic_queue_size", topic_queue_size, 1);
-    cloudPub = nh.advertise <pcl::PointCloud<pcl::PointXYZ >>("pointcloud", 1,latch_tipics);
+    cloudPub = nh.advertise < sensor_msgs::PointCloud2 >("pointcloud", 1,latch_tipics);
     normalMapPub = nh.advertise < sensor_msgs::Image > ("normal_map", topic_queue_size,latch_tipics);
     confidenceMapPub = nh.advertise < sensor_msgs::Image > ("confidence_map", topic_queue_size,latch_tipics);
     rawTexturePub = nh.advertise < sensor_msgs::Image > ("texture", topic_queue_size,latch_tipics);
