@@ -76,14 +76,17 @@ static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPoi
     std::shared_ptr <pcl::PointCloud<pcl::PointNormal>>cloud(new pcl::PointCloud<pcl::PointNormal>(frame->GetResolution().Width,frame->GetResolution().Height));
     for(int r = 0; r < frame->GetResolution().Height; r++){
         for (int c = 0; c < frame->GetResolution().Width; c++){
-            //todo
             auto point = frame->PointCloud.At(r,c);
-            auto normal = frame->NormalMap.At(r,c);
-            Eigen::Vector3f eigenPoint(point.x, point.y, point.z);
-            Eigen::Vector3f eigenNormal(point.x, point.y, point.z);
             pcl::PointNormal pclPoint;
-            pclPoint.getVector3fMap() = eigenPoint/1000;  //to [m]
-            pclPoint.getNormalVector3fMap() = eigenNormal/1000; //to [m]
+            pclPoint.x = point.x /1000;                 //to [m]
+            pclPoint.y = point.y /1000;                 //to [m]
+            pclPoint.z = point.z /1000;                 //to [m]
+            if(!frame->NormalMap.Empty()){
+                auto normal = frame->NormalMap.At(r,c);
+                pclPoint.normal_x = normal.x / 1000;    //to [m]
+                pclPoint.normal_y = normal.y / 1000;    //to [m]
+                pclPoint.normal_z = normal.z / 1000;    //to [m]
+            }
             cloud->at(c,r) = pclPoint;
         }
     }
