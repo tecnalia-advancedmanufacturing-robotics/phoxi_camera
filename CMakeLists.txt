@@ -8,17 +8,16 @@ find_package(Boost REQUIRED COMPONENTS system)
 find_package(catkin REQUIRED
   COMPONENTS
     roscpp
-    roslib
     rospy
     std_msgs
     sensor_msgs
     pcl_ros
-    pcl_conversions
     dynamic_reconfigure
     diagnostic_updater
     geometry_msgs
     eigen_conversions
     cv_bridge
+    message_generation
 )
 
 catkin_python_setup()
@@ -64,11 +63,25 @@ generate_dynamic_reconfigure_options(
 )
 
 catkin_package(
+  INCLUDE_DIRS
+    include
+    ${PHOXI_INCLUDE_DIRS}
+  LIBRARIES
+    ${PROJECT_NAME}_PhoXi_Interface
+    ${PROJECT_NAME}_Ros_Interface
   CATKIN_DEPENDS
     roscpp
     message_runtime
     std_msgs
-    sensor_msgs 
+    sensor_msgs
+    pcl_ros
+    dynamic_reconfigure
+    diagnostic_updater
+    geometry_msgs
+    cv_bridge
+    eigen_conversions
+  DEPENDS
+    PhoXi
 )
 
 add_compile_options(-w)
@@ -101,7 +114,6 @@ add_dependencies(
 
 add_dependencies(
   ${PROJECT_NAME}
-  ${PROJECT_NAME}_gencfg
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
   ${PROJECT_NAME}_Ros_Interface
@@ -116,7 +128,6 @@ target_link_libraries(
 target_link_libraries(
   ${PROJECT_NAME}_Ros_Interface
   ${PROJECT_NAME}_PhoXi_Interface
-  ${Boost_LIBRARIES}
   ${catkin_LIBRARIES}
 )
 
@@ -126,10 +137,14 @@ target_link_libraries(
   ${PROJECT_NAME}_Ros_Interface
 )
 
-install(PROGRAMS
-  test/interfaces/ros_utils.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+install(TARGETS ${PROJECT_NAME}_Ros_Interface ${PROJECT_NAME}_PhoXi_Interface
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
+
+
+install(DIRECTORY include/${PROJECT_NAME}/
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
 if (CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
