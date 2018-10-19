@@ -4,7 +4,7 @@
 
 #include "phoxi_camera/PhoXiInterface.h"
 
-PhoXiInterface::PhoXiCamera(){
+PhoXiInterface::PhoXiInterface(){
 
 }
 

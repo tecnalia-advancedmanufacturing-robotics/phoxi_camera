@@ -22,7 +22,7 @@ public:
     /**
     * Default constructor.
     */
-    PhoXiCamera();
+    PhoXiInterface();
 
     /**
     * Return all PhoXi 3D Scanners ids connected on netwok.
