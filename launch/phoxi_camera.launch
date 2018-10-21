@@ -6,5 +6,6 @@
     <node name="$(anon dynparam)" pkg="dynamic_reconfigure" type="dynparam" args="set_from_parameters phoxi_camera">
         <param name="min_intensity" type="double" value="0.0" />
         <param name="max_intensity" type="double" value="0.0" />
+        <param name="generate_point_cloud_with_only_valid_points" type="bool" value="false" />
     </node>
 </launch>

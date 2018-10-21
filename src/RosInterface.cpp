@@ -539,6 +539,16 @@ void RosInterface::dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &
             ROS_WARN("%s",e.what());
         }
     }
+
+    if (level & (1 << 15)) {
+        try{
+            this->isOk();
+            PhoXiInterface::setGeneratePointCloudWithOnlyValidPoints(config.generate_point_cloud_with_only_valid_points);
+            this->dynamicReconfigureConfig.generate_point_cloud_with_only_valid_points = config.generate_point_cloud_with_only_valid_points;
+        }catch (PhoXiInterfaceException &e){
+            ROS_WARN("%s",e.what());
+        }
+    }
 }
 
 pho::api::PFrame RosInterface::getPFrame(int id){

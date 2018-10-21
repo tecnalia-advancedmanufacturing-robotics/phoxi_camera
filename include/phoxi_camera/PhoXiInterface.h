@@ -221,11 +221,31 @@ public:
     void setMaxIntensity(float maxIntensity) {
         PhoXiInterface::maxIntensity = maxIntensity;
     }
+    /**
+     * Gets the flag for specifying that only valid points should be used when
+     * generating a point cloud.
+     */
+    bool getGeneratePointCloudWithOnlyValidPoints() const {
+        return generatePointCloudWithOnlyValidPoints;
+    }
+    /**
+     * Sets the flag for specifying that only valid points should be used when
+     * generating a point cloud. As a result, the point cloud will be sparse and
+     * no longer retain its underlying 2D structure
+     */
+    void setGeneratePointCloudWithOnlyValidPoints(bool generatePointcloudWithOnlyValidPoints) {
+        PhoXiInterface::generatePointCloudWithOnlyValidPoints = generatePointcloudWithOnlyValidPoints;
+    }
+    /**
+     * Value associated with an invalid point for which the depth value could not be calculated
+     */
+    static const pho::api::Point3_32f invalidPoint;
 protected:
     pho::api::PPhoXi scanner;
     pho::api::PhoXiFactory phoXiFactory;
     float minIntensity;
     float maxIntensity;
+    bool generatePointCloudWithOnlyValidPoints;
 private:
 
 
