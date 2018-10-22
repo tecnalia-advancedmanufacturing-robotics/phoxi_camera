@@ -273,7 +273,7 @@ namespace phoxi_camera{
         if (frame->PointCloud.Empty()){
             ROS_WARN("Empty point cloud!");
         } else {
-            auto cloud = PhoXiInterface::getPointCloudFromFrame(frame);
+            auto cloud = PhoXiInterface::getPointCloudFromFrame(frame,dynamicReconfigureConfig.organized_cloud);
             sensor_msgs::PointCloud2 output_cloud;
             pcl::toROSMsg(*cloud,output_cloud);
             output_cloud.header = header;
@@ -468,6 +468,9 @@ namespace phoxi_camera{
                 this->isOk();
                 PhoXiInterface::setCoordinateSpace(config.coordinate_space);
                 this->dynamicReconfigureConfig.coordinate_space = config.coordinate_space;
+            }
+            if (level & (1 << 13)) {
+                this->dynamicReconfigureConfig.organized_cloud = config.organized_cloud;
             }
         }catch (PhoXiInterfaceException &e){
             ROS_WARN("%s",e.what());

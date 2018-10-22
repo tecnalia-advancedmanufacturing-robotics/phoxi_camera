@@ -3,6 +3,7 @@ frame_id: "PhoXi3Dscanner_sensor"
 latch_topics: true
 topic_queue_size: 1
 init_from_config: false # if true all following parameters will be inicialized from this config otherwise from PhoXi control application.
+organized_cloud: True # if true organized point cloud wil be published, other otherwise unorganized (Default value true)
 # All following parameters are for PhoXi Control and they can override all dynamic_reconfigure parameters in cfg file.
 # This values are set to scanner after successful connection only if init_from_config parameter is true.
 coordination_space: 1 # 1 = Camera, 2 =  Mounting, 3 = Marker, 4 = Robot, 5 = Custom

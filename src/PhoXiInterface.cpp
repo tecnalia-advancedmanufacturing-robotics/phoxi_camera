@@ -67,17 +67,21 @@ namespace phoxi_camera {
         return scanner->GetSpecificFrame(id, 10000);
     }
 
-    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud() {
-        return getPointCloudFromFrame(getPFrame(-1));
+    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud(bool organised) {
+        return getPointCloudFromFrame(getPFrame(-1),organised);
     }
 
-    static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>>
-    PhoXiInterface::getPointCloudFromFrame(pho::api::PFrame frame) {
+    static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloudFromFrame(pho::api::PFrame frame, bool organised) {
+        if(organised){
+            return getOrganizedCloudFromFrame(frame);
+        }
+        return getUnorganizedCloudFromFrame(frame);
+    }
+    static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getOrganizedCloudFromFrame(pho::api::PFrame frame){
         if (!frame || !frame->Successful) {
             throw CorruptedFrame("Corrupted frame!");
         }
-        std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> cloud(
-                new pcl::PointCloud<pcl::PointNormal>(frame->GetResolution().Width, frame->GetResolution().Height));
+        std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> cloud(new pcl::PointCloud<pcl::PointNormal>(frame->GetResolution().Width, frame->GetResolution().Height));
         for (int r = 0; r < frame->GetResolution().Height; r++) {
             for (int c = 0; c < frame->GetResolution().Width; c++) {
                 auto point = frame->PointCloud.At(r, c);
@@ -92,6 +96,33 @@ namespace phoxi_camera {
                     pclPoint.normal_z = normal.z / 1000;    //to [m]
                 }
                 cloud->at(c, r) = pclPoint;
+            }
+        }
+        return cloud;
+    }
+
+    static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getUnorganizedCloudFromFrame(pho::api::PFrame frame){
+        if (!frame || !frame->Successful) {
+            throw CorruptedFrame("Corrupted frame!");
+        }
+        std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> cloud(new pcl::PointCloud<pcl::PointNormal>());
+        for (int r = 0; r < frame->GetResolution().Height; r++) {
+            for (int c = 0; c < frame->GetResolution().Width; c++) {
+                auto point = frame->PointCloud.At(r, c);
+                if(point == pho::api::Point3_32f(0,0,0)){
+                    continue;
+                }
+                pcl::PointNormal pclPoint;
+                pclPoint.x = point.x / 1000;                 //to [m]
+                pclPoint.y = point.y / 1000;                 //to [m]
+                pclPoint.z = point.z / 1000;                 //to [m]
+                if (!frame->NormalMap.Empty()) {
+                    auto normal = frame->NormalMap.At(r, c);
+                    pclPoint.normal_x = normal.x / 1000;    //to [m]
+                    pclPoint.normal_y = normal.y / 1000;    //to [m]
+                    pclPoint.normal_z = normal.z / 1000;    //to [m]
+                }
+                cloud->push_back(pclPoint);
             }
         }
         return cloud;

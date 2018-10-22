@@ -58,13 +58,28 @@ class PhoXiInterface {
         /**
         * Get point cloud
         *
+        * \param organised - if true return organised point cloud
         * \throw PhoXiScannerNotConnected when no scanner is connected
         */
-        std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloud();
+        std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloud(bool organised = true);
         /**
         * Convert PFrame to point cloud
+        *
+        * \param organised - if true return organised point cloud
         */
-        static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloudFromFrame(pho::api::PFrame frame);
+        static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloudFromFrame(pho::api::PFrame frame,bool organised = true);
+        /**
+        * Convert PFrame to organized point cloud
+        *
+        * \return roganize point cloud
+        */
+        static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getOrganizedCloudFromFrame(pho::api::PFrame frame);
+        /**
+        * Convert PFrame to unorganized point cloud
+        *
+        * \return runoganize point cloud
+        */
+        static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getUnorganizedCloudFromFrame(pho::api::PFrame frame);
         /**
         * Test if connection to PhoXi 3D Scanner is working
         *
