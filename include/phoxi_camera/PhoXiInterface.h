@@ -26,19 +26,19 @@ class PhoXiInterface {
         PhoXiInterface();
 
         /**
-        * Return all PhoXi 3D Scanners ids connected on netwok.
+        * Return all PhoXi 3D Scanners ids connected on network.
         *
         * \note returned id can be passed to connectCamera method
-        * \throw PhoXiControlNotRunning when PhoXi Controll is not running
+        * \throw PhoXiControlNotRunning when PhoXi Control is not running
         */
         std::vector<std::string> cameraList();
         /**
-        * Connecto cammera.
+        * Connect to camera.
         *
         * \param HWIdentification - identification number
         * \param mode - trigger mode to set after connection
         * \param startAcquisition if true Acquisition will be started
-        * \throw PhoXiControlNotRunning when PhoXi Controll is not running
+        * \throw PhoXiControlNotRunning when PhoXi Control is not running
         * \throw PhoXiScannerNotFound when PhoXi 3D Scanner with HWIdentification is not available on network
         * \throw UnableToStartAcquisition when connection failed
         */
@@ -58,26 +58,26 @@ class PhoXiInterface {
         /**
         * Get point cloud
         *
-        * \param organised - if true return organised point cloud
+        * \param organized - if true return organized point cloud
         * \throw PhoXiScannerNotConnected when no scanner is connected
         */
-        std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloud(bool organised = true);
+        std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloud(bool organized = true);
         /**
         * Convert PFrame to point cloud
         *
-        * \param organised - if true return organised point cloud
+        * \param organized - if true return organized point cloud
         */
-        static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloudFromFrame(pho::api::PFrame frame,bool organised = true);
+        static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getPointCloudFromFrame(pho::api::PFrame frame,bool organized = true);
         /**
         * Convert PFrame to organized point cloud
         *
-        * \return roganize point cloud
+        * \return organized point cloud
         */
         static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getOrganizedCloudFromFrame(pho::api::PFrame frame);
         /**
         * Convert PFrame to unorganized point cloud
         *
-        * \return runoganize point cloud
+        * \return unorganized point cloud
         */
         static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getUnorganizedCloudFromFrame(pho::api::PFrame frame);
         /**
@@ -132,7 +132,7 @@ class PhoXiInterface {
         * Set transformation matrix space
         *
         * \param coordinateTransformation - transformation
-        * \param coordianation coordination space where to set transformation
+        * \param coordination coordination space where to set transformation
         * \param setSpace if true space will be set
         * \param saveSettings if true settings will persist after restart (disconnection from device)
         * \throw PhoXiScannerNotConnected when no scanner is connected
@@ -143,7 +143,7 @@ class PhoXiInterface {
         * Set transformation matrix space
         *
         * \param coordinateTransformation - transformation
-        * \param coordianation coordination space where to set transformation
+        * \param coordination coordination space where to set transformation
         * \param setSpace if true space will be set
         * \param saveSettings if true settings will persist after restart (disconnection from device)
         * \note transformation can be set only to RobotSpace and CustomSpace

@@ -67,12 +67,12 @@ namespace phoxi_camera {
         return scanner->GetSpecificFrame(id, 10000);
     }
 
-    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud(bool organised) {
-        return getPointCloudFromFrame(getPFrame(-1),organised);
+    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloud(bool organized) {
+        return getPointCloudFromFrame(getPFrame(-1), organized);
     }
 
-    static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloudFromFrame(pho::api::PFrame frame, bool organised) {
-        if(organised){
+    static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloudFromFrame(pho::api::PFrame frame, bool organized) {
+        if(organized){
             return getOrganizedCloudFromFrame(frame);
         }
         return getUnorganizedCloudFromFrame(frame);

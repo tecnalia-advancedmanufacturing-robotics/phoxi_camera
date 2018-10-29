@@ -14,7 +14,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <phoxi_camera/phoxi_cameraConfig.h>
 
-//diagnstic updater
+//diagnostic updater
 #include <boost/thread/mutex.hpp>
 #include <diagnostic_updater/diagnostic_updater.h>
 
