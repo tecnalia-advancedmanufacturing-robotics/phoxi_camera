@@ -54,6 +54,13 @@ namespace phoxi_camera{
         }
     };
 
+    class UnableToTriggerFrame : public PhoXiInterfaceException {
+    public:
+        UnableToTriggerFrame(std::string message) : PhoXiInterfaceException(message) {
+        }
+    };
+
+
     class  PhoXiScannerNotConnected : public PhoXiInterfaceException {
     public:
         PhoXiScannerNotConnected(std::string message) : PhoXiInterfaceException(message){

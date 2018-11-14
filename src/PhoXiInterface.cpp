@@ -61,7 +61,12 @@ namespace phoxi_camera {
 
     pho::api::PFrame PhoXiInterface::getPFrame(int id) {
         if (id < 0) {
-            id = this->triggerImage();
+            try {
+                id = this->triggerImage();
+            } catch (UnableToTriggerFrame &e) {
+                throw;
+            }
+
         }
         this->isOk();
         return scanner->GetSpecificFrame(id, 10000);
@@ -214,7 +219,23 @@ namespace phoxi_camera {
 
     int PhoXiInterface::triggerImage() {
         this->setTriggerMode(pho::api::PhoXiTriggerMode::Software, true);
-        return scanner->TriggerFrame();
+        int success = scanner->TriggerFrame();
+
+        if (success < 0) {
+            switch (success) {
+                case -1:
+                    throw UnableToTriggerFrame("Trigger not accepted.");
+                case -2:
+                    throw UnableToTriggerFrame("Device is not running.");
+                case -3:
+                    throw UnableToTriggerFrame("Communication Error.");
+                case -4:
+                    throw UnableToTriggerFrame("WaitForGrabbingEnd is not supported.");
+                default:
+                    throw UnableToTriggerFrame("Unknown error.");
+            }
+        }
+        return success;
     }
 
     std::vector<pho::api::PhoXiCapturingMode> PhoXiInterface::getSupportedCapturingModes() {
