@@ -8,6 +8,8 @@ it is needed for connect to camera. Default file camera ID for testing is "Insta
 
 
 ## Compile and run tests
+Before running a test, you must run PhoXi Control.
+
 This command is needed for compile tests in phoxi_camera package and also run all tests which have been built.
 ```bash
 catkin_make run_tests_phoxi_camera

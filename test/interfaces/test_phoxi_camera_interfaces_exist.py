@@ -17,9 +17,9 @@ def connect():
     srv_connect(camera_id)
 
 class Test_phoxi_camera_interfaces(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        time.sleep(5)
+    # @classmethod
+    # def setUpClass(cls):
+    #     time.sleep(5)
 
     def setUp(self):
         rospy.init_node('Test_ROS_interfaces')

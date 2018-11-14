@@ -11,7 +11,7 @@ import rospy, time
 import std_srvs.srv
 import sensor_msgs.msg
 import geometry_msgs.msg._Transform as transform
-from ros_utils import *
+# from ros_utils import *
 import phoxi_camera.srv as phoxi_camera_srv
 
 published_topics_num = 0
@@ -21,22 +21,27 @@ def connect():
     rospy.wait_for_service(service.connect_camera)
     srv_connect = rospy.ServiceProxy(service.connect_camera, phoxi_camera_srv.ConnectCamera)
     srv_connect(camera_id)
+    time.sleep(1)
 
 
 def disconnect():
     rospy.wait_for_service(service.disconnect_camera)
     srv_disconnect = rospy.ServiceProxy(service.disconnect_camera, std_srvs.srv.Empty)
     srv_disconnect()
+    time.sleep(1)
 
 
 class Test_phoxi_camera_ros_interface(TestCase):
-    @classmethod
-    def setUpClass(cls):
-        time.sleep(5)
+    # @classmethod
+    # def setUpClass(cls):
+    #     time.sleep(5)
 
     def setUp(self):
         rospy.init_node('Test_ROS_interfaces')
         connect()
+
+    def tearDown(self):
+        disconnect()
 
     def test_getDeviceList(self):
         srv = rospy.ServiceProxy(service.get_device_list, phoxi_camera_srv.GetDeviceList)
@@ -128,25 +133,45 @@ class Test_phoxi_camera_ros_interface(TestCase):
 
     def test_startAcquisition(self):
         srv_startAcq = rospy.ServiceProxy(service.start_acquisition, std_srvs.srv.Empty)
-        srv_startAcq()  # TODO no throw
+        srv_startAcq()
+
+        # check acquisition setting
+        srv_acquiring = rospy.ServiceProxy(service.V2_is_acquiring, phoxi_camera_srv.GetBool)
+        res = srv_acquiring()
+        assert True == res.value
 
     def test_stopAcquisition(self):
         srv_stopAcq = rospy.ServiceProxy(service.stop_acquisition, std_srvs.srv.Empty)
-        srv_stopAcq()  # TODO no except
+        srv_stopAcq()
+
+        # check acquisition setting
+        srv_acquiring = rospy.ServiceProxy(service.V2_is_acquiring, phoxi_camera_srv.GetBool)
+        res = srv_acquiring()
+        assert False == res.value
 
     def test_startAcquisitionV2(self):
         srv_startAcq = rospy.ServiceProxy(service.V2_start_acquisition, phoxi_camera_srv.Empty)
-        res = srv_startAcq()  # TODO no throw
+        res = srv_startAcq()
 
         assert True == res.success
         assert "Ok" == res.message
+
+        # check acquisition setting
+        srv_acquiring = rospy.ServiceProxy(service.V2_is_acquiring, phoxi_camera_srv.GetBool)
+        res = srv_acquiring()
+        assert True == res.value
 
     def test_stopAcquisitionV2(self):
         srv_stopAcq = rospy.ServiceProxy(service.V2_stop_acquisition, phoxi_camera_srv.Empty)
-        res = srv_stopAcq()  # TODO no except
+        res = srv_stopAcq()
 
         assert True == res.success
         assert "Ok" == res.message
+
+        # check acquisition setting
+        srv_acquiring = rospy.ServiceProxy(service.V2_is_acquiring, phoxi_camera_srv.GetBool)
+        res = srv_acquiring()
+        assert False == res.value
 
     def test_triggerImage(self):
         srv_trig = rospy.ServiceProxy(service.trigger_image, phoxi_camera_srv.TriggerImage)
@@ -248,7 +273,7 @@ class Test_phoxi_camera_ros_interface(TestCase):
     def test_setCoordianteSpace(self):
         srv_setSpace = rospy.ServiceProxy(service.V2_set_coordination_space, phoxi_camera_srv.SetCoordinatesSpace)
 
-        # 0 - 5 c++ enum, pho::api::PhoXiCoordinateSpace::...
+        # NoValue = 0, CameraSpace = 1, MarkerSpace = 3, RobotSpace = 4, CustomSpace = 5
         res = srv_setSpace(0)
         assert True == res.success
         assert "Ok" == res.message
