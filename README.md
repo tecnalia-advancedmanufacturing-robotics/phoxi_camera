@@ -55,6 +55,7 @@ For input and output parameters of each service please see coresponding service 
 ~/V2/set_transformation
 ~/V2/start_acquisition
 ~/V2/stop_acquisition
+~/V2/save_last_frame
 ~/connect_camera
 ~/disconnect_camera
 ~/get_device_list

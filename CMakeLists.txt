@@ -48,6 +48,7 @@ add_service_files(
     GetHardwareIdentification.srv
     GetSupportedCapturingModes.srv
     SaveFrame.srv
+    SaveLastFrame.srv
     SetCoordinatesSpace.srv
     SetTransformationMatrix.srv
 )

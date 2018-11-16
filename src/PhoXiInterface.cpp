@@ -57,6 +57,7 @@ namespace phoxi_camera {
         if (scanner && scanner->isConnected()) {
             scanner->Disconnect(true);
         }
+        last_frame_id = -1;
     }
 
     pho::api::PFrame PhoXiInterface::getPFrame(int id) {
@@ -219,10 +220,11 @@ namespace phoxi_camera {
 
     int PhoXiInterface::triggerImage() {
         this->setTriggerMode(pho::api::PhoXiTriggerMode::Software, true);
-        int success = scanner->TriggerFrame();
+        int frame_id = scanner->TriggerFrame();
+        last_frame_id = frame_id;
 
-        if (success < 0) {
-            switch (success) {
+        if (frame_id < 0) {
+            switch (frame_id) {
                 case -1:
                     throw UnableToTriggerFrame("Trigger not accepted.");
                 case -2:
@@ -235,7 +237,7 @@ namespace phoxi_camera {
                     throw UnableToTriggerFrame("Unknown error.");
             }
         }
-        return success;
+        return frame_id;
     }
 
     std::vector<pho::api::PhoXiCapturingMode> PhoXiInterface::getSupportedCapturingModes() {
@@ -283,5 +285,16 @@ namespace phoxi_camera {
     pho::api::PhoXiTriggerMode PhoXiInterface::getTriggerMode() {
         this->isOk();
         return scanner->TriggerMode;
+    }
+
+    bool PhoXiInterface::saveLastFrame(const std::string &path) {
+        if (last_frame_id == -1) {
+            // this is needed due to PhoXi API bug
+            // if you didn't trigger frame before, you can not save it
+            return false;
+        }
+
+        bool success = scanner->SaveLastOutput(path, this->last_frame_id);
+        return success;
     }
 }

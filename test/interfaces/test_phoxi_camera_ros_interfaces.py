@@ -306,78 +306,31 @@ class Test_phoxi_camera_ros_interface(TestCase):
         assert True == res.success
         assert "Ok" == res.message
 
-    def test_topics_running(self):
-        """
-        test if there are all the necessary topics that have been published
-        """
+    def test_saveLastFrameV2(self):
+        import os
 
-        assert topic_is_running(topic.confidence_map) == True, \
-            "Topic %s, not exist" % (topic.confidence_map)
+        # trigger image has to be perform before
+        srv_trig = rospy.ServiceProxy(service.trigger_image, phoxi_camera_srv.TriggerImage)
+        res = srv_trig()
+        time.sleep(5)       #TODO  SCAN-904
 
-        assert topic_is_running(topic.diagnostics) == True, \
-            "Topic %s, not exist" % (topic.diagnostics)
+        # save last frame service
+        srv_saveLastFrame = rospy.ServiceProxy(service.V2_save_last_frame, phoxi_camera_srv.SaveLastFrame)
 
-        assert topic_is_running(topic.normal_map) == True, \
-            "Topic %s, not exist" % (topic.normal_map)
+        path = os.getcwd() + '/'
+        filenames = ["file.ply", "file.praw", "file.ptx"]
+        os.system("rm " + path + "*.ply " + path + "*.praw " + path + "*.ptx")  # remove old file if exist
 
-        assert topic_is_running(topic.param_description) == True, \
-            "Topic %s, not exist" % (topic.param_description)
+        for file in filenames:
+            dir = os.listdir(path) # record files in directory
 
-        assert topic_is_running(topic.param_update) == True, \
-            "Topic %s, not exist" % (topic.param_update)
+            res = srv_saveLastFrame(path + file)
 
-        assert topic_is_running(topic.point_cloud) == True, \
-            "Topic %s, not exist" % (topic.point_cloud)
-
-        assert topic_is_running(topic.texture) == True, \
-            "Topic %s, not exist" % (topic.texture)
-
-    def test_parameter_server_variables_exist(self):
-        """
-        test if variables exist in parameter server
-        """
-
-        assert rospy.has_param(param.confidence) == True, \
-            "Parameter %s is not exist" % param.confidence
-
-        assert rospy.has_param(param.coordination_space) == True, \
-            "Parameter %s is not exist" % param.coordination_space
-
-        assert rospy.has_param(param.frame_id) == True, \
-            "Parameter %s is not exist" % param.frame_id
-
-        assert rospy.has_param(param.resolution) == True, \
-            "Parameter %s is not exist" % param.resolution
-
-        assert rospy.has_param(param.scan_multiplier) == True, \
-            "Parameter %s is not exist" % param.scan_multiplier
-
-        assert rospy.has_param(param.scanner_id) == True, \
-            "Parameter %s is not exist" % param.scanner_id
-
-        assert rospy.has_param(param.send_confidence_map) == True, \
-            "Parameter %s is not exist" % param.send_confidence_map
-
-        assert rospy.has_param(param.send_depth_map) == True, \
-            "Parameter %s is not exist" % param.send_depth_map
-
-        assert rospy.has_param(param.send_normal_map) == True, \
-            "Parameter %s is not exist" % param.send_normal_map
-
-        assert rospy.has_param(param.send_point_cloud) == True, \
-            "Parameter %s is not exist" % param.send_point_cloud
-
-        assert rospy.has_param(param.send_texture) == True, \
-            "Parameter %s is not exist" % param.send_texture
-
-        assert rospy.has_param(param.shutter_multiplier) == True, \
-            "Parameter %s is not exist" % param.shutter_multiplier
-
-        assert rospy.has_param(param.timeout) == True, \
-            "Parameter %s is not exist" % param.timeout
-
-        assert rospy.has_param(param.trigger_mode) == True, \
-            "Parameter %s is not exist" % param.trigger_mode
+            dir = set(os.listdir(path)) - set(dir)
+            assert dir.pop() == file
+            assert True == res.success
+            assert "Ok" == res.message
+            os.system("rm " + path + file)  # remove created file
 
 
 if __name__ == '__main__':

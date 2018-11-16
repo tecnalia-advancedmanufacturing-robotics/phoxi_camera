@@ -142,6 +142,9 @@ class Test_phoxi_camera_interfaces(TestCase):
         assert service_is_running(service.V2_stop_acquisition) == True, \
             "Service %s is not exist" % service.V2_stop_acquisition
 
+        assert service_is_running(service.V2_save_last_frame) == True, \
+            "Service %s is not exist" % service.V2_save_last_frame
+
     def test5_parameter_server_variables_exist(self):
         """
         test if variables exist in parameter server

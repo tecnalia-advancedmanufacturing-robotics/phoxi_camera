@@ -205,6 +205,15 @@ class PhoXiInterface {
         * \throw InvalidTriggerMode when invalid trigger mode is passed
         */
         void setTriggerMode(pho::api::PhoXiTriggerMode mode, bool startAcquisition = false);
+
+        /**
+         * Save last frame to file
+         *
+         * \param path full path of file with extension
+         * \return bool whether saving proceed successful
+         */
+        bool saveLastFrame(const std::string &path);
+
         /**
         * Get trigger mode
         *
@@ -215,8 +224,7 @@ class PhoXiInterface {
         pho::api::PPhoXi scanner;
         pho::api::PhoXiFactory phoXiFactory;
     private:
-
-
+        int last_frame_id = -1;
     };
 }
 

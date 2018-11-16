@@ -28,6 +28,7 @@ namespace phoxi_camera{
         triggerImageService =nh.advertiseService("trigger_image", &RosInterface::triggerImage, this);
         getFrameService = nh.advertiseService("get_frame", &RosInterface::getFrame, this);
         saveFrameService = nh.advertiseService("save_frame", &RosInterface::saveFrame, this);
+        saveLastFrameService = nh.advertiseService("V2/save_last_frame", &RosInterface::saveLastFrame, this);
         disconnectCameraService = nh.advertiseService("disconnect_camera", &RosInterface::disconnectCamera, this);
         getHardwareIdentificationService = nh.advertiseService("get_hardware_indentification", &RosInterface::getHardwareIdentification, this);
         getSupportedCapturingModesService = nh.advertiseService("get_supported_capturing_modes", &RosInterface::getSupportedCapturingModes, this);
@@ -189,6 +190,57 @@ namespace phoxi_camera{
             res.success = false;
             res.message = e.what();
         }
+        return true;
+    }
+    bool RosInterface::saveLastFrame(phoxi_camera::SaveLastFrame::Request &req, phoxi_camera::SaveLastFrame::Response &res) {
+        std::string file_path = req.file_path;
+
+        try {
+            // ~ error handling
+            size_t pos = file_path.find('~');
+            if(pos != std::string::npos){
+                char* home = std::getenv("HOME");
+                if(!home){
+                    res.message = "'~' found in 'file_path' parameter but environment variable 'HOME' not found. Export' HOME' variable or pass absolute value to 'path' parameter.";
+                    res.success = false;
+                    return true;
+                }
+                file_path.replace(pos, 1, home);
+            }
+
+            // extension error handling
+            const std::string extensions[] = {"praw", "ply", "ptx", "tif", "prawf"};
+            bool correct_ext = false;
+            pos = file_path.rfind('.') + 1;
+            std::string extension = file_path.substr(pos, file_path.length());
+            
+            for (const auto &ext: extensions) {
+                if (ext == extension) {
+                    correct_ext = true;
+                }
+            }
+            if (!correct_ext) {
+                res.message = "Wrong extension.";
+                res.success = false;
+                return true;
+            }
+
+            // save last frame
+            ROS_INFO("File path: %s",file_path.c_str());
+            bool result = PhoXiInterface::saveLastFrame(file_path);
+            if (result){
+                res.message = OKRESPONSE;
+                res.success = true;
+            } else {
+                res.message = "Unsuccessful save.";
+                res.success = false;
+            }
+
+        } catch (PhoXiInterfaceException &e){
+            res.success = false;
+            res.message = e.what();
+        }
+
         return true;
     }
     bool RosInterface::saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera::SaveFrame::Response &res){

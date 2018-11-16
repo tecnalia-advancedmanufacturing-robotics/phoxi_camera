@@ -30,6 +30,7 @@
 #include <phoxi_camera/TriggerImage.h>
 #include <phoxi_camera/GetFrame.h>
 #include <phoxi_camera/SaveFrame.h>
+#include <phoxi_camera/SaveLastFrame.h>
 #include <phoxi_camera/GetHardwareIdentification.h>
 #include <phoxi_camera/GetSupportedCapturingModes.h>
 #include <phoxi_camera/SetCoordinatesSpace.h>
@@ -61,6 +62,7 @@ namespace phoxi_camera{
             bool triggerImage(phoxi_camera::TriggerImage::Request &req, phoxi_camera::TriggerImage::Response &res);
             bool getFrame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Response &res);
             bool saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera::SaveFrame::Response &res);
+            bool saveLastFrame(phoxi_camera::SaveLastFrame::Request &req, phoxi_camera::SaveLastFrame::Response &res);
             bool disconnectCamera(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
             bool getHardwareIdentification(phoxi_camera::GetHardwareIdentification::Request &req, phoxi_camera::GetHardwareIdentification::Response &res);
             bool getSupportedCapturingModes(phoxi_camera::GetSupportedCapturingModes::Request &req, phoxi_camera::GetSupportedCapturingModes::Response &res);
@@ -88,6 +90,7 @@ namespace phoxi_camera{
             ros::ServiceServer triggerImageService;
             ros::ServiceServer getFrameService;
             ros::ServiceServer saveFrameService;
+            ros::ServiceServer saveLastFrameService;
             ros::ServiceServer disconnectCameraService;
             ros::ServiceServer getHardwareIdentificationService;
             ros::ServiceServer getSupportedCapturingModesService;

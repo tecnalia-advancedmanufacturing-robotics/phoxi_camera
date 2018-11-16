@@ -39,6 +39,7 @@ class service:
     V2_set_transformation   = node_name + "/V2/set_transformation"
     V2_start_acquisition    = node_name + "/V2/start_acquisition"
     V2_stop_acquisition     = node_name + "/V2/stop_acquisition"
+    V2_save_last_frame      = node_name + "/V2/save_last_frame"
 
 class param:
     confidence          = node_name + "/confidence"
