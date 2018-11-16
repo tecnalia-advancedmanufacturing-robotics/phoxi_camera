@@ -51,11 +51,8 @@ For input and output parameters of each service please see coresponding service 
 ```
 ~/V2/is_acquiring
 ~/V2/is_connected
-~/V2/set_coordination_space
-~/V2/set_transformation
 ~/V2/start_acquisition
 ~/V2/stop_acquisition
-~/V2/save_last_frame
 ~/connect_camera
 ~/disconnect_camera
 ~/get_device_list
@@ -69,6 +66,12 @@ For input and output parameters of each service please see coresponding service 
 ~/start_acquisition
 ~/stop_acquisition
 ~/trigger_image
+```
+Services available only for PhoXi Control API version 1.2 and higher
+```
+~/V2/save_last_frame
+~/V2/set_coordination_space
+~/V2/set_transformation
 ```
 
 #### Available ROS topics

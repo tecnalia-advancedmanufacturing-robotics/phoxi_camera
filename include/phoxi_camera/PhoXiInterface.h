@@ -11,6 +11,15 @@
 #include <Eigen/Core>
 #include <phoxi_camera/PhoXiException.h>
 
+// PhoXi API version
+#if PHOXI_API_VERSION_MAJOR == 1
+    #if PHOXI_API_VERSION_MINOR == 1
+        #define PHOXI_API_v1_1
+    #elif PHOXI_API_VERSION_MINOR == 2
+        #define PHOXI_API_v1_2
+    #endif
+#endif
+
 //* PhoXiInterface
 /**
  * Wrapper to PhoXi 3D Scanner api to make interface easier
@@ -115,6 +124,55 @@ class PhoXiInterface {
         * \note id can be passed to getPFrame method
         */
         int triggerImage();
+
+        /**
+        * Get hardware identification number of currently connected PhoXi 3D Scanner
+        *
+        * \throw PhoXiScannerNotConnected when no scanner is connected
+        */
+        std::string getHardwareIdentification();
+
+        /**
+        * Get supported capturing modes
+        *
+        * \throw PhoXiScannerNotConnected when no scanner is connected
+        */
+        std::vector<pho::api::PhoXiCapturingMode> getSupportedCapturingModes();
+
+        /**
+        * Set high resolution (2064 x 1544)
+        *
+        * \throw PhoXiScannerNotConnected when no scanner is connected
+        */
+        void setHighResolution();
+
+        /**
+        * Set low resolution (1032 x 772)
+        *
+        * \throw PhoXiScannerNotConnected when no scanner is connected
+        */
+        void setLowResolution();
+
+        /**
+        * Set trigger mode
+        *
+        * \param mode new trigger mode
+        * \param startAcquisition if true Acquisition will be started
+        * \note if mode is Freerun new PFrames will be triggered immediately after acquisition is started
+        *
+        * \throw PhoXiScannerNotConnected when no scanner is connected
+        * \throw InvalidTriggerMode when invalid trigger mode is passed
+        */
+        void setTriggerMode(pho::api::PhoXiTriggerMode mode, bool startAcquisition = false);
+
+        /**
+        * Get trigger mode
+        *
+        * \throw PhoXiScannerNotConnected when no scanner is connected
+        */
+        pho::api::PhoXiTriggerMode getTriggerMode();
+
+#ifndef PHOXI_API_v1_1
         /**
         * Set coordination space
         *
@@ -122,12 +180,14 @@ class PhoXiInterface {
         * \throw PhoXiScannerNotConnected when no scanner is connected
         */
         void setCoordinateSpace(pho::api::PhoXiCoordinateSpace space);
+
         /**
         * Get coordination space
         *
         * \throw PhoXiScannerNotConnected when no scanner is connected
         */
         pho::api::PhoXiCoordinateSpace getCoordinateSpace();
+
         /**
         * Set transformation matrix space
         *
@@ -139,6 +199,7 @@ class PhoXiInterface {
         * \throw CoordinationSpaceNotSupported when space is not supported
         */
         void setTransformation(pho::api::PhoXiCoordinateTransformation coordinateTransformation,pho::api::PhoXiCoordinateSpace space,bool setSpace = true, bool saveSettings = true);
+
         /**
         * Set transformation matrix space
         *
@@ -155,6 +216,7 @@ class PhoXiInterface {
             setTransformation(getPhoXiCoordinateTransformation(transformation),space,setSpace,saveSettings);
         }
         template <typename T>
+
         /**
         * Convert eigen matrix to pho::api::PhoXiCoordinateTransformation
         */
@@ -170,41 +232,6 @@ class PhoXiInterface {
             coordinateTransformation.Translation.z = mat(2,3);
             return coordinateTransformation;
         }
-        /**
-        * Get hardware identification number of currently connected PhoXi 3D Scanner
-        *
-        * \throw PhoXiScannerNotConnected when no scanner is connected
-        */
-        std::string getHardwareIdentification();
-        /**
-        * Get supported capturing modes
-        *
-        * \throw PhoXiScannerNotConnected when no scanner is connected
-        */
-        std::vector<pho::api::PhoXiCapturingMode> getSupportedCapturingModes();
-        /**
-        * Set high resolution (2064 x 1544)
-        *
-        * \throw PhoXiScannerNotConnected when no scanner is connected
-        */
-        void setHighResolution();
-        /**
-        * Set low resolution (1032 x 772)
-        *
-        * \throw PhoXiScannerNotConnected when no scanner is connected
-        */
-        void setLowResolution();
-        /**
-        * Set trigger mode
-        *
-        * \param mode new trigger mode
-        * \param startAcquisition if true Acquisition will be started
-        * \note if mode is Freerun new PFrames will be triggered immediately after acquisition is started
-        *
-        * \throw PhoXiScannerNotConnected when no scanner is connected
-        * \throw InvalidTriggerMode when invalid trigger mode is passed
-        */
-        void setTriggerMode(pho::api::PhoXiTriggerMode mode, bool startAcquisition = false);
 
         /**
          * Save last frame to file
@@ -213,13 +240,7 @@ class PhoXiInterface {
          * \return bool whether saving proceed successful
          */
         bool saveLastFrame(const std::string &path);
-
-        /**
-        * Get trigger mode
-        *
-        * \throw PhoXiScannerNotConnected when no scanner is connected
-        */
-        pho::api::PhoXiTriggerMode getTriggerMode();
+#endif
     protected:
         pho::api::PPhoXi scanner;
         pho::api::PhoXiFactory phoXiFactory;

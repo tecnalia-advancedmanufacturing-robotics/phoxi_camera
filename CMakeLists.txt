@@ -90,6 +90,11 @@ add_compile_options(-std=c++11)
 add_compile_options(-fpermissive)
 add_compile_options(-pthread)
 
+# add PhoXi version definitions to code
+add_definitions(-DPHOXI_API_VERSION_MAJOR=${PHO_SOFTWARE_VERSION_MAJOR})
+add_definitions(-DPHOXI_API_VERSION_MINOR=${PHO_SOFTWARE_VERSION_MINOR})
+add_definitions(-DPHOXI_API_VERSION_PATCH=${PHO_SOFTWARE_VERSION_PATCH})
+
 add_library(
   ${PROJECT_NAME}_PhoXi_Interface
   src/PhoXiInterface.cpp

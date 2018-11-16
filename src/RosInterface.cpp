@@ -28,12 +28,14 @@ namespace phoxi_camera{
         triggerImageService =nh.advertiseService("trigger_image", &RosInterface::triggerImage, this);
         getFrameService = nh.advertiseService("get_frame", &RosInterface::getFrame, this);
         saveFrameService = nh.advertiseService("save_frame", &RosInterface::saveFrame, this);
-        saveLastFrameService = nh.advertiseService("V2/save_last_frame", &RosInterface::saveLastFrame, this);
         disconnectCameraService = nh.advertiseService("disconnect_camera", &RosInterface::disconnectCamera, this);
         getHardwareIdentificationService = nh.advertiseService("get_hardware_indentification", &RosInterface::getHardwareIdentification, this);
         getSupportedCapturingModesService = nh.advertiseService("get_supported_capturing_modes", &RosInterface::getSupportedCapturingModes, this);
+#ifndef PHOXI_API_v1_1
         setCoordianteSpaceService = nh.advertiseService("V2/set_transformation",&RosInterface::setTransformation, this);
         setTransformationService = nh.advertiseService("V2/set_coordination_space",&RosInterface::setCoordianteSpace, this);
+        saveLastFrameService = nh.advertiseService("V2/save_last_frame", &RosInterface::saveLastFrame, this);
+#endif
 
         //create publishers
         bool latch_topics;
@@ -192,57 +194,7 @@ namespace phoxi_camera{
         }
         return true;
     }
-    bool RosInterface::saveLastFrame(phoxi_camera::SaveLastFrame::Request &req, phoxi_camera::SaveLastFrame::Response &res) {
-        std::string file_path = req.file_path;
 
-        try {
-            // ~ error handling
-            size_t pos = file_path.find('~');
-            if(pos != std::string::npos){
-                char* home = std::getenv("HOME");
-                if(!home){
-                    res.message = "'~' found in 'file_path' parameter but environment variable 'HOME' not found. Export' HOME' variable or pass absolute value to 'path' parameter.";
-                    res.success = false;
-                    return true;
-                }
-                file_path.replace(pos, 1, home);
-            }
-
-            // extension error handling
-            const std::string extensions[] = {"praw", "ply", "ptx", "tif", "prawf"};
-            bool correct_ext = false;
-            pos = file_path.rfind('.') + 1;
-            std::string extension = file_path.substr(pos, file_path.length());
-            
-            for (const auto &ext: extensions) {
-                if (ext == extension) {
-                    correct_ext = true;
-                }
-            }
-            if (!correct_ext) {
-                res.message = "Wrong extension.";
-                res.success = false;
-                return true;
-            }
-
-            // save last frame
-            ROS_INFO("File path: %s",file_path.c_str());
-            bool result = PhoXiInterface::saveLastFrame(file_path);
-            if (result){
-                res.message = OKRESPONSE;
-                res.success = true;
-            } else {
-                res.message = "Unsuccessful save.";
-                res.success = false;
-            }
-
-        } catch (PhoXiInterfaceException &e){
-            res.success = false;
-            res.message = e.what();
-        }
-
-        return true;
-    }
     bool RosInterface::saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera::SaveFrame::Response &res){
         try {
             pho::api::PFrame frame = RosInterface::getPFrame(req.in);
@@ -400,40 +352,6 @@ namespace phoxi_camera{
 
     }
 
-    bool RosInterface::setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request &req, phoxi_camera::SetCoordinatesSpace::Response &res){
-        try {
-            PhoXiInterface::setCoordinateSpace(req.coordinates_space);
-            //update dynamic reconfigure
-            dynamicReconfigureConfig.coordinate_space = req.coordinates_space;
-            dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
-            res.success = true;
-            res.message = OKRESPONSE;
-        }catch (PhoXiInterfaceException &e){
-            res.success = false;
-            res.message = e.what();
-        }
-        return true;
-    }
-
-    bool RosInterface::setTransformation(phoxi_camera::SetTransformationMatrix::Request &req, phoxi_camera::SetTransformationMatrix::Response &res){
-        try {
-            Eigen::Affine3d transform;
-            tf::transformMsgToEigen(req.transform,transform);
-            PhoXiInterface::setTransformation(transform.matrix(),req.coordinates_space,req.set_space,req.save_settings);
-            //update dynamic reconfigure
-            if(req.set_space) {
-                dynamicReconfigureConfig.coordinate_space = req.coordinates_space;
-            }
-            dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
-            res.success = true;
-            res.message = OKRESPONSE;
-        }catch (PhoXiInterfaceException &e){
-            res.success = false;
-            res.message = e.what();
-        }
-        return true;
-    }
-
     void RosInterface::dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &config, uint32_t level) {
         if(!PhoXiInterface::isConnected()){
             config = this->dynamicReconfigureConfig;
@@ -516,11 +434,13 @@ namespace phoxi_camera{
                 this->dynamicReconfigureConfig.send_depth_map = config.send_depth_map;
             }
 
+#ifndef PHOXI_API_v1_1
             if (level & (1 << 12)) {
                 this->isOk();
                 PhoXiInterface::setCoordinateSpace(config.coordinate_space);
                 this->dynamicReconfigureConfig.coordinate_space = config.coordinate_space;
             }
+#endif
             if (level & (1 << 13)) {
                 this->dynamicReconfigureConfig.organized_cloud = config.organized_cloud;
             }
@@ -624,8 +544,98 @@ namespace phoxi_camera{
         this->dynamicReconfigureConfig.send_confidence_map = scanner->OutputSettings->SendConfidenceMap;
         this->dynamicReconfigureConfig.send_depth_map = scanner->OutputSettings->SendDepthMap;
         this->dynamicReconfigureConfig.send_texture = scanner->OutputSettings->SendTexture;
+#ifndef PHOXI_API_v1_1
         this->dynamicReconfigureConfig.coordinate_space = scanner->CoordinatesSettings->CoordinateSpace;
+#endif
     }
+
+#ifndef PHOXI_API_v1_1
+    bool RosInterface::setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request &req, phoxi_camera::SetCoordinatesSpace::Response &res){
+        try {
+            PhoXiInterface::setCoordinateSpace(req.coordinates_space);
+            //update dynamic reconfigure
+            dynamicReconfigureConfig.coordinate_space = req.coordinates_space;
+            dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
+            res.success = true;
+            res.message = OKRESPONSE;
+        }catch (PhoXiInterfaceException &e){
+            res.success = false;
+            res.message = e.what();
+        }
+        return true;
+    }
+
+    bool RosInterface::setTransformation(phoxi_camera::SetTransformationMatrix::Request &req, phoxi_camera::SetTransformationMatrix::Response &res){
+        try {
+            Eigen::Affine3d transform;
+            tf::transformMsgToEigen(req.transform,transform);
+            PhoXiInterface::setTransformation(transform.matrix(),req.coordinates_space,req.set_space,req.save_settings);
+            //update dynamic reconfigure
+            if(req.set_space) {
+                dynamicReconfigureConfig.coordinate_space = req.coordinates_space;
+            }
+            dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
+            res.success = true;
+            res.message = OKRESPONSE;
+        }catch (PhoXiInterfaceException &e){
+            res.success = false;
+            res.message = e.what();
+        }
+        return true;
+    }
+
+    bool RosInterface::saveLastFrame(phoxi_camera::SaveLastFrame::Request &req, phoxi_camera::SaveLastFrame::Response &res) {
+        std::string file_path = req.file_path;
+
+        try {
+            // ~ error handling
+            size_t pos = file_path.find('~');
+            if(pos != std::string::npos){
+                char* home = std::getenv("HOME");
+                if(!home){
+                    res.message = "'~' found in 'file_path' parameter but environment variable 'HOME' not found. Export' HOME' variable or pass absolute value to 'path' parameter.";
+                    res.success = false;
+                    return true;
+                }
+                file_path.replace(pos, 1, home);
+            }
+
+            // extension error handling
+            const std::string extensions[] = {"praw", "ply", "ptx", "tif", "prawf"};
+            bool correct_ext = false;
+            pos = file_path.rfind('.') + 1;
+            std::string extension = file_path.substr(pos, file_path.length());
+
+            for (const auto &ext: extensions) {
+                if (ext == extension) {
+                    correct_ext = true;
+                }
+            }
+            if (!correct_ext) {
+                res.message = "Wrong extension.";
+                res.success = false;
+                return true;
+            }
+
+            // save last frame
+            ROS_INFO("File path: %s",file_path.c_str());
+            bool result = PhoXiInterface::saveLastFrame(file_path);
+            if (result){
+                res.message = OKRESPONSE;
+                res.success = true;
+            } else {
+                res.message = "Unsuccessful save.";
+                res.success = false;
+            }
+
+        } catch (PhoXiInterfaceException &e){
+            res.success = false;
+            res.message = e.what();
+        }
+
+        return true;
+    }
+#endif
 }
 
 

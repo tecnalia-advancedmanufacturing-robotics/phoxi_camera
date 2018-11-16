@@ -140,49 +140,6 @@ namespace phoxi_camera {
         }
     }
 
-    void PhoXiInterface::setCoordinateSpace(pho::api::PhoXiCoordinateSpace space) {
-        this->isOk();
-        scanner->CoordinatesSettings->CoordinateSpace = space;
-    }
-
-    pho::api::PhoXiCoordinateSpace PhoXiInterface::getCoordinateSpace() {
-        this->isOk();
-        return scanner->CoordinatesSettings->CoordinateSpace;
-    }
-
-    void PhoXiInterface::setTransformation(pho::api::PhoXiCoordinateTransformation coordinateTransformation,
-                                           pho::api::PhoXiCoordinateSpace space, bool setSpace = true,
-                                           bool saveSettings = true) {
-        this->isOk();
-        pho::api::PhoXiCoordinatesSettings settings = scanner->CoordinatesSettings;
-        switch (space) {
-            case pho::api::PhoXiCoordinateSpace::RobotSpace:
-                if (!settings.RobotTransformation.isSupported()) {
-                    throw CoordinationSpaceNotSupported("Coordination space is not supported");
-                }
-                settings.RobotTransformation = coordinateTransformation;
-                settings.CoordinateSpace = pho::api::PhoXiCoordinateSpace::RobotSpace;
-                break;
-            case pho::api::PhoXiCoordinateSpace::CustomSpace:
-                if (!settings.CustomTransformation.isSupported()) {
-                    throw CoordinationSpaceNotSupported("Coordination space is not supported");
-                }
-                settings.CustomTransformation = coordinateTransformation;
-                settings.CoordinateSpace = pho::api::PhoXiCoordinateSpace::CustomSpace;
-                break;
-            default:
-                throw CoordinationSpaceNotSupported("Coordination space is not supported");
-        }
-        if (setSpace) {
-            settings.CoordinateSpace = space;
-        }
-        this->isOk();
-        scanner->CoordinatesSettings = settings;
-        if (saveSettings) {
-            scanner->SaveSettings();
-        }
-    }
-
     std::string PhoXiInterface::getHardwareIdentification() {
         this->isOk();
         return scanner->HardwareIdentification;
@@ -287,6 +244,50 @@ namespace phoxi_camera {
         return scanner->TriggerMode;
     }
 
+#ifndef PHOXI_API_v1_1
+    void PhoXiInterface::setCoordinateSpace(pho::api::PhoXiCoordinateSpace space) {
+        this->isOk();
+        scanner->CoordinatesSettings->CoordinateSpace = space;
+    }
+
+    pho::api::PhoXiCoordinateSpace PhoXiInterface::getCoordinateSpace() {
+        this->isOk();
+        return scanner->CoordinatesSettings->CoordinateSpace;
+    }
+
+    void PhoXiInterface::setTransformation(pho::api::PhoXiCoordinateTransformation coordinateTransformation,
+                                           pho::api::PhoXiCoordinateSpace space, bool setSpace = true,
+                                           bool saveSettings = true) {
+        this->isOk();
+        pho::api::PhoXiCoordinatesSettings settings = scanner->CoordinatesSettings;
+        switch (space) {
+            case pho::api::PhoXiCoordinateSpace::RobotSpace:
+                if (!settings.RobotTransformation.isSupported()) {
+                    throw CoordinationSpaceNotSupported("Coordination space is not supported");
+                }
+                settings.RobotTransformation = coordinateTransformation;
+                settings.CoordinateSpace = pho::api::PhoXiCoordinateSpace::RobotSpace;
+                break;
+            case pho::api::PhoXiCoordinateSpace::CustomSpace:
+                if (!settings.CustomTransformation.isSupported()) {
+                    throw CoordinationSpaceNotSupported("Coordination space is not supported");
+                }
+                settings.CustomTransformation = coordinateTransformation;
+                settings.CoordinateSpace = pho::api::PhoXiCoordinateSpace::CustomSpace;
+                break;
+            default:
+                throw CoordinationSpaceNotSupported("Coordination space is not supported");
+        }
+        if (setSpace) {
+            settings.CoordinateSpace = space;
+        }
+        this->isOk();
+        scanner->CoordinatesSettings = settings;
+        if (saveSettings) {
+            scanner->SaveSettings();
+        }
+    }
+
     bool PhoXiInterface::saveLastFrame(const std::string &path) {
         if (last_frame_id == -1) {
             // this is needed due to PhoXi API bug
@@ -297,4 +298,6 @@ namespace phoxi_camera {
         bool success = scanner->SaveLastOutput(path, this->last_frame_id);
         return success;
     }
+#endif
+
 }

@@ -62,17 +62,18 @@ namespace phoxi_camera{
             bool triggerImage(phoxi_camera::TriggerImage::Request &req, phoxi_camera::TriggerImage::Response &res);
             bool getFrame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Response &res);
             bool saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera::SaveFrame::Response &res);
-            bool saveLastFrame(phoxi_camera::SaveLastFrame::Request &req, phoxi_camera::SaveLastFrame::Response &res);
             bool disconnectCamera(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
             bool getHardwareIdentification(phoxi_camera::GetHardwareIdentification::Request &req, phoxi_camera::GetHardwareIdentification::Response &res);
             bool getSupportedCapturingModes(phoxi_camera::GetSupportedCapturingModes::Request &req, phoxi_camera::GetSupportedCapturingModes::Response &res);
-            bool setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request &req, phoxi_camera::SetCoordinatesSpace::Response &res);
-            bool setTransformation(phoxi_camera::SetTransformationMatrix::Request &req, phoxi_camera::SetTransformationMatrix::Response &res);
             void dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &config, uint32_t level);
             void diagnosticCallback(diagnostic_updater::DiagnosticStatusWrapper& status);
             void diagnosticTimerCallback(const ros::TimerEvent&);
             void initFromPhoXi();
-
+#ifndef PHOXI_API_v1_1
+            bool setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request &req, phoxi_camera::SetCoordinatesSpace::Response &res);
+            bool setTransformation(phoxi_camera::SetTransformationMatrix::Request &req, phoxi_camera::SetTransformationMatrix::Response &res);
+            bool saveLastFrame(phoxi_camera::SaveLastFrame::Request &req, phoxi_camera::SaveLastFrame::Response &res);
+#endif
             //node handle
             ros::NodeHandle nh;
 
