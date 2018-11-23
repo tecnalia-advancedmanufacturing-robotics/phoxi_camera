@@ -1,6 +1,6 @@
 scanner_id: "" # keep "" if scanner id is number
 frame_id: "PhoXi3Dscanner_sensor"
-latch_topics: true
+latch_topics: false
 topic_queue_size: 1
 init_from_config: false # if true all following parameters will be inicialized from this config otherwise from PhoXi control application.
 organized_cloud: True # if true organized point cloud wil be published, other otherwise unorganized (Default value true)
