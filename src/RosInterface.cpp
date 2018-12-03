@@ -533,20 +533,26 @@ namespace phoxi_camera{
         else{
             this->dynamicReconfigureConfig.resolution = 0;
         }
-        this->dynamicReconfigureConfig.scan_multiplier = scanner->CapturingSettings->ScanMultiplier;
-        this->dynamicReconfigureConfig.shutter_multiplier = scanner->CapturingSettings->ShutterMultiplier;
-        this->dynamicReconfigureConfig.trigger_mode = scanner->TriggerMode.GetValue();
-        this->dynamicReconfigureConfig.start_acquisition = scanner->isAcquiring();
-        this->dynamicReconfigureConfig.timeout = scanner->Timeout.GetValue();
+
+        pho::api::PhoXiCapturingSettings capturingSettings;
+        capturingSettings = scanner->CapturingSettings;
+        this->dynamicReconfigureConfig.scan_multiplier = capturingSettings.ScanMultiplier;
+        this->dynamicReconfigureConfig.shutter_multiplier = capturingSettings.ShutterMultiplier;
         this->dynamicReconfigureConfig.confidence = scanner->ProcessingSettings->Confidence;
-        this->dynamicReconfigureConfig.send_point_cloud = scanner->OutputSettings->SendPointCloud;
-        this->dynamicReconfigureConfig.send_normal_map = scanner->OutputSettings->SendNormalMap;
-        this->dynamicReconfigureConfig.send_confidence_map = scanner->OutputSettings->SendConfidenceMap;
-        this->dynamicReconfigureConfig.send_depth_map = scanner->OutputSettings->SendDepthMap;
-        this->dynamicReconfigureConfig.send_texture = scanner->OutputSettings->SendTexture;
+
+        pho::api::FrameOutputSettings outputSettings;
+        outputSettings = scanner->OutputSettings;
+        this->dynamicReconfigureConfig.send_point_cloud = outputSettings.SendPointCloud;
+        this->dynamicReconfigureConfig.send_normal_map = outputSettings.SendNormalMap;
+        this->dynamicReconfigureConfig.send_confidence_map = outputSettings.SendConfidenceMap;
+        this->dynamicReconfigureConfig.send_depth_map = outputSettings.SendDepthMap;
+        this->dynamicReconfigureConfig.send_texture = outputSettings.SendTexture;
 #ifndef PHOXI_API_v1_1
         this->dynamicReconfigureConfig.coordinate_space = scanner->CoordinatesSettings->CoordinateSpace;
 #endif
+        this->dynamicReconfigureConfig.trigger_mode = scanner->TriggerMode.GetValue();
+        this->dynamicReconfigureConfig.start_acquisition = scanner->isAcquiring();
+        this->dynamicReconfigureConfig.timeout = scanner->Timeout.GetValue();
     }
 
 #ifndef PHOXI_API_v1_1
