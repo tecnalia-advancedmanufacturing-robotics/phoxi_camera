@@ -89,6 +89,7 @@ add_compile_options(-w)
 add_compile_options(-std=c++11)
 add_compile_options(-fpermissive)
 add_compile_options(-pthread)
+add_compile_options(-O2)
 
 # add PhoXi version definitions to code
 add_definitions(-DPHOXI_API_VERSION_MAJOR=${PHO_SOFTWARE_VERSION_MAJOR})

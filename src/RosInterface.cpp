@@ -473,12 +473,12 @@ namespace phoxi_camera{
         nh.getParam("init_from_config",initFromConfig);
         if(initFromConfig){
             dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
+            this->dynamicReconfigureCallback(dynamicReconfigureConfig,std::numeric_limits<uint32_t>::max());
         }
         else{
             initFromPhoXi();
         }
         dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
-        this->dynamicReconfigureCallback(dynamicReconfigureConfig,std::numeric_limits<uint32_t>::max());
         diagnosticUpdater.force_update();
     }
 
