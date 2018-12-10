@@ -398,7 +398,6 @@ namespace phoxi_camera{
             }
 
             if (level & (1 << 6)) {
-
                 this->isOk();
                 scanner->ProcessingSettings->Confidence = config.confidence;
                 this->dynamicReconfigureConfig.confidence = config.confidence;
@@ -444,6 +443,21 @@ namespace phoxi_camera{
             if (level & (1 << 13)) {
                 this->dynamicReconfigureConfig.organized_cloud = config.organized_cloud;
             }
+
+#ifndef PHOXI_API_v1_1
+            if (level & (1 << 14)) {
+                this->isOk();
+                scanner->CapturingSettings->AmbientLightSuppression = config.ambient_light_suppression;
+                this->dynamicReconfigureConfig.ambient_light_suppression = config.ambient_light_suppression;
+            }
+
+            if (level & (1 << 15)) {
+                this->isOk();
+                scanner->CapturingSettings->SinglePatternExposure = config.single_pattern_exposure;
+                this->dynamicReconfigureConfig.single_pattern_exposure = config.single_pattern_exposure;
+            }
+#endif
+
         }catch (PhoXiInterfaceException &e){
             ROS_WARN("%s",e.what());
         }
@@ -549,6 +563,12 @@ namespace phoxi_camera{
         this->dynamicReconfigureConfig.send_texture = outputSettings.SendTexture;
 #ifndef PHOXI_API_v1_1
         this->dynamicReconfigureConfig.coordinate_space = scanner->CoordinatesSettings->CoordinateSpace;
+        this->dynamicReconfigureConfig.ambient_light_suppression = scanner->CapturingSettings->AmbientLightSuppression;
+        if (scanner->CapturingSettings->SinglePatternExposure >= 10.24){
+            this->dynamicReconfigureConfig.single_pattern_exposure =  scanner->CapturingSettings->SinglePatternExposure;
+        } else {
+            this->dynamicReconfigureConfig.single_pattern_exposure = 20.48;
+        }
 #endif
         this->dynamicReconfigureConfig.trigger_mode = scanner->TriggerMode.GetValue();
         this->dynamicReconfigureConfig.start_acquisition = scanner->isAcquiring();

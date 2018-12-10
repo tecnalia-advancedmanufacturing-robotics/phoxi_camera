@@ -27,22 +27,33 @@ catkin_make
 #### Parameters
 
 ```
-~/scanner_id          - Default PhoXi 3D Scannet to connect after startup. Default value: "InstalledExamples-PhoXi-example"
-~/frame_id:           - Frame id to which captured data relies to. Default value: "PhoXi3Dscanner_sensor"
-# All folowing parameters are for PhoXi Control and they can override all dynamic_reconfigure parameters in cfg file.
-# This values are set to scanner after startup of node.
-~/confidence          - Default value 3.0
-~/coordination_space  - Default value 1 # 1 = Camera, 2 =  Mounting, 3 = Marker, 4 = Robot, 5 = Custom
-~/resolution          - Default value 1         # 0 = Low, 1 = High
-~/scan_multiplier     - Default value 1
-~/send_confidence_map - Default value true
-~/send_depth_map      - Default value true
-~/send_normal_map     - Default value true
-~/send_point_cloud    - Default value true
-~/send_texture        - Default valuetrue
-~/shutter_multiplier  - Default value 1
-~/timeout             - Default value -3          # in ms, special parameters: 0 = Zero, -1 = Infinity, -2 = Last stored, -3 = Default
-~/trigger_mode        - Default value 1      # 0 = Free run, 1 = Software
+~/scanner_id                - Default PhoXi 3D Scannet to connect after startup. Default value: "InstalledExamples-PhoXi-example"
+~/frame_id:                 - Frame id to which captured data relies to. Default value: "PhoXi3Dscanner_sensor"
+~/latch_topics              - Default value: false
+~/topic_queue_size          - Default value: 1
+~/init_from_config          - Default value: false # if true all following parameters will be initialized from this config otherwise from PhoXi control application.
+~/organized_cloud           - Default value: true  # if true organized point cloud will be published, other otherwise unorganized
+
+## All following parameters are for PhoXi Control and they can override all dynamic_reconfigure parameters in cfg file.
+#  This values are set to scanner after successful connection only if init_from_config parameter is true.
+~/resolution                - Default value: 1  # 0 = Low, 1 = High
+~/scan_multiplier           - Default value: 1
+~/confidence                - Default value: 3.0
+~/send_confidence_map       - Default value: true
+~/send_depth_map            - Default value: true
+~/send_normal_map           - Default value: true
+~/send_point_cloud          - Default value: true
+~/send_texture              - Default value: true
+~/shutter_multiplier        - Default value: 1
+~/timeout                   - Default value: -3    # in ms, special parameters: 0 = Zero, -1 = Infinity, -2 = Last stored, -3 = Default
+~/trigger_mode              - Default value: 1     # 0 = Free run, 1 = Software
+
+## Setting available only for PhoXi Control 1.2 and higher. Also for dynamic reconfigure
+~/coordination_space        - Default value: 1 # 1 = Camera, 2 =  Mounting, 3 = Marker, 4 = Robot, 5 = Custom
+~/ambient_light_suppression - Default value: false  # Ambient light suppression samples the scene multiple times during one pattern exposure.
+                                  # This multiple samples are then used to suppress the effect of ambient illumination by eliminating most of the shot noise caused by longer exposure of ambient light.
+                                  # Enabling the mode will set Shutter multiplier to fixed value of 2.
+~/single_pattern_exposure   - Default value: 20.480   # The time for projection of one pattern. Use only provided values form PhoXi control settings.
 ```
 
 #### Available ROS services
@@ -77,9 +88,11 @@ Services available only for PhoXi Control API version 1.2 and higher
 #### Available ROS topics
 ```
 ~/confidence_map
+~/depth_map
 ~/normal_map
 ~/parameter_updates
 ~/pointcloud
+~/rgb_texture
 ~/texture
 ```
 ### Test PhoXi ROS interface 
