@@ -130,8 +130,8 @@ class Test_phoxi_camera_interfaces(TestCase):
         assert service_is_running(service.V2_is_connected) == True, \
             "Service %s is not exist" % service.V2_is_connected
 
-        assert service_is_running(service.V2_set_coordination_space) == True, \
-            "Service %s is not exist" % service.V2_set_coordination_space
+        assert service_is_running(service.V2_set_coordinate_space) == True, \
+            "Service %s is not exist" % service.V2_set_coordinate_space
 
         assert service_is_running(service.V2_set_transformation) == True, \
             "Service %s is not exist" % service.V2_set_transformation
@@ -153,8 +153,8 @@ class Test_phoxi_camera_interfaces(TestCase):
         assert rospy.has_param(param.confidence) == True, \
             "Parameter %s is not exist" % param.confidence
 
-        assert rospy.has_param(param.coordination_space) == True, \
-            "Parameter %s is not exist" % param.coordination_space
+        assert rospy.has_param(param.coordinate_space) == True, \
+            "Parameter %s is not exist" % param.coordinate_space
 
         assert rospy.has_param(param.frame_id) == True, \
             "Parameter %s is not exist" % param.frame_id

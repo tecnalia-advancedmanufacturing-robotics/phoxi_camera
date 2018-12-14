@@ -321,7 +321,7 @@ TEST_F (PhoXiInterfaceTest, setTransformation) {
     // MarkerSpace
     EXPECT_THROW(phoxi_interface.setTransformation(transformation,
                                                    pho::api::PhoXiCoordinateSpace::MarkerSpace,
-                                                   true, false), CoordinationSpaceNotSupported);
+                                                   true, false), CoordinateSpaceNotSupported);
     ASSERT_NO_THROW(phoxi_interface.triggerImage());
 
     // try it without connected camera

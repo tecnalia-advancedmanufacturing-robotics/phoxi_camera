@@ -174,15 +174,15 @@ class PhoXiInterface {
 
 #ifndef PHOXI_API_v1_1
         /**
-        * Set coordination space
+        * Set coordinate space
         *
-        * \param space - new coordination space
+        * \param space - new coordinate space
         * \throw PhoXiScannerNotConnected when no scanner is connected
         */
         void setCoordinateSpace(pho::api::PhoXiCoordinateSpace space);
 
         /**
-        * Get coordination space
+        * Get coordinate space
         *
         * \throw PhoXiScannerNotConnected when no scanner is connected
         */
@@ -192,11 +192,11 @@ class PhoXiInterface {
         * Set transformation matrix space
         *
         * \param coordinateTransformation - transformation
-        * \param coordination coordination space where to set transformation
+        * \param coordinate coordinate space where to set transformation
         * \param setSpace if true space will be set
         * \param saveSettings if true settings will persist after restart (disconnection from device)
         * \throw PhoXiScannerNotConnected when no scanner is connected
-        * \throw CoordinationSpaceNotSupported when space is not supported
+        * \throw CoordinateSpaceNotSupported when space is not supported
         */
         void setTransformation(pho::api::PhoXiCoordinateTransformation coordinateTransformation,pho::api::PhoXiCoordinateSpace space,bool setSpace = true, bool saveSettings = true);
 
@@ -204,12 +204,12 @@ class PhoXiInterface {
         * Set transformation matrix space
         *
         * \param coordinateTransformation - transformation
-        * \param coordination coordination space where to set transformation
+        * \param coordinate coordinate space where to set transformation
         * \param setSpace if true space will be set
         * \param saveSettings if true settings will persist after restart (disconnection from device)
         * \note transformation can be set only to RobotSpace and CustomSpace
         * \throw PhoXiScannerNotConnected when no scanner is connected
-        * \throw CoordinationSpaceNotSupported when space is not supported
+        * \throw CoordinateSpaceNotSupported when space is not supported
         */
         template <typename T>
         void setTransformation(Eigen::Matrix<T,4,4> transformation,pho::api::PhoXiCoordinateSpace space,bool setSpace = true, bool saveSettings = true){

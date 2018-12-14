@@ -271,7 +271,7 @@ class Test_phoxi_camera_ros_interface(TestCase):
         assert "Ok" != res.message
 
     def test_setCoordianteSpace(self):
-        srv_setSpace = rospy.ServiceProxy(service.V2_set_coordination_space, phoxi_camera_srv.SetCoordinatesSpace)
+        srv_setSpace = rospy.ServiceProxy(service.V2_set_coordinate_space, phoxi_camera_srv.SetCoordinatesSpace)
 
         # NoValue = 0, CameraSpace = 1, MarkerSpace = 3, RobotSpace = 4, CustomSpace = 5
         res = srv_setSpace(0)

@@ -263,20 +263,20 @@ namespace phoxi_camera {
         switch (space) {
             case pho::api::PhoXiCoordinateSpace::RobotSpace:
                 if (!settings.RobotTransformation.isSupported()) {
-                    throw CoordinationSpaceNotSupported("Coordination space is not supported");
+                    throw CoordinateSpaceNotSupported("Coordinate space is not supported");
                 }
                 settings.RobotTransformation = coordinateTransformation;
                 settings.CoordinateSpace = pho::api::PhoXiCoordinateSpace::RobotSpace;
                 break;
             case pho::api::PhoXiCoordinateSpace::CustomSpace:
                 if (!settings.CustomTransformation.isSupported()) {
-                    throw CoordinationSpaceNotSupported("Coordination space is not supported");
+                    throw CoordinateSpaceNotSupported("Coordinate space is not supported");
                 }
                 settings.CustomTransformation = coordinateTransformation;
                 settings.CoordinateSpace = pho::api::PhoXiCoordinateSpace::CustomSpace;
                 break;
             default:
-                throw CoordinationSpaceNotSupported("Coordination space is not supported");
+                throw CoordinateSpaceNotSupported("Coordinate space is not supported");
         }
         if (setSpace) {
             settings.CoordinateSpace = space;

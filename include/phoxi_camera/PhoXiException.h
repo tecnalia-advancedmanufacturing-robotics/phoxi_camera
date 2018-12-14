@@ -67,9 +67,9 @@ namespace phoxi_camera{
         }
     };
 
-    class  CoordinationSpaceNotSupported : public PhoXiInterfaceException {
+    class  CoordinateSpaceNotSupported : public PhoXiInterfaceException {
         public:
-        CoordinationSpaceNotSupported(std::string message) : PhoXiInterfaceException(message){
+        CoordinateSpaceNotSupported(std::string message) : PhoXiInterfaceException(message){
         }
     };
 

@@ -33,7 +33,7 @@ namespace phoxi_camera{
         getSupportedCapturingModesService = nh.advertiseService("get_supported_capturing_modes", &RosInterface::getSupportedCapturingModes, this);
 #ifndef PHOXI_API_v1_1
         setCoordianteSpaceService = nh.advertiseService("V2/set_transformation",&RosInterface::setTransformation, this);
-        setTransformationService = nh.advertiseService("V2/set_coordination_space",&RosInterface::setCoordianteSpace, this);
+        setTransformationService = nh.advertiseService("V2/set_coordinate_space",&RosInterface::setCoordianteSpace, this);
         saveLastFrameService = nh.advertiseService("V2/save_last_frame", &RosInterface::saveLastFrame, this);
 #endif
 
@@ -441,7 +441,7 @@ namespace phoxi_camera{
             }
 #endif
             if (level & (1 << 13)) {
-                this->dynamicReconfigureConfig.organized_cloud = config.organized_cloud;
+                //this->dynamicReconfigureConfig.organized_cloud = config.organized_cloud;
             }
 
 #ifndef PHOXI_API_v1_1

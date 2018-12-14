@@ -49,7 +49,7 @@ catkin_make
 ~/trigger_mode              - Default value: 1     # 0 = Free run, 1 = Software
 
 ## Setting available only for PhoXi Control 1.2 and higher. Also for dynamic reconfigure
-~/coordination_space        - Default value: 1 # 1 = Camera, 2 =  Mounting, 3 = Marker, 4 = Robot, 5 = Custom
+~/coordinate_space        - Default value: 1 # 1 = Camera, 2 =  Mounting, 3 = Marker, 4 = Robot, 5 = Custom
 ~/ambient_light_suppression - Default value: false  # Ambient light suppression samples the scene multiple times during one pattern exposure.
                                   # This multiple samples are then used to suppress the effect of ambient illumination by eliminating most of the shot noise caused by longer exposure of ambient light.
                                   # Enabling the mode will set Shutter multiplier to fixed value of 2.
@@ -81,7 +81,7 @@ For input and output parameters of each service please see coresponding service 
 Services available only for PhoXi Control API version 1.2 and higher
 ```
 ~/V2/save_last_frame
-~/V2/set_coordination_space
+~/V2/set_coordinate_space
 ~/V2/set_transformation
 ```
 
