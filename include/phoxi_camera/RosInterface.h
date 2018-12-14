@@ -46,6 +46,7 @@ namespace phoxi_camera{
             int triggerImage();
             void connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode = pho::api::PhoXiTriggerMode::Software, bool startAcquisition = true);
             std::string getTriggerMode(pho::api::PhoXiTriggerMode mode);
+            void getDefaultDynamicReconfigureConfig(phoxi_camera::phoxi_cameraConfig& config);
 
             std::string frameId;
         private:

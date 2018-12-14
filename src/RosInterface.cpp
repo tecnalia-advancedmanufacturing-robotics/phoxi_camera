@@ -68,7 +68,7 @@ namespace phoxi_camera{
             }
         }
         if(!PhoXiInterface::isConnected()){
-            dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
+            getDefaultDynamicReconfigureConfig(dynamicReconfigureConfig);
         }
         //set dynamic reconfigure callback
         dynamicReconfigureServer.setCallback(boost::bind(&RosInterface::dynamicReconfigureCallback,this, _1, _2));
@@ -486,7 +486,7 @@ namespace phoxi_camera{
         bool initFromConfig = false;
         nh.getParam("init_from_config",initFromConfig);
         if(initFromConfig){
-            dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
+            getDefaultDynamicReconfigureConfig(dynamicReconfigureConfig);
             this->dynamicReconfigureCallback(dynamicReconfigureConfig,std::numeric_limits<uint32_t>::max());
         }
         else{
@@ -533,10 +533,9 @@ namespace phoxi_camera{
     }
 
     void RosInterface::initFromPhoXi(){
-        dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
+        getDefaultDynamicReconfigureConfig(dynamicReconfigureConfig);
         if(!scanner->isConnected()){
             ROS_WARN("Scanner not connected.");
-            dynamicReconfigureServer.getConfigDefault(dynamicReconfigureConfig);
             return;
         }
         ///resolution
@@ -662,6 +661,10 @@ namespace phoxi_camera{
         return true;
     }
 #endif
+    void RosInterface::getDefaultDynamicReconfigureConfig(phoxi_camera::phoxi_cameraConfig& config){
+        dynamicReconfigureServer.getConfigDefault(config);
+        config.__fromServer__(nh);
+    }
 }
 
 
