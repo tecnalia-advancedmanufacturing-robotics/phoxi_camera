@@ -4,25 +4,36 @@ This package enables interfacing Photoneo PhoXi 3D Scanner/Camera from ROS.
 
 <img src="http://photoneo.com/images/photoneo_scanner.png" width="640">
 
-### Installation of latest version 2
+### Installation
 *phoxi_camera* package depends on:
 - ROS (we are using Kinetic)
 - PhoXiControl driver software which you can download on Photoneo website: https://www.photoneo.com/3d-scanning-software/ (* contact support@photoneo.com for testing the release candidate)
-
-### Installation of version 1
-*phoxi_camera* package depends on several state-of-the-art libraries and latest version 
-of g++ compiler. Script *install_prerequisities.sh* which is available in main repo folder
- install all packages and libraries required for successful phoxi_camera compilation. 
- Follow steps below to get phoxi_camera package working properly on your system: 
-
-```bash
+#### Installation steps
+- Download latest PhoXi Control
+- Add rights to execute downloaded file 
+```
+sudo cmod +x PhotoneoPhoXiControlInstaller-xxxxx.run
+```
+- Install downloaded file 
+```
+sudo ./PhotoneoPhoXiControlInstaller-xxxxx.run
+```
+- clone phoxi_camera repository to your ROS workspace (usually catkin_ws/src)
+```
 cd catkin_ws/src
-git clone https://github.com/photoneo/phoxi_camera.git
-cd phoxi_camera
-chmod +x install_prerequisities.sh
-./install_prerequisities.sh
-cd ../..
-catkin_make
+git clone https://github.com/photoneo/phoxi_camera
+```
+- Update rosdep
+```
+rosdep update
+```
+- Change working directory to your root ROS workspace folder (usually catkin_ws )
+```
+cd catkin_ws
+```
+- Install all dependencies needed by phoxi_camera package
+```
+rosdep install --from-paths src --ignore-src -r -y
 ```
 #### Parameters
 
