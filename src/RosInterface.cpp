@@ -441,7 +441,7 @@ namespace phoxi_camera{
             }
 #endif
             if (level & (1 << 13)) {
-                //this->dynamicReconfigureConfig.organized_cloud = config.organized_cloud;
+                this->dynamicReconfigureConfig.organized_cloud = config.organized_cloud;
             }
 
 #ifndef PHOXI_API_v1_1
@@ -569,11 +569,7 @@ namespace phoxi_camera{
 #ifndef PHOXI_API_v1_1
         this->dynamicReconfigureConfig.coordinate_space = scanner->CoordinatesSettings->CoordinateSpace;
         this->dynamicReconfigureConfig.ambient_light_suppression = capturingSettings.AmbientLightSuppression;
-        if (capturingSettings.SinglePatternExposure >= 10.24){
-            this->dynamicReconfigureConfig.single_pattern_exposure =  capturingSettings.SinglePatternExposure;
-        } else {
-            this->dynamicReconfigureConfig.single_pattern_exposure = 20.48;
-        }
+        this->dynamicReconfigureConfig.single_pattern_exposure =  capturingSettings.SinglePatternExposure;
         this->dynamicReconfigureConfig.camera_only_mode = capturingSettings.CameraOnlyMode;
 #endif
         this->dynamicReconfigureConfig.trigger_mode = scanner->TriggerMode.GetValue();

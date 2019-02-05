@@ -12,7 +12,7 @@ This package enables interfacing Photoneo PhoXi 3D Scanner/Camera from ROS.
 - Download latest PhoXi Control
 - Add rights to execute downloaded file 
 ```
-sudo cmod +x PhotoneoPhoXiControlInstaller-xxxxx.run
+sudo chmod +x PhotoneoPhoXiControlInstaller-xxxxx.run
 ```
 - Install downloaded file 
 ```
@@ -64,7 +64,7 @@ rosdep install --from-paths src --ignore-src -r -y
 ~/ambient_light_suppression - Default value: false  # Ambient light suppression samples the scene multiple times during one pattern exposure.
                                   # This multiple samples are then used to suppress the effect of ambient illumination by eliminating most of the shot noise caused by longer exposure of ambient light.
                                   # Enabling the mode will set Shutter multiplier to fixed value of 2.
-~/single_pattern_exposure   - Default value: 20.480   # The time for projection of one pattern. Use only provided values form PhoXi control settings.
+~/single_pattern_exposure   - Default value: 20       # The time for projection of one pattern. Use only provided values form PhoXi control settings.
 ~/camera_only_mode          - Default value: false    # With this mode you can use the scanner internal camera to capture only 2D images of the scene. 
 ```
 
