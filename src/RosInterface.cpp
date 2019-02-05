@@ -456,6 +456,12 @@ namespace phoxi_camera{
                 scanner->CapturingSettings->SinglePatternExposure = config.single_pattern_exposure;
                 this->dynamicReconfigureConfig.single_pattern_exposure = config.single_pattern_exposure;
             }
+
+            if (level & (1 << 16)) {
+                this->isOk();
+                scanner->CapturingSettings->CameraOnlyMode = config.camera_only_mode;
+                this->dynamicReconfigureConfig.camera_only_mode = config.camera_only_mode;
+            }
 #endif
 
         }catch (PhoXiInterfaceException &e){
@@ -562,12 +568,13 @@ namespace phoxi_camera{
         this->dynamicReconfigureConfig.send_texture = outputSettings.SendTexture;
 #ifndef PHOXI_API_v1_1
         this->dynamicReconfigureConfig.coordinate_space = scanner->CoordinatesSettings->CoordinateSpace;
-        this->dynamicReconfigureConfig.ambient_light_suppression = scanner->CapturingSettings->AmbientLightSuppression;
-        if (scanner->CapturingSettings->SinglePatternExposure >= 10.24){
-            this->dynamicReconfigureConfig.single_pattern_exposure =  scanner->CapturingSettings->SinglePatternExposure;
+        this->dynamicReconfigureConfig.ambient_light_suppression = capturingSettings.AmbientLightSuppression;
+        if (capturingSettings.SinglePatternExposure >= 10.24){
+            this->dynamicReconfigureConfig.single_pattern_exposure =  capturingSettings.SinglePatternExposure;
         } else {
             this->dynamicReconfigureConfig.single_pattern_exposure = 20.48;
         }
+        this->dynamicReconfigureConfig.camera_only_mode = capturingSettings.CameraOnlyMode;
 #endif
         this->dynamicReconfigureConfig.trigger_mode = scanner->TriggerMode.GetValue();
         this->dynamicReconfigureConfig.start_acquisition = scanner->isAcquiring();

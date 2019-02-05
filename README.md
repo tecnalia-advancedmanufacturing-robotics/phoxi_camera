@@ -65,6 +65,7 @@ rosdep install --from-paths src --ignore-src -r -y
                                   # This multiple samples are then used to suppress the effect of ambient illumination by eliminating most of the shot noise caused by longer exposure of ambient light.
                                   # Enabling the mode will set Shutter multiplier to fixed value of 2.
 ~/single_pattern_exposure   - Default value: 20.480   # The time for projection of one pattern. Use only provided values form PhoXi control settings.
+~/camera_only_mode          - Default value: false    # With this mode you can use the scanner internal camera to capture only 2D images of the scene. 
 ```
 
 #### Available ROS services
