@@ -10,8 +10,11 @@
 #include <pcl_ros/point_cloud.h>
 #include <Eigen/Core>
 #include <phoxi_camera/PhoXiException.h>
+#include <phoxi_camera/PhoXiDeviceInformation.h>
 
 // PhoXi API version
+#define STR_HELPER(x) #x
+#define PHOXI_API_VERSION STR_HELPER(PHOXI_API_VERSION_MAJOR) "." STR_HELPER(PHOXI_API_VERSION_MINOR) "." STR_HELPER(DPHOXI_API_VERSION_PATCH)
 #if PHOXI_API_VERSION_MAJOR == 1
     #if PHOXI_API_VERSION_MINOR == 1
         #define PHOXI_API_v1_1
@@ -34,6 +37,12 @@ class PhoXiInterface {
         */
         PhoXiInterface();
 
+        /**
+        * Return all PhoXi 3D Scanners ids connected on network with all informations about dcevice.
+        *
+        * \throw PhoXiControlNotRunning when PhoXi Control is not running
+        */
+        std::vector<PhoXiDeviceInformation> deviceList();
         /**
         * Return all PhoXi 3D Scanners ids connected on network.
         *
@@ -240,10 +249,31 @@ class PhoXiInterface {
          * \return bool whether saving proceed successful
          */
         bool saveLastFrame(const std::string &path);
+
+        /**
+         * get PhoXi Api Version
+         *
+         * \return PhoXi Api Version
+         */
+
+        std::string getApiVersion();
+        /**
+         * get PhoXi Scanner firmware Version
+         *
+         * \return connected PhoXi Scanner firmware Version
+         */
+        std::string getFirmwareVersion();
 #endif
     protected:
         pho::api::PPhoXi scanner;
         pho::api::PhoXiFactory phoXiFactory;
+        /**
+        * Return all PhoXi 3D Scanners ids connected on network.
+        *
+        * \note returned id can be passed to connectCamera method
+        * \throw PhoXiControlNotRunning when PhoXi Control is not running
+        */
+        std::vector<pho::api::PhoXiDeviceInformation> deviceInforamtionList();
     private:
         int last_frame_id = -1;
     };

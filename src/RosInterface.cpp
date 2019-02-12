@@ -11,6 +11,8 @@
 #include <phoxi_camera/PhoXiException.h>
 #include <eigen_conversions/eigen_msg.h>
 #include <cv_bridge/cv_bridge.h>
+#include <phoxi_camera/RosConversions.h>
+
 namespace phoxi_camera{
     RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex,nh), PhoXi3DscannerDiagnosticTask("PhoXi3Dscanner",boost::bind(&RosInterface::diagnosticCallback, this, _1)) {
 
@@ -77,6 +79,7 @@ namespace phoxi_camera{
     bool RosInterface::getDeviceList(phoxi_camera::GetDeviceList::Request &req, phoxi_camera::GetDeviceList::Response &res){
         try {
             res.out = PhoXiInterface::cameraList();
+            phoXiDeviceInforamtionToRosMsg(PhoXiInterface::deviceList(),res.device_information_list);
             res.len = res.out.size();
             res.success = true;
             res.message = OKRESPONSE;

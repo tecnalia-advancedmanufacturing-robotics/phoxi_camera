@@ -1,0 +1,5 @@
+string name
+phoxi_camera/DeviceType type
+string hwIdentification
+phoxi_camera/DeviceConnectionStatus status
+string firmwareVersion

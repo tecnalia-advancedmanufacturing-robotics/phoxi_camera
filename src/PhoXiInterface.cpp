@@ -2,23 +2,35 @@
 // Created by controller on 1/11/18.
 //
 
-#include "phoxi_camera/PhoXiInterface.h"
+#include <phoxi_camera/PhoXiInterface.h>
+#include <phoxi_camera/PhoXiConversions.h>
+
 namespace phoxi_camera {
+
     PhoXiInterface::PhoXiInterface() {
 
     }
 
-    std::vector<std::string> PhoXiInterface::cameraList() {
+    std::vector<PhoXiDeviceInformation> PhoXiInterface::deviceList(){
         if (!phoXiFactory.isPhoXiControlRunning()) {
             scanner.Reset();
             throw PhoXiControlNotRunning("PhoXi Control is not running");
         }
-        std::vector<std::string> list;
-        auto DeviceList = phoXiFactory.GetDeviceList();
-        for (int i = 0; i < DeviceList.size(); ++i) {
-            list.push_back(DeviceList[i].HWIdentification);
-        }
-        return list;
+        std::vector<PhoXiDeviceInformation> deviceInfo;
+        auto dl = phoXiFactory.GetDeviceList();
+        toPhoXiCameraDeviceInforamtion(dl,deviceInfo);
+        return deviceInfo;
+    }
+
+    std::vector<std::string> PhoXiInterface::cameraList() {
+
+       auto dl = deviceList();
+       std::vector<std::string> hwIdentificationList;
+       for (const auto& device : dl){
+           hwIdentificationList.push_back(device);
+       }
+        return hwIdentificationList;
+//        return std::vector<std::string>();
     }
 
     void PhoXiInterface::connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode,
@@ -29,24 +41,13 @@ namespace phoxi_camera {
                 return;
             }
         }
-        if (!phoXiFactory.isPhoXiControlRunning()) {
-            throw PhoXiControlNotRunning("PhoXi Control is not running");
-        }
-        auto DeviceList = phoXiFactory.GetDeviceList();
-        bool found = false;
-        std::string device;
-        for (int i = 0; i < DeviceList.size(); i++) {
-            if (DeviceList[i].HWIdentification == HWIdentification) {
-                found = true;
-                device = DeviceList[i].HWIdentification;
-                break;
-            }
-        }
-        if (!found) {
+        std::vector<std::string> cl = cameraList();
+        auto it = std::find(cl.begin(),cl.end(),HWIdentification);
+        if (it == cl.end()) {
             throw PhoXiScannerNotFound("Scanner not found");
         }
         disconnectCamera();
-        if (!(scanner = phoXiFactory.CreateAndConnect(device, 5000))) {
+        if (!(scanner = phoXiFactory.CreateAndConnect(*it, 5000))) {
             disconnectCamera();
             throw UnableToStartAcquisition("Scanner was not able to connect. Disconnected.");
         }
@@ -77,13 +78,13 @@ namespace phoxi_camera {
         return getPointCloudFromFrame(getPFrame(-1), organized);
     }
 
-    static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloudFromFrame(pho::api::PFrame frame, bool organized) {
+    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloudFromFrame(pho::api::PFrame frame, bool organized) {
         if(organized){
             return getOrganizedCloudFromFrame(frame);
         }
         return getUnorganizedCloudFromFrame(frame);
     }
-    static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getOrganizedCloudFromFrame(pho::api::PFrame frame){
+    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getOrganizedCloudFromFrame(pho::api::PFrame frame){
         if (!frame || !frame->Successful) {
             throw CorruptedFrame("Corrupted frame!");
         }
@@ -107,7 +108,7 @@ namespace phoxi_camera {
         return cloud;
     }
 
-    static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getUnorganizedCloudFromFrame(pho::api::PFrame frame){
+    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getUnorganizedCloudFromFrame(pho::api::PFrame frame){
         if (!frame || !frame->Successful) {
             throw CorruptedFrame("Corrupted frame!");
         }
@@ -299,5 +300,14 @@ namespace phoxi_camera {
         return success;
     }
 #endif
+    std::string PhoXiInterface::getApiVersion(){
+        return PHOXI_API_VERSION;
+    }
+    std::string PhoXiInterface::getFirmwareVersion(){
+        auto list = cameraList();
+        for(auto device : list){
+
+        }
+    }
 
 }
