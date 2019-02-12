@@ -27,6 +27,12 @@ namespace phoxi_camera{
         operator std::string() const {
             return hwIdentification;
         }
+        bool operator==(const PhoXiDeviceInformation & other){
+            return hwIdentification == other.hwIdentification;
+        }
+        bool operator==(const std::string & hwIdentification){
+            return this->hwIdentification == hwIdentification;
+        }
         std::string name;
         PhoXiDeviceType type;
         std::string hwIdentification;

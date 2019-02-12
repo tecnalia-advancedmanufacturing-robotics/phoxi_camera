@@ -51,6 +51,7 @@ add_service_files(
     SaveLastFrame.srv
     SetCoordinatesSpace.srv
     SetTransformationMatrix.srv
+    GetString.srv
 )
 
 generate_messages(

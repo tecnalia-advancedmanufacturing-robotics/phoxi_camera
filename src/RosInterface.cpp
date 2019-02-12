@@ -33,6 +33,8 @@ namespace phoxi_camera{
         disconnectCameraService = nh.advertiseService("disconnect_camera", &RosInterface::disconnectCamera, this);
         getHardwareIdentificationService = nh.advertiseService("get_hardware_indentification", &RosInterface::getHardwareIdentification, this);
         getSupportedCapturingModesService = nh.advertiseService("get_supported_capturing_modes", &RosInterface::getSupportedCapturingModes, this);
+        getApiVersionService = nh.advertiseService("get_api_version", &RosInterface::getApiVersion, this);
+        getFirmwareVersionService = nh.advertiseService("get_firmware_version", &RosInterface::getFirmwareVersion, this);
 #ifndef PHOXI_API_v1_1
         setCoordianteSpaceService = nh.advertiseService("V2/set_transformation",&RosInterface::setTransformation, this);
         setTransformationService = nh.advertiseService("V2/set_coordinate_space",&RosInterface::setCoordianteSpace, this);
@@ -261,6 +263,26 @@ namespace phoxi_camera{
             res.success = false;
             res.message = e.what();
         }
+        return true;
+    }
+    bool RosInterface::getApiVersion(phoxi_camera::GetString::Request &req, phoxi_camera::GetString::Response &res){
+        res.value = PhoXiInterface::getApiVersion();
+        res.success = true;
+        return true;
+    }
+    bool RosInterface::getFirmwareVersion(phoxi_camera::GetString::Request &req, phoxi_camera::GetString::Response &res){
+        try{
+            auto dl = PhoXiInterface::deviceList();
+            auto it = std::find(dl.begin(),dl.end(),PhoXiInterface::getHardwareIdentification());
+            if(it != dl.end()){
+                res.value = it->firmwareVersion;
+            }
+        }
+        catch (phoxi_camera::PhoXiInterfaceException &e){
+            res.message = e.what();
+            res.success = false;
+        }
+        res.success = true;
         return true;
     }
 

@@ -35,6 +35,7 @@
 #include <phoxi_camera/GetSupportedCapturingModes.h>
 #include <phoxi_camera/SetCoordinatesSpace.h>
 #include <phoxi_camera/SetTransformationMatrix.h>
+#include <phoxi_camera/GetString.h>
 
 namespace phoxi_camera{
     class RosInterface : protected  PhoXiInterface {
@@ -66,6 +67,8 @@ namespace phoxi_camera{
             bool disconnectCamera(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
             bool getHardwareIdentification(phoxi_camera::GetHardwareIdentification::Request &req, phoxi_camera::GetHardwareIdentification::Response &res);
             bool getSupportedCapturingModes(phoxi_camera::GetSupportedCapturingModes::Request &req, phoxi_camera::GetSupportedCapturingModes::Response &res);
+            bool getApiVersion(phoxi_camera::GetString::Request &req, phoxi_camera::GetString::Response &res);
+            bool getFirmwareVersion(phoxi_camera::GetString::Request &req, phoxi_camera::GetString::Response &res);
             void dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &config, uint32_t level);
             void diagnosticCallback(diagnostic_updater::DiagnosticStatusWrapper& status);
             void diagnosticTimerCallback(const ros::TimerEvent&);
@@ -98,6 +101,8 @@ namespace phoxi_camera{
             ros::ServiceServer getSupportedCapturingModesService;
             ros::ServiceServer setCoordianteSpaceService;
             ros::ServiceServer setTransformationService;
+            ros::ServiceServer getApiVersionService;
+            ros::ServiceServer getFirmwareVersionService;
 
             //ros publishers
             ros::Publisher cloudPub;
