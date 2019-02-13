@@ -33,6 +33,9 @@ include_directories(include
 add_message_files(
   FILES
     PhoXiSize.msg
+    DeviceConnectionStatus.msg
+    DeviceType.msg
+    DeviceInformation.msg
 )
 
 add_service_files(
