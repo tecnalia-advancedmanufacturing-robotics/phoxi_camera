@@ -7,32 +7,36 @@
 
 #include <string>
 
-namespace phoxi_camera{
+namespace phoxi_camera {
     class PhoXiInterface;
 
     class PhoXiDeviceInformation {
     public:
         friend PhoXiInterface;
-        enum PhoXiConnectionStatus{
+        enum PhoXiConnectionStatus {
             Unknown = 0,
             Ready = 1,
             Occupied = 2,
             Starting = 3
         };
-        enum PhoXiDeviceType{
+        enum PhoXiDeviceType {
             PhoXiScanner,
             PhoXiCamera,        //future camera support
             NoValue
         };
+
         operator std::string() const {
             return hwIdentification;
         }
-        bool operator==(const PhoXiDeviceInformation & other){
+
+        bool operator==(const PhoXiDeviceInformation& other) {
             return hwIdentification == other.hwIdentification;
         }
-        bool operator==(const std::string & hwIdentification){
+
+        bool operator==(const std::string& hwIdentification) {
             return this->hwIdentification == hwIdentification;
         }
+
         std::string name;
         PhoXiDeviceType type;
         std::string hwIdentification;

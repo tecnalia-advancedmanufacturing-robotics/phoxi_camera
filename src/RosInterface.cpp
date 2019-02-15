@@ -13,8 +13,11 @@
 #include <cv_bridge/cv_bridge.h>
 #include <phoxi_camera/RosConversions.h>
 
-namespace phoxi_camera{
-    RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex,nh), PhoXi3DscannerDiagnosticTask("PhoXi3Dscanner",boost::bind(&RosInterface::diagnosticCallback, this, _1)) {
+namespace phoxi_camera {
+    RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex, nh),
+                                   PhoXi3DscannerDiagnosticTask("PhoXi3Dscanner",
+                                                                boost::bind(&RosInterface::diagnosticCallback, this,
+                                                                            _1)) {
 
         //create service servers
         getDeviceListService = nh.advertiseService("get_device_list", &RosInterface::getDeviceList, this);
@@ -46,212 +49,230 @@ namespace phoxi_camera{
         int topic_queue_size;
         nh.param<bool>("latch_topics", latch_topics, false);
         nh.param<int>("topic_queue_size", topic_queue_size, 1);
-        cloudPub = nh.advertise < sensor_msgs::PointCloud2 >("pointcloud", 1,latch_topics);
-        normalMapPub = nh.advertise < sensor_msgs::Image > ("normal_map", topic_queue_size,latch_topics);
-        confidenceMapPub = nh.advertise < sensor_msgs::Image > ("confidence_map", topic_queue_size,latch_topics);
-        rawTexturePub = nh.advertise < sensor_msgs::Image > ("texture", topic_queue_size,latch_topics);
-        rgbTexturePub = nh.advertise < sensor_msgs::Image > ("rgb_texture", topic_queue_size,latch_topics);
-        depthMapPub = nh.advertise < sensor_msgs::Image > ("depth_map", topic_queue_size,latch_topics);
+        cloudPub = nh.advertise<sensor_msgs::PointCloud2>("pointcloud", 1, latch_topics);
+        normalMapPub = nh.advertise<sensor_msgs::Image>("normal_map", topic_queue_size, latch_topics);
+        confidenceMapPub = nh.advertise<sensor_msgs::Image>("confidence_map", topic_queue_size, latch_topics);
+        rawTexturePub = nh.advertise<sensor_msgs::Image>("texture", topic_queue_size, latch_topics);
+        rgbTexturePub = nh.advertise<sensor_msgs::Image>("rgb_texture", topic_queue_size, latch_topics);
+        depthMapPub = nh.advertise<sensor_msgs::Image>("depth_map", topic_queue_size, latch_topics);
 
         //set diagnostic Hw id
         diagnosticUpdater.setHardwareID("none");
         diagnosticUpdater.add(PhoXi3DscannerDiagnosticTask);
-        diagnosticTimer  = nh.createTimer(ros::Duration(5.0),&RosInterface::diagnosticTimerCallback, this);
+        diagnosticTimer = nh.createTimer(ros::Duration(5.0), &RosInterface::diagnosticTimerCallback, this);
         diagnosticTimer.start();
 
         nh.param<std::string>("frame_id", frameId, "PhoXi3Dscanner_sensor");
 
         //connect to default scanner
         std::string scannerId;
-        if(nh.param<std::string>("scanner_id", scannerId, "") && !scannerId.empty()){
+        if (nh.param<std::string>("scanner_id", scannerId, "") && !scannerId.empty()) {
             try {
                 RosInterface::connectCamera(scannerId);
-                ROS_INFO("Connected to %s",scannerId.c_str());
-            }catch(PhoXiInterfaceException& e) {
-                ROS_WARN("Connection to default scanner %s failed. %s ",scannerId.c_str(),e.what());
+                ROS_INFO("Connected to %s", scannerId.c_str());
+            } catch (PhoXiInterfaceException& e) {
+                ROS_WARN("Connection to default scanner %s failed. %s ", scannerId.c_str(), e.what());
             }
         }
-        if(!PhoXiInterface::isConnected()){
+        if (!PhoXiInterface::isConnected()) {
             getDefaultDynamicReconfigureConfig(dynamicReconfigureConfig);
         }
         //set dynamic reconfigure callback
-        dynamicReconfigureServer.setCallback(boost::bind(&RosInterface::dynamicReconfigureCallback,this, _1, _2));
+        dynamicReconfigureServer.setCallback(boost::bind(&RosInterface::dynamicReconfigureCallback, this, _1, _2));
     }
 
-    bool RosInterface::getDeviceList(phoxi_camera::GetDeviceList::Request &req, phoxi_camera::GetDeviceList::Response &res){
+    bool
+    RosInterface::getDeviceList(phoxi_camera::GetDeviceList::Request& req, phoxi_camera::GetDeviceList::Response& res) {
         try {
             res.out = PhoXiInterface::cameraList();
-            phoXiDeviceInforamtionToRosMsg(PhoXiInterface::deviceList(),res.device_information_list);
+            phoXiDeviceInforamtionToRosMsg(PhoXiInterface::deviceList(), res.device_information_list);
             res.len = res.out.size();
             res.success = true;
             res.message = OKRESPONSE;
-        }catch (PhoXiInterfaceException &e){
+        } catch (PhoXiInterfaceException& e) {
             res.success = false;
             res.message = e.what();
         }
         return true;
     }
-    bool RosInterface::connectCamera(phoxi_camera::ConnectCamera::Request &req, phoxi_camera::ConnectCamera::Response &res){
+
+    bool
+    RosInterface::connectCamera(phoxi_camera::ConnectCamera::Request& req, phoxi_camera::ConnectCamera::Response& res) {
         try {
             RosInterface::connectCamera(req.name);
             res.success = true;
             res.message = OKRESPONSE;
-        }catch (PhoXiInterfaceException &e){
+        } catch (PhoXiInterfaceException& e) {
             res.success = false;
             res.message = e.what();
         }
         return true;
     }
-    bool RosInterface::isConnected(phoxi_camera::IsConnected::Request &req, phoxi_camera::IsConnected::Response &res){
+
+    bool RosInterface::isConnected(phoxi_camera::IsConnected::Request& req, phoxi_camera::IsConnected::Response& res) {
         res.connected = PhoXiInterface::isConnected();
         return true;
     }
-    bool RosInterface::isAcquiring(phoxi_camera::IsAcquiring::Request &req, phoxi_camera::IsAcquiring::Response &res){
+
+    bool RosInterface::isAcquiring(phoxi_camera::IsAcquiring::Request& req, phoxi_camera::IsAcquiring::Response& res) {
         res.is_acquiring = PhoXiInterface::isAcquiring();
         return true;
     }
-    bool RosInterface::isConnected(phoxi_camera::GetBool::Request &req, phoxi_camera::GetBool::Response &res){
+
+    bool RosInterface::isConnected(phoxi_camera::GetBool::Request& req, phoxi_camera::GetBool::Response& res) {
         res.value = PhoXiInterface::isConnected();
         res.message = OKRESPONSE; //todo tot este premysliet
         res.success = true;
         return true;
     }
-    bool RosInterface::isAcquiring(phoxi_camera::GetBool::Request &req, phoxi_camera::GetBool::Response &res){
+
+    bool RosInterface::isAcquiring(phoxi_camera::GetBool::Request& req, phoxi_camera::GetBool::Response& res) {
         res.value = PhoXiInterface::isAcquiring();
         res.message = OKRESPONSE; //todo tot este premysliet
         res.success = true;
         return true;
     }
-    bool RosInterface::startAcquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
+
+    bool RosInterface::startAcquisition(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res) {
         try {
             PhoXiInterface::startAcquisition();
             dynamicReconfigureConfig.start_acquisition = true;
             dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
             diagnosticUpdater.force_update();
-        }catch (PhoXiInterfaceException &e){
-            ROS_ERROR("%s",e.what());
+        } catch (PhoXiInterfaceException& e) {
+            ROS_ERROR("%s", e.what());
         }
         return true;
     }
-    bool RosInterface::stopAcquisition(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
+
+    bool RosInterface::stopAcquisition(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res) {
         try {
             PhoXiInterface::stopAcquisition();
             dynamicReconfigureConfig.start_acquisition = false;
             dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
             diagnosticUpdater.force_update();
-        }catch (PhoXiInterfaceException &e){
-            ROS_ERROR("%s",e.what());
+        } catch (PhoXiInterfaceException& e) {
+            ROS_ERROR("%s", e.what());
         }
         return true;
     }
-    bool RosInterface::startAcquisition(phoxi_camera::Empty::Request &req, phoxi_camera::Empty::Response &res){
+
+    bool RosInterface::startAcquisition(phoxi_camera::Empty::Request& req, phoxi_camera::Empty::Response& res) {
         try {
             dynamicReconfigureConfig.start_acquisition = true;
             dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
             PhoXiInterface::startAcquisition();
             res.message = OKRESPONSE;
             res.success = true;
-        }catch (PhoXiInterfaceException &e){
+        } catch (PhoXiInterfaceException& e) {
             res.message = e.what();
             res.success = false;
         }
         return true;
     }
-    bool RosInterface::stopAcquisition(phoxi_camera::Empty::Request &req, phoxi_camera::Empty::Response &res){
+
+    bool RosInterface::stopAcquisition(phoxi_camera::Empty::Request& req, phoxi_camera::Empty::Response& res) {
         try {
             dynamicReconfigureConfig.start_acquisition = false;
             dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
             PhoXiInterface::stopAcquisition();
             res.message = OKRESPONSE;
             res.success = true;
-        }catch (PhoXiInterfaceException &e){
+        } catch (PhoXiInterfaceException& e) {
             res.message = e.what();
             res.success = false;
         }
         return true;
     }
-    bool RosInterface::triggerImage(phoxi_camera::TriggerImage::Request &req, phoxi_camera::TriggerImage::Response &res){
+
+    bool
+    RosInterface::triggerImage(phoxi_camera::TriggerImage::Request& req, phoxi_camera::TriggerImage::Response& res) {
         try {
             res.id = RosInterface::triggerImage();
             res.success = true;
             res.message = OKRESPONSE;
-        }catch (PhoXiInterfaceException &e){
-            res.success = false;
-            res.message = e.what();
-        }
-        return true;
-    }
-    bool RosInterface::getFrame(phoxi_camera::GetFrame::Request &req, phoxi_camera::GetFrame::Response &res){
-        try {
-            pho::api::PFrame frame = getPFrame(req.in);
-            publishFrame(frame);
-            if(!frame){
-                res.success = false;
-                res.message = "Null frame!";
-            }
-            else{
-                res.success = true;
-                res.message = OKRESPONSE;
-            }
-        }catch (PhoXiInterfaceException &e){
+        } catch (PhoXiInterfaceException& e) {
             res.success = false;
             res.message = e.what();
         }
         return true;
     }
 
-    bool RosInterface::saveFrame(phoxi_camera::SaveFrame::Request &req, phoxi_camera::SaveFrame::Response &res){
+    bool RosInterface::getFrame(phoxi_camera::GetFrame::Request& req, phoxi_camera::GetFrame::Response& res) {
+        try {
+            pho::api::PFrame frame = getPFrame(req.in);
+            publishFrame(frame);
+            if (!frame) {
+                res.success = false;
+                res.message = "Null frame!";
+            } else {
+                res.success = true;
+                res.message = OKRESPONSE;
+            }
+        } catch (PhoXiInterfaceException& e) {
+            res.success = false;
+            res.message = e.what();
+        }
+        return true;
+    }
+
+    bool RosInterface::saveFrame(phoxi_camera::SaveFrame::Request& req, phoxi_camera::SaveFrame::Response& res) {
         try {
             pho::api::PFrame frame = RosInterface::getPFrame(req.in);
-            if(!frame){
+            if (!frame) {
                 res.success = false;
                 res.message = "Null frame!";
                 return true;
             }
             size_t pos = req.path.find("~");
-            if(pos != std::string::npos){
+            if (pos != std::string::npos) {
                 char* home = std::getenv("HOME");
-                if(!home){
+                if (!home) {
                     res.message = "'~' found in 'path' parameter but environment variable 'HOME' not found. Export' HOME' variable or pass absolute value to 'path' parameter.";
                     res.success = false;
                     return true;
                 }
-                req.path.replace(pos,1,home);
+                req.path.replace(pos, 1, home);
             }
-            ROS_INFO("path: %s",req.path.c_str());
+            ROS_INFO("path: %s", req.path.c_str());
             frame->SaveAsPly(req.path);
             res.message = OKRESPONSE;
             res.success = true;
-        }catch (PhoXiInterfaceException &e){
+        } catch (PhoXiInterfaceException& e) {
             res.success = false;
             res.message = e.what();
         }
         return true;
     }
-    bool RosInterface::disconnectCamera(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res){
+
+    bool RosInterface::disconnectCamera(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res) {
         try {
             PhoXiInterface::disconnectCamera();
             diagnosticUpdater.force_update();
-        }catch (PhoXiInterfaceException &e){
+        } catch (PhoXiInterfaceException& e) {
             //scanner is already disconnected on exception
         }
         return true;
     }
-    bool RosInterface::getHardwareIdentification(phoxi_camera::GetHardwareIdentification::Request &req, phoxi_camera::GetHardwareIdentification::Response &res){
+
+    bool RosInterface::getHardwareIdentification(phoxi_camera::GetHardwareIdentification::Request& req,
+                                                 phoxi_camera::GetHardwareIdentification::Response& res) {
         try {
             res.hardware_identification = PhoXiInterface::getHardwareIdentification();
             res.success = true;
             res.message = OKRESPONSE;
-        }catch (PhoXiInterfaceException &e){
+        } catch (PhoXiInterfaceException& e) {
             res.success = false;
             res.message = e.what();
         }
         return true;
     }
-    bool RosInterface::getSupportedCapturingModes(phoxi_camera::GetSupportedCapturingModes::Request &req, phoxi_camera::GetSupportedCapturingModes::Response &res){
+
+    bool RosInterface::getSupportedCapturingModes(phoxi_camera::GetSupportedCapturingModes::Request& req,
+                                                  phoxi_camera::GetSupportedCapturingModes::Response& res) {
         try {
             std::vector<pho::api::PhoXiCapturingMode> modes = PhoXiInterface::getSupportedCapturingModes();
-            for(int i =0; i < modes.size(); i++){
+            for (int i = 0; i < modes.size(); i++) {
                 phoxi_camera::PhoXiSize size;
                 size.Height = modes[i].Resolution.Height;
                 size.Width = modes[i].Resolution.Width;
@@ -259,26 +280,29 @@ namespace phoxi_camera{
             }
             res.success = true;
             res.message = OKRESPONSE;
-        }catch (PhoXiInterfaceException &e){
+        } catch (PhoXiInterfaceException& e) {
             res.success = false;
             res.message = e.what();
         }
         return true;
     }
-    bool RosInterface::getApiVersion(phoxi_camera::GetString::Request &req, phoxi_camera::GetString::Response &res){
+
+    bool RosInterface::getApiVersion(phoxi_camera::GetString::Request& req, phoxi_camera::GetString::Response& res) {
         res.value = PhoXiInterface::getApiVersion();
         res.success = true;
         return true;
     }
-    bool RosInterface::getFirmwareVersion(phoxi_camera::GetString::Request &req, phoxi_camera::GetString::Response &res){
-        try{
+
+    bool
+    RosInterface::getFirmwareVersion(phoxi_camera::GetString::Request& req, phoxi_camera::GetString::Response& res) {
+        try {
             auto dl = PhoXiInterface::deviceList();
-            auto it = std::find(dl.begin(),dl.end(),PhoXiInterface::getHardwareIdentification());
-            if(it != dl.end()){
+            auto it = std::find(dl.begin(), dl.end(), PhoXiInterface::getHardwareIdentification());
+            if (it != dl.end()) {
                 res.value = it->firmwareVersion;
             }
         }
-        catch (phoxi_camera::PhoXiInterfaceException &e){
+        catch (phoxi_camera::PhoXiInterfaceException& e) {
             res.message = e.what();
             res.success = false;
         }
@@ -299,17 +323,17 @@ namespace phoxi_camera{
         header.frame_id = frameId;
         header.seq = frame->Info.FrameIndex;
 
-        if (frame->PointCloud.Empty()){
+        if (frame->PointCloud.Empty()) {
             ROS_WARN("Empty point cloud!");
         } else {
-            auto cloud = PhoXiInterface::getPointCloudFromFrame(frame,dynamicReconfigureConfig.organized_cloud);
+            auto cloud = PhoXiInterface::getPointCloudFromFrame(frame, dynamicReconfigureConfig.organized_cloud);
             sensor_msgs::PointCloud2 output_cloud;
-            pcl::toROSMsg(*cloud,output_cloud);
+            pcl::toROSMsg(*cloud, output_cloud);
             output_cloud.header = header;
             cloudPub.publish(output_cloud);
         }
 
-        if(frame->DepthMap.Empty()){
+        if (frame->DepthMap.Empty()) {
             ROS_WARN("Empty depth map!");
         } else {
             sensor_msgs::Image depth_map;
@@ -336,7 +360,8 @@ namespace phoxi_camera{
                                    frame->Texture.Size.Width * sizeof(float), // stepSize
                                    frame->Texture.operator[](0));
             rawTexturePub.publish(texture);
-            cv::Mat cvGreyTexture(frame->Texture.Size.Height, frame->Texture.Size.Width, CV_32FC1, frame->Texture.operator[](0));
+            cv::Mat cvGreyTexture(frame->Texture.Size.Height, frame->Texture.Size.Width, CV_32FC1,
+                                  frame->Texture.operator[](0));
             cv::normalize(cvGreyTexture, cvGreyTexture, 0, 255, CV_MINMAX);
             cvGreyTexture.convertTo(cvGreyTexture, CV_8U);
             cv::equalizeHist(cvGreyTexture, cvGreyTexture);
@@ -345,7 +370,7 @@ namespace phoxi_camera{
             cv_bridge::CvImage rgbTexture(header, sensor_msgs::image_encodings::BGR8, cvRgbTexture);
             rgbTexturePub.publish(rgbTexture.toImageMsg());
         }
-        if (frame->ConfidenceMap.Empty()){
+        if (frame->ConfidenceMap.Empty()) {
             ROS_WARN("Empty confidence map!");
         } else {
             sensor_msgs::Image confidence_map;
@@ -360,7 +385,7 @@ namespace phoxi_camera{
             confidenceMapPub.publish(confidence_map);
         }
 
-        if (frame->NormalMap.Empty()){
+        if (frame->NormalMap.Empty()) {
             ROS_WARN("Empty normal map!");
         } else {
             sensor_msgs::Image normal_map;
@@ -377,14 +402,14 @@ namespace phoxi_camera{
 
     }
 
-    void RosInterface::dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig &config, uint32_t level) {
-        if(!PhoXiInterface::isConnected()){
+    void RosInterface::dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig& config, uint32_t level) {
+        if (!PhoXiInterface::isConnected()) {
             config = this->dynamicReconfigureConfig;
             return;
         }
-        try{
+        try {
             if (level & (1 << 1)) {
-                switch (config.resolution){
+                switch (config.resolution) {
                     case 0:
                         PhoXiInterface::setLowResolution();
                         break;
@@ -411,7 +436,7 @@ namespace phoxi_camera{
             }
 
             if (level & (1 << 4)) {
-                PhoXiInterface::setTriggerMode(config.trigger_mode,config.start_acquisition);
+                PhoXiInterface::setTriggerMode(config.trigger_mode, config.start_acquisition);
                 this->dynamicReconfigureConfig.trigger_mode = config.trigger_mode;
                 this->dynamicReconfigureConfig.start_acquisition = config.start_acquisition;
             }
@@ -489,12 +514,12 @@ namespace phoxi_camera{
             }
 #endif
 
-        }catch (PhoXiInterfaceException &e){
-            ROS_WARN("%s",e.what());
+        } catch (PhoXiInterfaceException& e) {
+            ROS_WARN("%s", e.what());
         }
     }
 
-    pho::api::PFrame RosInterface::getPFrame(int id){
+    pho::api::PFrame RosInterface::getPFrame(int id) {
         pho::api::PFrame frame = PhoXiInterface::getPFrame(id);
         //update dynamic reconfigure
         dynamicReconfigureConfig.trigger_mode = PhoXiInterface::scanner->TriggerMode.GetValue();
@@ -503,7 +528,7 @@ namespace phoxi_camera{
         return frame;
     }
 
-    int RosInterface::triggerImage(){
+    int RosInterface::triggerImage() {
         int id = PhoXiInterface::triggerImage();
         //update dynamic reconfigure
         dynamicReconfigureConfig.coordinate_space = pho::api::PhoXiTriggerMode::Software;
@@ -512,44 +537,42 @@ namespace phoxi_camera{
         return id;
     }
 
-    void RosInterface::connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode, bool startAcquisition){
-        PhoXiInterface::connectCamera(HWIdentification,mode,startAcquisition);
+    void
+    RosInterface::connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode, bool startAcquisition) {
+        PhoXiInterface::connectCamera(HWIdentification, mode, startAcquisition);
         bool initFromConfig = false;
-        nh.getParam("init_from_config",initFromConfig);
-        if(initFromConfig){
+        nh.getParam("init_from_config", initFromConfig);
+        if (initFromConfig) {
             getDefaultDynamicReconfigureConfig(dynamicReconfigureConfig);
-            this->dynamicReconfigureCallback(dynamicReconfigureConfig,std::numeric_limits<uint32_t>::max());
-        }
-        else{
+            this->dynamicReconfigureCallback(dynamicReconfigureConfig, std::numeric_limits<uint32_t>::max());
+        } else {
             initFromPhoXi();
         }
         dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
         diagnosticUpdater.force_update();
     }
 
-    void RosInterface::diagnosticCallback(diagnostic_updater::DiagnosticStatusWrapper& status){
-        if(PhoXiInterface::isConnected()){
-            if(PhoXiInterface::isAcquiring()){
-                status.summary(diagnostic_msgs::DiagnosticStatus::OK,"Ready");
+    void RosInterface::diagnosticCallback(diagnostic_updater::DiagnosticStatusWrapper& status) {
+        if (PhoXiInterface::isConnected()) {
+            if (PhoXiInterface::isAcquiring()) {
+                status.summary(diagnostic_msgs::DiagnosticStatus::OK, "Ready");
+            } else {
+                status.summary(diagnostic_msgs::DiagnosticStatus::WARN, "Acquisition not started");
             }
-            else{
-                status.summary(diagnostic_msgs::DiagnosticStatus::WARN,"Acquisition not started");
-            }
-            status.add("HardwareIdentification",std::string(scanner->HardwareIdentification));
-            status.add("Trigger mode",getTriggerMode(scanner->TriggerMode));
+            status.add("HardwareIdentification", std::string(scanner->HardwareIdentification));
+            status.add("Trigger mode", getTriggerMode(scanner->TriggerMode));
 
-        }
-        else{
-            status.summary(diagnostic_msgs::DiagnosticStatus::ERROR,"Not connected");
+        } else {
+            status.summary(diagnostic_msgs::DiagnosticStatus::ERROR, "Not connected");
         }
     }
 
-    void RosInterface::diagnosticTimerCallback(const ros::TimerEvent&){
+    void RosInterface::diagnosticTimerCallback(const ros::TimerEvent&) {
         diagnosticUpdater.force_update();
     }
 
-    std::string RosInterface::getTriggerMode(pho::api::PhoXiTriggerMode mode){
-        switch (mode){
+    std::string RosInterface::getTriggerMode(pho::api::PhoXiTriggerMode mode) {
+        switch (mode) {
             case pho::api::PhoXiTriggerMode::Freerun:
                 return "Freerun";
             case pho::api::PhoXiTriggerMode::Software:
@@ -563,18 +586,17 @@ namespace phoxi_camera{
         }
     }
 
-    void RosInterface::initFromPhoXi(){
+    void RosInterface::initFromPhoXi() {
         getDefaultDynamicReconfigureConfig(dynamicReconfigureConfig);
-        if(!scanner->isConnected()){
+        if (!scanner->isConnected()) {
             ROS_WARN("Scanner not connected.");
             return;
         }
         ///resolution
         pho::api::PhoXiCapturingMode mode = scanner->CapturingMode;
-        if((mode.Resolution.Width == 2064) && (mode.Resolution.Height = 1544)){
+        if ((mode.Resolution.Width == 2064) && (mode.Resolution.Height = 1544)) {
             this->dynamicReconfigureConfig.resolution = 1;
-        }
-        else{
+        } else {
             this->dynamicReconfigureConfig.resolution = 0;
         }
 
@@ -594,7 +616,7 @@ namespace phoxi_camera{
 #ifndef PHOXI_API_v1_1
         this->dynamicReconfigureConfig.coordinate_space = scanner->CoordinatesSettings->CoordinateSpace;
         this->dynamicReconfigureConfig.ambient_light_suppression = capturingSettings.AmbientLightSuppression;
-        this->dynamicReconfigureConfig.single_pattern_exposure =  capturingSettings.SinglePatternExposure;
+        this->dynamicReconfigureConfig.single_pattern_exposure = capturingSettings.SinglePatternExposure;
         this->dynamicReconfigureConfig.camera_only_mode = capturingSettings.CameraOnlyMode;
 #endif
         this->dynamicReconfigureConfig.trigger_mode = scanner->TriggerMode.GetValue();
@@ -603,7 +625,9 @@ namespace phoxi_camera{
     }
 
 #ifndef PHOXI_API_v1_1
-    bool RosInterface::setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request &req, phoxi_camera::SetCoordinatesSpace::Response &res){
+
+    bool RosInterface::setCoordianteSpace(phoxi_camera::SetCoordinatesSpace::Request& req,
+                                          phoxi_camera::SetCoordinatesSpace::Response& res) {
         try {
             PhoXiInterface::setCoordinateSpace(req.coordinates_space);
             //update dynamic reconfigure
@@ -611,41 +635,44 @@ namespace phoxi_camera{
             dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
             res.success = true;
             res.message = OKRESPONSE;
-        }catch (PhoXiInterfaceException &e){
+        } catch (PhoXiInterfaceException& e) {
             res.success = false;
             res.message = e.what();
         }
         return true;
     }
 
-    bool RosInterface::setTransformation(phoxi_camera::SetTransformationMatrix::Request &req, phoxi_camera::SetTransformationMatrix::Response &res){
+    bool RosInterface::setTransformation(phoxi_camera::SetTransformationMatrix::Request& req,
+                                         phoxi_camera::SetTransformationMatrix::Response& res) {
         try {
             Eigen::Affine3d transform;
-            tf::transformMsgToEigen(req.transform,transform);
-            PhoXiInterface::setTransformation(transform.matrix(),req.coordinates_space,req.set_space,req.save_settings);
+            tf::transformMsgToEigen(req.transform, transform);
+            PhoXiInterface::setTransformation(transform.matrix(), req.coordinates_space, req.set_space,
+                                              req.save_settings);
             //update dynamic reconfigure
-            if(req.set_space) {
+            if (req.set_space) {
                 dynamicReconfigureConfig.coordinate_space = req.coordinates_space;
             }
             dynamicReconfigureServer.updateConfig(dynamicReconfigureConfig);
             res.success = true;
             res.message = OKRESPONSE;
-        }catch (PhoXiInterfaceException &e){
+        } catch (PhoXiInterfaceException& e) {
             res.success = false;
             res.message = e.what();
         }
         return true;
     }
 
-    bool RosInterface::saveLastFrame(phoxi_camera::SaveLastFrame::Request &req, phoxi_camera::SaveLastFrame::Response &res) {
+    bool
+    RosInterface::saveLastFrame(phoxi_camera::SaveLastFrame::Request& req, phoxi_camera::SaveLastFrame::Response& res) {
         std::string file_path = req.file_path;
 
         try {
             // ~ error handling
             size_t pos = file_path.find('~');
-            if(pos != std::string::npos){
+            if (pos != std::string::npos) {
                 char* home = std::getenv("HOME");
-                if(!home){
+                if (!home) {
                     res.message = "'~' found in 'file_path' parameter but environment variable 'HOME' not found. Export' HOME' variable or pass absolute value to 'path' parameter.";
                     res.success = false;
                     return true;
@@ -659,7 +686,7 @@ namespace phoxi_camera{
             pos = file_path.rfind('.') + 1;
             std::string extension = file_path.substr(pos, file_path.length());
 
-            for (const auto &ext: extensions) {
+            for (const auto& ext: extensions) {
                 if (ext == extension) {
                     correct_ext = true;
                 }
@@ -671,9 +698,9 @@ namespace phoxi_camera{
             }
 
             // save last frame
-            ROS_INFO("File path: %s",file_path.c_str());
+            ROS_INFO("File path: %s", file_path.c_str());
             bool result = PhoXiInterface::saveLastFrame(file_path);
-            if (result){
+            if (result) {
                 res.message = OKRESPONSE;
                 res.success = true;
             } else {
@@ -681,15 +708,17 @@ namespace phoxi_camera{
                 res.success = false;
             }
 
-        } catch (PhoXiInterfaceException &e){
+        } catch (PhoXiInterfaceException& e) {
             res.success = false;
             res.message = e.what();
         }
 
         return true;
     }
+
 #endif
-    void RosInterface::getDefaultDynamicReconfigureConfig(phoxi_camera::phoxi_cameraConfig& config){
+
+    void RosInterface::getDefaultDynamicReconfigureConfig(phoxi_camera::phoxi_cameraConfig& config) {
         dynamicReconfigureServer.getConfigDefault(config);
         config.__fromServer__(nh);
     }

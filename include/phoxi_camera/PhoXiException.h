@@ -6,51 +6,54 @@
 #define PROJECT_PHOXIEXCEPTION_H
 
 #include <exception>
-namespace phoxi_camera{
+
+namespace phoxi_camera {
     class PhoXiInterfaceException : public std::exception {
     public:
-        PhoXiInterfaceException(std::string message) : message(message){
+        PhoXiInterfaceException(std::string message) : message(message) {
         }
-        virtual const char* what() const throw()
-        {
+
+        virtual const char* what() const throw() {
             return message.c_str();
         }
+
     private:
         std::string message;
     };
 
     class PhoXiControlNotRunning : public PhoXiInterfaceException {
     public:
-        PhoXiControlNotRunning(std::string message) : PhoXiInterfaceException(message){
+        PhoXiControlNotRunning(std::string message) : PhoXiInterfaceException(message) {
         }
     };
 
     class PhoXiScannerNotFound : public PhoXiInterfaceException {
     public:
-        PhoXiScannerNotFound(std::string message) : PhoXiInterfaceException(message){
+        PhoXiScannerNotFound(std::string message) : PhoXiInterfaceException(message) {
         }
     };
+
     class UnableToConnect : public PhoXiInterfaceException {
     public:
-        UnableToConnect(std::string message) : PhoXiInterfaceException(message){
+        UnableToConnect(std::string message) : PhoXiInterfaceException(message) {
         }
     };
 
     class UnableToStartAcquisition : public PhoXiInterfaceException {
     public:
-        UnableToStartAcquisition(std::string message) : PhoXiInterfaceException(message){
+        UnableToStartAcquisition(std::string message) : PhoXiInterfaceException(message) {
         }
     };
 
     class UnableToStopAcquisition : public PhoXiInterfaceException {
     public:
-        UnableToStopAcquisition(std::string message) : PhoXiInterfaceException(message){
+        UnableToStopAcquisition(std::string message) : PhoXiInterfaceException(message) {
         }
     };
 
     class CorruptedFrame : public PhoXiInterfaceException {
     public:
-        CorruptedFrame(std::string message) : PhoXiInterfaceException(message){
+        CorruptedFrame(std::string message) : PhoXiInterfaceException(message) {
         }
     };
 
@@ -61,27 +64,27 @@ namespace phoxi_camera{
     };
 
 
-    class  PhoXiScannerNotConnected : public PhoXiInterfaceException {
+    class PhoXiScannerNotConnected : public PhoXiInterfaceException {
     public:
-        PhoXiScannerNotConnected(std::string message) : PhoXiInterfaceException(message){
+        PhoXiScannerNotConnected(std::string message) : PhoXiInterfaceException(message) {
         }
     };
 
-    class  CoordinateSpaceNotSupported : public PhoXiInterfaceException {
-        public:
-        CoordinateSpaceNotSupported(std::string message) : PhoXiInterfaceException(message){
+    class CoordinateSpaceNotSupported : public PhoXiInterfaceException {
+    public:
+        CoordinateSpaceNotSupported(std::string message) : PhoXiInterfaceException(message) {
         }
     };
 
-    class  InvalidTransformationMatrix : public PhoXiInterfaceException {
+    class InvalidTransformationMatrix : public PhoXiInterfaceException {
     public:
-        InvalidTransformationMatrix(std::string message) : PhoXiInterfaceException(message){
+        InvalidTransformationMatrix(std::string message) : PhoXiInterfaceException(message) {
         }
     };
 
-    class  InvalidTriggerMode : public PhoXiInterfaceException {
+    class InvalidTriggerMode : public PhoXiInterfaceException {
     public:
-        InvalidTriggerMode(std::string message) : PhoXiInterfaceException(message){
+        InvalidTriggerMode(std::string message) : PhoXiInterfaceException(message) {
         }
     };
 }

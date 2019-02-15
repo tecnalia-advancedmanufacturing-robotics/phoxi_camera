@@ -11,24 +11,24 @@ namespace phoxi_camera {
 
     }
 
-    std::vector<PhoXiDeviceInformation> PhoXiInterface::deviceList(){
+    std::vector<PhoXiDeviceInformation> PhoXiInterface::deviceList() {
         if (!phoXiFactory.isPhoXiControlRunning()) {
             scanner.Reset();
             throw PhoXiControlNotRunning("PhoXi Control is not running");
         }
         std::vector<PhoXiDeviceInformation> deviceInfo;
         auto dl = phoXiFactory.GetDeviceList();
-        toPhoXiCameraDeviceInforamtion(dl,deviceInfo);
+        toPhoXiCameraDeviceInforamtion(dl, deviceInfo);
         return deviceInfo;
     }
 
     std::vector<std::string> PhoXiInterface::cameraList() {
 
-       auto dl = deviceList();
-       std::vector<std::string> hwIdentificationList;
-       for (const auto& device : dl){
-           hwIdentificationList.push_back(device);
-       }
+        auto dl = deviceList();
+        std::vector<std::string> hwIdentificationList;
+        for (const auto& device : dl) {
+            hwIdentificationList.push_back(device);
+        }
         return hwIdentificationList;
 //        return std::vector<std::string>();
     }
@@ -42,7 +42,7 @@ namespace phoxi_camera {
             }
         }
         std::vector<std::string> cl = cameraList();
-        auto it = std::find(cl.begin(),cl.end(),HWIdentification);
+        auto it = std::find(cl.begin(), cl.end(), HWIdentification);
         if (it == cl.end()) {
             throw PhoXiScannerNotFound("Scanner not found");
         }
@@ -65,7 +65,7 @@ namespace phoxi_camera {
         if (id < 0) {
             try {
                 id = this->triggerImage();
-            } catch (UnableToTriggerFrame &e) {
+            } catch (UnableToTriggerFrame& e) {
                 throw;
             }
 
@@ -79,16 +79,19 @@ namespace phoxi_camera {
     }
 
     std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getPointCloudFromFrame(pho::api::PFrame frame, bool organized) {
-        if(organized){
+        if (organized) {
             return getOrganizedCloudFromFrame(frame);
         }
         return getUnorganizedCloudFromFrame(frame);
     }
-    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getOrganizedCloudFromFrame(pho::api::PFrame frame){
+
+    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>>
+    PhoXiInterface::getOrganizedCloudFromFrame(pho::api::PFrame frame) {
         if (!frame || !frame->Successful) {
             throw CorruptedFrame("Corrupted frame!");
         }
-        std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> cloud(new pcl::PointCloud<pcl::PointNormal>(frame->GetResolution().Width, frame->GetResolution().Height));
+        std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> cloud(
+                new pcl::PointCloud<pcl::PointNormal>(frame->GetResolution().Width, frame->GetResolution().Height));
         for (int r = 0; r < frame->GetResolution().Height; r++) {
             for (int c = 0; c < frame->GetResolution().Width; c++) {
                 auto point = frame->PointCloud.At(r, c);
@@ -108,7 +111,7 @@ namespace phoxi_camera {
         return cloud;
     }
 
-    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getUnorganizedCloudFromFrame(pho::api::PFrame frame){
+    std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> PhoXiInterface::getUnorganizedCloudFromFrame(pho::api::PFrame frame) {
         if (!frame || !frame->Successful) {
             throw CorruptedFrame("Corrupted frame!");
         }
@@ -116,7 +119,7 @@ namespace phoxi_camera {
         for (int r = 0; r < frame->GetResolution().Height; r++) {
             for (int c = 0; c < frame->GetResolution().Width; c++) {
                 auto point = frame->PointCloud.At(r, c);
-                if(point == pho::api::Point3_32f(0,0,0)){
+                if (point == pho::api::Point3_32f(0, 0, 0)) {
                     continue;
                 }
                 pcl::PointNormal pclPoint;
@@ -246,6 +249,7 @@ namespace phoxi_camera {
     }
 
 #ifndef PHOXI_API_v1_1
+
     void PhoXiInterface::setCoordinateSpace(pho::api::PhoXiCoordinateSpace space) {
         this->isOk();
         scanner->CoordinatesSettings->CoordinateSpace = space;
@@ -289,7 +293,7 @@ namespace phoxi_camera {
         }
     }
 
-    bool PhoXiInterface::saveLastFrame(const std::string &path) {
+    bool PhoXiInterface::saveLastFrame(const std::string& path) {
         if (last_frame_id == -1) {
             // this is needed due to PhoXi API bug
             // if you didn't trigger frame before, you can not save it
@@ -299,13 +303,16 @@ namespace phoxi_camera {
         bool success = scanner->SaveLastOutput(path, this->last_frame_id);
         return success;
     }
+
 #endif
-    std::string PhoXiInterface::getApiVersion(){
+
+    std::string PhoXiInterface::getApiVersion() {
         return PHOXI_API_VERSION;
     }
-    std::string PhoXiInterface::getFirmwareVersion(){
+
+    std::string PhoXiInterface::getFirmwareVersion() {
         auto list = cameraList();
-        for(auto device : list){
+        for (auto device : list) {
 
         }
     }
