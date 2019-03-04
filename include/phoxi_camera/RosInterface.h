@@ -6,9 +6,14 @@
 #define PROJECT_ROSINTERFACE_H
 
 #define OKRESPONSE "Ok"
+
 //ros
 #include <ros/ros.h>
 #include <ros/callback_queue.h>
+#include <cv_bridge/cv_bridge.h>
+#include <eigen_conversions/eigen_msg.h>
+#include <pcl/point_types.h>
+#include <pcl_ros/point_cloud.h>
 
 //dynamic reconfigure
 #include <dynamic_reconfigure/server.h>
@@ -19,13 +24,16 @@
 #include <diagnostic_updater/diagnostic_updater.h>
 
 //messages
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
+#include <sensor_msgs/fill_image.h>
+#include <std_srvs/Empty.h>
 #include <phoxi_camera/PhoXiInterface.h>
 #include <phoxi_camera/GetDeviceList.h>
 #include <phoxi_camera/ConnectCamera.h>
 #include <phoxi_camera/IsConnected.h>
 #include <phoxi_camera/IsAcquiring.h>
 #include <phoxi_camera/GetBool.h>
-#include <std_srvs/Empty.h>
 #include <phoxi_camera/Empty.h>
 #include <phoxi_camera/TriggerImage.h>
 #include <phoxi_camera/GetFrame.h>
@@ -36,6 +44,15 @@
 #include <phoxi_camera/SetCoordinatesSpace.h>
 #include <phoxi_camera/SetTransformationMatrix.h>
 #include <phoxi_camera/GetString.h>
+
+//std
+#include <vector>
+#include <algorithm>
+
+//others
+#include <phoxi_camera/PhoXiException.h>
+#include <phoxi_camera/RosConversions.h>
+
 
 namespace phoxi_camera {
     class RosInterface : protected PhoXiInterface {

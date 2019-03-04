@@ -3,15 +3,6 @@
 //
 
 #include "phoxi_camera/RosInterface.h"
-#include <pcl/point_types.h>
-#include <pcl_ros/point_cloud.h>
-#include <sensor_msgs/Image.h>
-#include <sensor_msgs/image_encodings.h>
-#include <sensor_msgs/fill_image.h>
-#include <phoxi_camera/PhoXiException.h>
-#include <eigen_conversions/eigen_msg.h>
-#include <cv_bridge/cv_bridge.h>
-#include <phoxi_camera/RosConversions.h>
 
 namespace phoxi_camera {
     RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex, nh),
@@ -405,6 +396,7 @@ namespace phoxi_camera {
     void RosInterface::dynamicReconfigureCallback(phoxi_camera::phoxi_cameraConfig& config, uint32_t level) {
         if (!PhoXiInterface::isConnected()) {
             config = this->dynamicReconfigureConfig;
+            ROS_WARN("Node is not connected to scanner");
             return;
         }
         try {
@@ -503,7 +495,8 @@ namespace phoxi_camera {
 
             if (level & (1 << 15)) {
                 this->isOk();
-                scanner->CapturingSettings->SinglePatternExposure = config.single_pattern_exposure;
+                std::vector<double> supportedSPE = scanner->SupportedSinglePatternExposures;
+                scanner->CapturingSettings->SinglePatternExposure = supportedSPE.at(config.single_pattern_exposure);
                 this->dynamicReconfigureConfig.single_pattern_exposure = config.single_pattern_exposure;
             }
 
@@ -616,7 +609,18 @@ namespace phoxi_camera {
 #ifndef PHOXI_API_v1_1
         this->dynamicReconfigureConfig.coordinate_space = scanner->CoordinatesSettings->CoordinateSpace;
         this->dynamicReconfigureConfig.ambient_light_suppression = capturingSettings.AmbientLightSuppression;
-        this->dynamicReconfigureConfig.single_pattern_exposure = capturingSettings.SinglePatternExposure;
+
+        std::vector<double> supportedSPE = scanner->SupportedSinglePatternExposures;
+        auto actualParam_it = std::find(supportedSPE.begin(), supportedSPE.end(), capturingSettings.SinglePatternExposure);
+        if (actualParam_it == supportedSPE.end()) {
+            int singlePatternExposure_index;
+            nh.getParam("single_pattern_exposure", singlePatternExposure_index);
+            this->dynamicReconfigureConfig.single_pattern_exposure = singlePatternExposure_index;
+            ROS_WARN("Can not update Single Pattern Exposure parameter in dynamic reconfigure, set default value from config.");
+        } else {
+            this->dynamicReconfigureConfig.single_pattern_exposure = actualParam_it - supportedSPE.begin();
+        }
+
         this->dynamicReconfigureConfig.camera_only_mode = capturingSettings.CameraOnlyMode;
 #endif
         this->dynamicReconfigureConfig.trigger_mode = scanner->TriggerMode.GetValue();
