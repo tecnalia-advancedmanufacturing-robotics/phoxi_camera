@@ -358,7 +358,7 @@ namespace phoxi_camera {
             cv::equalizeHist(cvGreyTexture, cvGreyTexture);
             cv::Mat cvRgbTexture;
             cv::cvtColor(cvGreyTexture, cvRgbTexture, CV_GRAY2RGB);
-            cv_bridge::CvImage rgbTexture(header, sensor_msgs::image_encodings::BGR8, cvRgbTexture);
+            cv_bridge::CvImage rgbTexture(header, sensor_msgs::image_encodings::RGB8, cvRgbTexture);
             rgbTexturePub.publish(rgbTexture.toImageMsg());
         }
         if (frame->ConfidenceMap.Empty()) {
