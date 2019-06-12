@@ -63,13 +63,13 @@ namespace phoxi_camera {
 
     pho::api::PFrame PhoXiInterface::getPFrame(int id) {
         this->isOk();
+
         if (id < 0) {
             try {
-                id = this->triggerImage();
+                id = this->triggerImage(true);
             } catch (UnableToTriggerFrame& e) {
                 throw;
             }
-
         }
 
         return scanner->GetSpecificFrame(id, 10000);
@@ -180,9 +180,9 @@ namespace phoxi_camera {
         }
     }
 
-    int PhoXiInterface::triggerImage() {
+    int PhoXiInterface::triggerImage(bool waitForGrab) {
         this->setTriggerMode(pho::api::PhoXiTriggerMode::Software, true);
-        int frame_id = scanner->TriggerFrame();
+        int frame_id = scanner->TriggerFrame(true, waitForGrab);
         last_frame_id = frame_id;
 
         if (frame_id < 0) {

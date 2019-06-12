@@ -522,7 +522,7 @@ namespace phoxi_camera {
     }
 
     int RosInterface::triggerImage() {
-        int id = PhoXiInterface::triggerImage();
+        int id = PhoXiInterface::triggerImage(false);
         //update dynamic reconfigure
         dynamicReconfigureConfig.coordinate_space = pho::api::PhoXiTriggerMode::Software;
         dynamicReconfigureConfig.start_acquisition = true;

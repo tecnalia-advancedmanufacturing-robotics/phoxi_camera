@@ -150,7 +150,7 @@ namespace phoxi_camera {
         * \return @return positive id on success, negative number on failure (-1 Trigger not accepted, -2 Device is not running, -3 Communication Error, -4 WaitForGrabbingEnd is not supported)
         * \note id can be passed to getPFrame method
         */
-        int triggerImage();
+        int triggerImage(bool waitForGrab = false);
 
         /**
         * Get hardware identification number of currently connected PhoXi 3D Scanner
