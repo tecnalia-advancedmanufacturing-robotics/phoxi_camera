@@ -62,6 +62,7 @@ namespace phoxi_camera {
     }
 
     pho::api::PFrame PhoXiInterface::getPFrame(int id) {
+        this->isOk();
         if (id < 0) {
             try {
                 id = this->triggerImage();
@@ -70,7 +71,7 @@ namespace phoxi_camera {
             }
 
         }
-        this->isOk();
+
         return scanner->GetSpecificFrame(id, 10000);
     }
 
