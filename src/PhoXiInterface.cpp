@@ -30,7 +30,6 @@ namespace phoxi_camera {
             hwIdentificationList.push_back(device);
         }
         return hwIdentificationList;
-//        return std::vector<std::string>();
     }
 
     void PhoXiInterface::connectCamera(std::string HWIdentification, pho::api::PhoXiTriggerMode mode,
