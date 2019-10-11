@@ -6,6 +6,7 @@
 #define PROJECT_PHOXIDEVICEINFORMATION_H
 
 #include <string>
+#include <PhoXi.h>
 
 namespace phoxi_camera {
     class PhoXiInterface;
@@ -20,8 +21,12 @@ namespace phoxi_camera {
             Starting = 3
         };
         enum PhoXiDeviceType {
+#if PHOXI_SCANNER_ON
             PhoXiScanner,
-            PhoXiCamera,        //future camera support
+#endif
+#if PHOXI_CAMERA_ON
+            PhoXiCamera,
+#endif
             NoValue
         };
 
