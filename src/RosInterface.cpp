@@ -496,8 +496,12 @@ namespace phoxi_camera {
             if (level & (1 << 15)) {
                 this->isOk();
                 std::vector<double> supportedSPE = scanner->SupportedSinglePatternExposures;
-                scanner->CapturingSettings->SinglePatternExposure = supportedSPE.at(config.single_pattern_exposure);
-                this->dynamicReconfigureConfig.single_pattern_exposure = config.single_pattern_exposure;
+                if (!supportedSPE.empty()) {    // ignore setting if setting is not supported
+                    scanner->CapturingSettings->SinglePatternExposure = supportedSPE.at(config.single_pattern_exposure);
+                    this->dynamicReconfigureConfig.single_pattern_exposure = config.single_pattern_exposure;
+                } else {
+                    ROS_WARN("Scanner setting 'Single pattern exposure' is not supported by the scanner firmware.");
+                }
             }
 
             if (level & (1 << 16)) {
@@ -611,14 +615,18 @@ namespace phoxi_camera {
         this->dynamicReconfigureConfig.ambient_light_suppression = capturingSettings.AmbientLightSuppression;
 
         std::vector<double> supportedSPE = scanner->SupportedSinglePatternExposures;
-        auto actualParam_it = std::find(supportedSPE.begin(), supportedSPE.end(), capturingSettings.SinglePatternExposure);
-        if (actualParam_it == supportedSPE.end()) {
-            int singlePatternExposure_index;
-            nh.getParam("single_pattern_exposure", singlePatternExposure_index);
-            this->dynamicReconfigureConfig.single_pattern_exposure = singlePatternExposure_index;
-            ROS_WARN("Can not update Single Pattern Exposure parameter in dynamic reconfigure, set default value from config.");
+        if (!supportedSPE.empty()) {
+            auto actualParam_it = std::find(supportedSPE.begin(), supportedSPE.end(), capturingSettings.SinglePatternExposure);
+            if (actualParam_it != supportedSPE.end()) {
+                this->dynamicReconfigureConfig.single_pattern_exposure = actualParam_it - supportedSPE.begin();
+            } else {
+                int singlePatternExposure_index;
+                nh.getParam("single_pattern_exposure", singlePatternExposure_index);
+                this->dynamicReconfigureConfig.single_pattern_exposure = singlePatternExposure_index;
+                ROS_WARN("Can not update Single Pattern Exposure parameter in dynamic reconfigure, set default value from config.");
+            }
         } else {
-            this->dynamicReconfigureConfig.single_pattern_exposure = actualParam_it - supportedSPE.begin();
+            ROS_WARN("Scanner setting 'Single pattern exposure' is not supported by the scanner firmware.");
         }
 
         this->dynamicReconfigureConfig.camera_only_mode = capturingSettings.CameraOnlyMode;
