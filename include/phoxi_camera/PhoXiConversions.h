@@ -14,15 +14,16 @@ void toPhoXiCameraDeviceInforamtion(const pho::api::PhoXiDeviceInformation& phoX
     phoXiCameraDeviceInformation.type = phoxi_camera::PhoXiDeviceInformation::PhoXiDeviceType(
             (int)phoXiDeviceInformation.Type);
     phoXiCameraDeviceInformation.hwIdentification = phoXiDeviceInformation.HWIdentification;
-    if (phoXiDeviceInformation.Status.Ready == true) {
-        phoXiCameraDeviceInformation.status = phoXiDeviceInformation.Status.Ready
-                                              ? phoxi_camera::PhoXiDeviceInformation::PhoXiConnectionStatus::Ready
-                                              : phoxi_camera::PhoXiDeviceInformation::PhoXiConnectionStatus::Starting;
+    if (phoXiDeviceInformation.Status.Ready) {
+        phoXiCameraDeviceInformation.status =  phoxi_camera::PhoXiDeviceInformation::PhoXiConnectionStatus::Ready;
     } else {
-        phoXiCameraDeviceInformation.status = phoXiDeviceInformation.Status.Attached
-                                              ? phoxi_camera::PhoXiDeviceInformation::PhoXiConnectionStatus::Ready
-                                              : phoxi_camera::PhoXiDeviceInformation::PhoXiConnectionStatus::Occupied;
+        if (phoXiDeviceInformation.Status.Attached) {
+            phoXiCameraDeviceInformation.status = phoxi_camera::PhoXiDeviceInformation::PhoXiConnectionStatus::Starting;
+        } else {
+            phoXiCameraDeviceInformation.status = phoxi_camera::PhoXiDeviceInformation::PhoXiConnectionStatus::Occupied;
+        }
     }
+
     phoXiCameraDeviceInformation.firmwareVersion = phoXiDeviceInformation.FirmwareVersion;
 }
 
