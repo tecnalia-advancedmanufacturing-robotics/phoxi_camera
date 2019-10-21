@@ -3,8 +3,10 @@
 * Installed PhoXi Control
 * Installed pytest: sudo apt-get install python-pytest
 
-Before run of tests set scanner ID or file camera ID in the **interfaces/config.py**, 
-it is needed for connect to camera. Default file camera ID for testing is "InstalledExamples-PhoXi-example".
+Before run of tests set ID of real scanner in the **interfaces/config.py** for pytest and in the
+**gtest/test_phoxi_api_interface.cpp** for unittests, it is needed for connect to camera.
+Default camera ID for testing is file camera "InstalledExamples-PhoXi-example", but is strongly
+recommended to use real camera for testing purposes.
 
 
 ## Compile and run tests
@@ -48,3 +50,9 @@ In this special launch file is included tested launch file which runs
 target ros node and load parameters. The special launch file also launch
 testing node which consist of python unittests, this node interact with
 tested node and perform tests.
+
+## Troubleshooting
+
+You don't run python tests using command `catkin_make run_tests_phoxi_camera_...`
+but via `rostest phoxi_camera <test_name>`.
+If tests are failed in setUpClass, you should try to restart PhoXiControl.
