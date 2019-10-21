@@ -15,11 +15,10 @@
 using namespace std;
 phoxi_camera::PhoXiInterface phoxi_interface;
 long sleepPhoXiFactory = 1500000;
+const string camera_ID = "InstalledExamples-basic-example";
 
 class PhoXiInterfaceTest : public testing::Test {
 public:
-    const string camera_ID = "InstalledExamples-basic-example";
-
     static void SetUpTestCase(){
         //test constructor only once
         //ASSERT_NO_THROW(PhoXiInterface());
@@ -37,7 +36,6 @@ public:
 
 class PhoXiInterfaceTestConnection : public testing::Test {
 public:
-    const string camera_ID = "InstalledExamples-basic-example";
     //PhoXiInterface phoxi_interface;
 
     static void SetUpTestCase(){
