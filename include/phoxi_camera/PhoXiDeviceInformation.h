@@ -45,6 +45,7 @@ namespace phoxi_camera {
         std::string name;
         PhoXiDeviceType type;
         std::string hwIdentification;
+        std::string IPaddress;
         PhoXiConnectionStatus status;
         std::string firmwareVersion;
     };

@@ -11,6 +11,13 @@ namespace phoxi_camera {
 
     }
 
+    // scanners IP obtaining methods
+    std::string getContentBetweenSign(const std::string &, const std::string &, const std::string &);
+    bool checkScannersPresence(const std::vector<std::string> &, const std::string &);
+    std::vector<std::string> getAvailableScanersID(const std::vector<std::string> &);
+    std::map<std::string, std::string> getScannersIPs();
+    // ----------------
+
     std::vector<PhoXiDeviceInformation> PhoXiInterface::deviceList() {
         if (!phoXiFactory.isPhoXiControlRunning()) {
             scanner.Reset();
@@ -19,6 +26,17 @@ namespace phoxi_camera {
         std::vector<PhoXiDeviceInformation> deviceInfo;
         auto dl = phoXiFactory.GetDeviceList();
         toPhoXiCameraDeviceInforamtion(dl, deviceInfo);
+
+        std::map<std::string, std::string> scannersIPs = getScannersIPs();
+
+        for (auto &device : deviceInfo) {
+            if (scannersIPs.find(device.hwIdentification) == scannersIPs.end()) {
+                device.IPaddress = "unknown";
+            } else {
+                device.IPaddress = scannersIPs.at(device.hwIdentification);
+            }
+        }
+
         return deviceInfo;
     }
 
@@ -315,6 +333,108 @@ namespace phoxi_camera {
         for (auto device : list) {
 
         }
+    }
+
+    std::string getContentBetweenSign(const std::string &str, const std::string &begin, const std::string &end) {
+        auto first = str.find_first_of(begin);
+        if (first == std::string::npos)
+            return "";
+
+        auto last = str.find_last_of(end);
+        if (last == std::string::npos)
+            return "";
+
+        return str.substr(first + 1, last - first - 1);
+    }
+
+    bool checkScannersPresence(const std::vector<std::string> &scannersList, const std::string &scannerID) {
+        for (auto &currScannerID : scannersList) {
+            if (currScannerID == scannerID)
+                return true;
+        }
+        return false;
+    }
+
+    std::vector<std::string> getAvailableScanersID(const std::vector<std::string> &stdoutPipe) {
+        std::vector<std::string> scannersList;
+        std::string scannerMark = "PhoXi3DScan-";
+        std::string scriptMark = "_3d-camera._tcp";
+        const char *marker = "+";
+
+        for (auto &row : stdoutPipe) {
+            if (row.front() == *marker) {
+                std::size_t scannerMarkerPos = row.find(scannerMark);
+                if (scannerMarkerPos != std::string::npos) {
+                    std::string scannerRow = row.substr(scannerMarkerPos);
+                    std::size_t scriptMarkerPos = scannerRow.find(scriptMark);
+
+                    std::size_t scannersNameBegin = scannerMarkerPos + (std::size_t) scannerMark.size();
+                    std::size_t scannersNameEnd = scriptMarkerPos - (std::size_t) scannerMark.size();
+
+                    std::string scannersName = row.substr(scannersNameBegin, scannersNameEnd);
+                    scannersName.erase(remove_if(scannersName.begin(), scannersName.end(), isspace), scannersName.end());
+
+                    scannersList.emplace_back(scannersName);
+                }
+            }
+        }
+        return scannersList;
+    }
+
+    std::map<std::string, std::string> getScannersIPs() {
+        std::map<std::string, std::string> scannersIPs;
+        const char *command = "avahi-browse -r -t _3d-camera._tcp";
+        char buffer[256];
+        std::string result;
+        FILE *pipe = popen(command, "r");
+
+        std::vector<std::string> resultByRows;
+        if (!pipe) {
+            throw std::runtime_error("avahi-browse operation failed!");
+        }
+        try {
+            while (fgets(buffer, sizeof buffer, pipe) != nullptr) {
+                resultByRows.emplace_back(buffer);
+            }
+        } catch (...) {
+            pclose(pipe);
+            throw std::runtime_error("unexpect results from avahi-browse!");
+        }
+        pclose(pipe);
+
+        std::vector<std::string> scannersList = getAvailableScanersID(resultByRows);
+        resultByRows.erase(resultByRows.begin(), resultByRows.begin() + scannersList.size());
+
+        for(std::string scannerID: scannersList){
+            if (!checkScannersPresence(scannersList, scannerID)) {
+                scannersIPs.insert(std::pair<std::string, std::string>(scannerID, "unknown"));
+            }
+
+            int scannersInfoRowNum = -1;
+            int i = 0;
+            while (scannersInfoRowNum == -1) {
+                std::size_t scannersInfoPos = resultByRows.at(i).find(scannerID);
+                if (scannersInfoPos != std::string::npos) {
+                    scannersInfoRowNum = i;
+                }
+                i++;
+            }
+
+            std::vector<std::string> scannersInfo;
+            for (int j = scannersInfoRowNum + 1; j < scannersInfoRowNum + 5; j++) {
+                scannersInfo.emplace_back(getContentBetweenSign(resultByRows.at(j), "[", "]"));
+            }
+
+//            Other scanners parameters can be obtained from:
+//              hostname = scannersInfo.at(0);
+//              IPaddress = scannersInfo.at(1);
+//              port = scannersInfo.at(2);
+//              [Occupied_By, changeId, version, status, description, id..., contain depends on FW version] = scannersInfo.at(3);
+
+            std::string scannersIP = scannersInfo.at(1);
+            scannersIPs.insert(std::pair<std::string, std::string>(scannerID, scannersIP));
+        }
+        return scannersIPs;
     }
 
 }
