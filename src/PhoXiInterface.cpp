@@ -12,6 +12,7 @@ namespace phoxi_camera {
     }
 
     // scanners IP obtaining methods
+    int countRowsWithStartingSign(char, std::vector<std::string>);
     std::string getContentBetweenSign(const std::string &, const std::string &, const std::string &);
     bool checkScannersPresence(const std::vector<std::string> &, const std::string &);
     std::vector<std::string> getAvailableScanersID(const std::vector<std::string> &);
@@ -335,6 +336,15 @@ namespace phoxi_camera {
         }
     }
 
+    int countRowsWithStartingSign(char sign, std::vector<std::string> rowsVector){
+        int signRowsCounter = 0;
+        for(std::string row: rowsVector){
+            if(row.at(0) == sign)
+                signRowsCounter++;
+        }
+        return signRowsCounter;
+    }
+
     std::string getContentBetweenSign(const std::string &str, const std::string &begin, const std::string &end) {
         auto first = str.find_first_of(begin);
         if (first == std::string::npos)
@@ -374,7 +384,9 @@ namespace phoxi_camera {
                     std::string scannersName = row.substr(scannersNameBegin, scannersNameEnd);
                     scannersName.erase(remove_if(scannersName.begin(), scannersName.end(), isspace), scannersName.end());
 
-                    scannersList.emplace_back(scannersName);
+                    if(!(std::find(scannersList.begin(), scannersList.end(), scannersName) != scannersList.end())){
+                        scannersList.emplace_back(scannersName);
+                    }
                 }
             }
         }
@@ -403,7 +415,9 @@ namespace phoxi_camera {
         pclose(pipe);
 
         std::vector<std::string> scannersList = getAvailableScanersID(resultByRows);
-        resultByRows.erase(resultByRows.begin(), resultByRows.begin() + scannersList.size());
+
+        int numberRowsToDelete = countRowsWithStartingSign('+', resultByRows);
+        resultByRows.erase(resultByRows.begin(), resultByRows.begin() + numberRowsToDelete);
 
         for(std::string scannerID: scannersList){
             if (!checkScannersPresence(scannersList, scannerID)) {
@@ -426,10 +440,11 @@ namespace phoxi_camera {
             }
 
 //            Other scanners parameters can be obtained from:
-//              hostname = scannersInfo.at(0);
-//              IPaddress = scannersInfo.at(1);
-//              port = scannersInfo.at(2);
-//              [Occupied_By, changeId, version, status, description, id..., contain depends on FW version] = scannersInfo.at(3);
+//              hostname => scannersInfo.at(0);
+//              IPaddress => scannersInfo.at(1);
+//              port => scannersInfo.at(2);
+//              [Occupied_By, changeId, version, status, description, id...,
+//              contain depends on FW version] => scannersInfo.at(3);
 
             std::string scannersIP = scannersInfo.at(1);
             scannersIPs.insert(std::pair<std::string, std::string>(scannerID, scannersIP));
