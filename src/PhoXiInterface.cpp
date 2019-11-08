@@ -11,13 +11,6 @@ namespace phoxi_camera {
 
     }
 
-    // scanners IP obtaining methods
-    int countRowsWithStartingSign(char, std::vector<std::string>);
-    std::string getContentBetweenSign(const std::string &, const std::string &, const std::string &);
-    bool checkScannersPresence(const std::vector<std::string> &, const std::string &);
-    std::vector<std::string> getAvailableScanersID(const std::vector<std::string> &);
-    std::map<std::string, std::string> getScannersIPs();
-    // ----------------
 
     std::vector<PhoXiDeviceInformation> PhoXiInterface::deviceList() {
         if (!phoXiFactory.isPhoXiControlRunning()) {
@@ -28,10 +21,10 @@ namespace phoxi_camera {
         auto dl = phoXiFactory.GetDeviceList();
         toPhoXiCameraDeviceInforamtion(dl, deviceInfo);
 
-        std::map<std::string, std::string> scannersIPs = getScannersIPs();
+        std::map<std::string, std::string> scannersIPs = PhoXiInterface::getScannersIPs();
 
         for (auto &device : deviceInfo) {
-            if (scannersIPs.find(device.hwIdentification) == scannersIPs.end()) {
+            if (scannersIPs.empty() || (scannersIPs.find(device.hwIdentification) == scannersIPs.end())) {
                 device.IPaddress = "unknown";
             } else {
                 device.IPaddress = scannersIPs.at(device.hwIdentification);
@@ -336,7 +329,7 @@ namespace phoxi_camera {
         }
     }
 
-    int countRowsWithStartingSign(char sign, std::vector<std::string> rowsVector){
+    int PhoXiInterface::countRowsWithStartingSign(char sign, std::vector<std::string> rowsVector){
         int signRowsCounter = 0;
         for(std::string row: rowsVector){
             if(row.at(0) == sign)
@@ -345,7 +338,7 @@ namespace phoxi_camera {
         return signRowsCounter;
     }
 
-    std::string getContentBetweenSign(const std::string &str, const std::string &begin, const std::string &end) {
+    std::string PhoXiInterface::getContentBetweenSign(const std::string &str, const std::string &begin, const std::string &end) {
         auto first = str.find_first_of(begin);
         if (first == std::string::npos)
             return "";
@@ -357,7 +350,7 @@ namespace phoxi_camera {
         return str.substr(first + 1, last - first - 1);
     }
 
-    bool checkScannersPresence(const std::vector<std::string> &scannersList, const std::string &scannerID) {
+    bool PhoXiInterface::checkScannersPresence(const std::vector<std::string> &scannersList, const std::string &scannerID) {
         for (auto &currScannerID : scannersList) {
             if (currScannerID == scannerID)
                 return true;
@@ -365,7 +358,7 @@ namespace phoxi_camera {
         return false;
     }
 
-    std::vector<std::string> getAvailableScanersID(const std::vector<std::string> &stdoutPipe) {
+    std::vector<std::string> PhoXiInterface::getAvailableScanersID(const std::vector<std::string> &stdoutPipe) {
         std::vector<std::string> scannersList;
         std::string scannerMark = "PhoXi3DScan-";
         std::string scriptMark = "_3d-camera._tcp";
@@ -393,7 +386,7 @@ namespace phoxi_camera {
         return scannersList;
     }
 
-    std::map<std::string, std::string> getScannersIPs() {
+    std::map<std::string, std::string> PhoXiInterface::getScannersIPs() {
         std::map<std::string, std::string> scannersIPs;
         const char *command = "avahi-browse -r -t _3d-camera._tcp";
         char buffer[256];
@@ -402,16 +395,17 @@ namespace phoxi_camera {
 
         std::vector<std::string> resultByRows;
         if (!pipe) {
-            throw std::runtime_error("avahi-browse operation failed!");
+            throw AvahiFailed("Avahi-browse operation failed");
         }
-        try {
-            while (fgets(buffer, sizeof buffer, pipe) != nullptr) {
-                resultByRows.emplace_back(buffer);
+
+        while (fgets(buffer, sizeof buffer, pipe) != nullptr) {
+            if (ferror(pipe)) {
+                pclose(pipe);
+                throw AvahiUnexpectedResults("Unexpected results from avahi-browse!");
             }
-        } catch (...) {
-            pclose(pipe);
-            throw std::runtime_error("unexpect results from avahi-browse!");
+            resultByRows.emplace_back(buffer);
         }
+
         pclose(pipe);
 
         std::vector<std::string> scannersList = getAvailableScanersID(resultByRows);

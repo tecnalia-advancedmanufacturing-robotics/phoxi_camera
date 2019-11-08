@@ -87,6 +87,18 @@ namespace phoxi_camera {
         InvalidTriggerMode(std::string message) : PhoXiInterfaceException(message) {
         }
     };
+
+    class AvahiFailed : public PhoXiInterfaceException {
+    public:
+        AvahiFailed(std::string message) : PhoXiInterfaceException(message) {
+        }
+    };
+
+    class AvahiUnexpectedResults : public PhoXiInterfaceException {
+    public:
+        AvahiUnexpectedResults(std::string message) : PhoXiInterfaceException(message) {
+        }
+    };
 }
 
 
