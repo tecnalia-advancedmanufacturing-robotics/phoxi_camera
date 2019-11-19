@@ -10,9 +10,11 @@
 
 void phoXiDeviceInforamtionToRosMsg(const phoxi_camera::PhoXiDeviceInformation& phoXiDeviceInformation,
                                     phoxi_camera::DeviceInformation& deviceInformationMsg) {
+
     deviceInformationMsg.name = phoXiDeviceInformation.name;
     deviceInformationMsg.type.type = (int)phoXiDeviceInformation.type;
     deviceInformationMsg.hwIdentification = phoXiDeviceInformation.hwIdentification;
+    deviceInformationMsg.IPaddress = phoXiDeviceInformation.IPaddress;
     deviceInformationMsg.status.status = phoXiDeviceInformation.status;
     deviceInformationMsg.firmwareVersion = phoXiDeviceInformation.firmwareVersion;
 }

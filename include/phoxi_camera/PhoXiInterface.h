@@ -67,10 +67,39 @@ namespace phoxi_camera {
                            pho::api::PhoXiTriggerMode mode = pho::api::PhoXiTriggerMode::Software,
                            bool startAcquisition = true);
 
+
+        /**
+        * Return rows count with starting sign - for avahi-browse output parsing.
+        *
+        * \param rowsVector - Vector of strings, containig avahi-browse call output
+        * \param sign - considers rows that starts with this sign
+        * \return rows count
+        */
+        int countRowsWithStartingSign(char sign, std::vector<std::string> rowsVector);
+
         /**
         * Disconnect from camera if connected to any.
         */
         void disconnectCamera();
+
+        /**
+        * Return all available scanners on network from avahi-browse call output
+        *
+        * \param stdoutPipe - avahi-browse call output
+        * \return vector of all available scanners on network
+        */
+        std::vector<std::string> getAvailableScanersID(const std::vector<std::string> &stdoutPipe);
+
+        /**
+        * Return content from avahi-browse output row between begin and end signs.
+        *
+        * \param str - output row
+        * \param begin - begin sign
+        * \param end - end sign
+        * \return string content
+        */
+        std::string getContentBetweenSign(const std::string &str, const std::string &begin,
+                                          const std::string &end);
 
         /**
         * Get frame based on id. If id is negative new image is triggered and new PFrame returned.
@@ -104,12 +133,30 @@ namespace phoxi_camera {
         */
         static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getOrganizedCloudFromFrame(pho::api::PFrame frame);
 
+
+        /**
+        * Return map of all available scanners IP addresses, map key is scanner ID (avahi-browse is called)
+        *
+        * \return map of all available scanners IP addresses
+        */
+        std::map<std::string, std::string> getScannersIPs();
+
+
         /**
         * Convert PFrame to unorganized point cloud
         *
         * \return unorganized point cloud
         */
         static std::shared_ptr<pcl::PointCloud<pcl::PointNormal>> getUnorganizedCloudFromFrame(pho::api::PFrame frame);
+
+        /**
+        * Check if is scanner with scannerId present in scannersList
+        *
+        * \param scannersList - list of scannerIds
+        * \param scannerID - scannerID to search for
+        * \return true if is scanner present, false otherwise
+        */
+        bool checkScannersPresence(const std::vector<std::string> &scannersList, const std::string &scannerID);
 
         /**
         * Test if connection to PhoXi 3D Scanner is working
