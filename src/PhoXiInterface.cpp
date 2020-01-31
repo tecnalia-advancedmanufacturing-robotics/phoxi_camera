@@ -273,8 +273,8 @@ namespace phoxi_camera {
     }
 
     void PhoXiInterface::setTransformation(pho::api::PhoXiCoordinateTransformation coordinateTransformation,
-                                           pho::api::PhoXiCoordinateSpace space, bool setSpace = true,
-                                           bool saveSettings = true) {
+                                           pho::api::PhoXiCoordinateSpace space, bool setSpace,
+                                           bool saveSettings) {
         this->isOk();
         pho::api::PhoXiCoordinatesSettings settings = scanner->CoordinatesSettings;
         switch (space) {
