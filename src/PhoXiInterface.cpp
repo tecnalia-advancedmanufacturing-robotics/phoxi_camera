@@ -21,7 +21,14 @@ namespace phoxi_camera {
         auto dl = phoXiFactory.GetDeviceList();
         toPhoXiCameraDeviceInforamtion(dl, deviceInfo);
 
-        std::map<std::string, std::string> scannersIPs = PhoXiInterface::getScannersIPs();
+        std::map<std::string, std::string> scannersIPs;
+
+        try {
+            scannersIPs = PhoXiInterface::getScannersIPs();
+        }
+        catch (PhoXiInterfaceException& e){
+            ROS_WARN_STREAM("Can not get scanner ip: " << e.what());
+        }
 
         for (auto &device : deviceInfo) {
             if (scannersIPs.empty() || (scannersIPs.find(device.hwIdentification) == scannersIPs.end())) {
