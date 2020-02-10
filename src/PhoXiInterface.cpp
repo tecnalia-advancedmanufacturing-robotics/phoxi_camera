@@ -395,7 +395,10 @@ namespace phoxi_camera {
 
     std::map<std::string, std::string> PhoXiInterface::getScannersIPs() {
         std::map<std::string, std::string> scannersIPs;
-        const char *command = "avahi-browse -r -t _3d-camera._tcp";
+
+        // stderr is redirected to the classic stdout
+        // TODO: error handling
+        const char *command = "(avahi-browse -r -t _3d-camera._tcp) 2>&1";
         char buffer[256];
         std::string result;
         FILE *pipe = popen(command, "r");
