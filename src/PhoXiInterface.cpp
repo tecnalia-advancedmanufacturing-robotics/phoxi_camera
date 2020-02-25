@@ -365,11 +365,11 @@ namespace phoxi_camera {
         return false;
     }
 
-    std::vector<std::string> PhoXiInterface::getAvailableScanersID(const std::vector<std::string> &stdoutPipe) {
+    std::vector<std::string> PhoXiInterface::getAvailableScanersID(const char type, const std::vector<std::string> &stdoutPipe) {
         std::vector<std::string> scannersList;
         std::string scannerMark = "PhoXi3DScan-";
         std::string scriptMark = "_3d-camera._tcp";
-        const char *marker = "+";
+        const char *marker = &type;
 
         for (auto &row : stdoutPipe) {
             if (row.front() == *marker) {
@@ -396,51 +396,83 @@ namespace phoxi_camera {
     std::map<std::string, std::string> PhoXiInterface::getScannersIPs() {
         std::map<std::string, std::string> scannersIPs;
 
-        // stderr is redirected to the classic stdout
-        // TODO: error handling
-        const char *command = "(avahi-browse -r -t _3d-camera._tcp) 2>&1";
+        // stderr from avahi-browse is redirected (and handled later) to stdout
+        const char *command = "(timeout 0.5 avahi-browse -r -t _3d-camera._tcp) 2>&1";
         char buffer[256];
         std::string result;
         FILE *pipe = popen(command, "r");
 
-        std::vector<std::string> resultByRows;
+        std::vector<std::string> connectedScanners;
+        std::vector<std::string> disappearedScanners;
+        std::vector<std::string> stderrOutput;
+
         if (!pipe) {
+            pclose(pipe);
             throw AvahiFailed("Avahi-browse operation failed");
         }
 
         while (fgets(buffer, sizeof buffer, pipe) != nullptr) {
             if (ferror(pipe)) {
                 pclose(pipe);
-                throw AvahiUnexpectedResults("Unexpected results from avahi-browse!");
+                throw AvahiUnexpectedResults("Unexpected results from avahi-browse command!");
             }
-            resultByRows.emplace_back(buffer);
-        }
 
+            // valid response row from avahi-bowse starts with these characters
+            char startingSign = buffer[0];
+            const char *marker1 = "+";
+            const char *marker2 = "=";
+            const char *marker3 = " ";
+            const char *marker4 = "-";
+
+            if ((startingSign == *marker1) || (startingSign == *marker2) || (startingSign == *marker3)) {
+                connectedScanners.emplace_back(buffer);
+            } else if (startingSign == *marker4) {
+                disappearedScanners.emplace_back(buffer);
+            } else {
+                stderrOutput.emplace_back(buffer);
+            }
+        }
         pclose(pipe);
 
-        std::vector<std::string> scannersList = getAvailableScanersID(resultByRows);
+        if (connectedScanners.empty()) {
+            ROS_WARN("Avahi-browse does not see any scanners.");
+            return scannersIPs;
+        }
 
-        int numberRowsToDelete = countRowsWithStartingSign('+', resultByRows);
-        resultByRows.erase(resultByRows.begin(), resultByRows.begin() + numberRowsToDelete);
+        std::vector<std::string> scannersList = getAvailableScanersID('+', connectedScanners);
+        std::vector<std::string> disappearedScannersList = getAvailableScanersID('-', disappearedScanners);
 
-        for(std::string scannerID: scannersList){
-            if (!checkScannersPresence(scannersList, scannerID)) {
+        int numberRowsToDelete = countRowsWithStartingSign('+', connectedScanners);
+        connectedScanners.erase(connectedScanners.begin(), connectedScanners.begin() + numberRowsToDelete);
+
+        for (std::string scannerID: scannersList) {
+            if (!checkScannersPresence(scannersList, scannerID) ||
+                checkScannersPresence(disappearedScannersList, scannerID)) {
                 scannersIPs.insert(std::pair<std::string, std::string>(scannerID, "unknown"));
+                continue;
             }
 
-            int scannersInfoRowNum = -1;
-            int i = 0;
-            while (scannersInfoRowNum == -1) {
-                std::size_t scannersInfoPos = resultByRows.at(i).find(scannerID);
+            // find corresponding row for current scanner information
+            bool rowFound = false;
+            int scannersInfoRowNum = 0;
+
+            // we need first occurrence of scannerID to get right row number
+            for (int i = 0; (i <= connectedScanners.size() - 1) && !rowFound; i++) {
+                std::size_t scannersInfoPos = connectedScanners.at((unsigned long) i).find(scannerID);
                 if (scannersInfoPos != std::string::npos) {
                     scannersInfoRowNum = i;
+                    rowFound = true;
                 }
-                i++;
+            }
+
+            // scanners response not present in stdout
+            if (!rowFound) {
+                continue;
             }
 
             std::vector<std::string> scannersInfo;
             for (int j = scannersInfoRowNum + 1; j < scannersInfoRowNum + 5; j++) {
-                scannersInfo.emplace_back(getContentBetweenSign(resultByRows.at(j), "[", "]"));
+                scannersInfo.emplace_back(getContentBetweenSign(connectedScanners.at(j), "[", "]"));
             }
 
 //            Other scanners parameters can be obtained from:
@@ -453,7 +485,18 @@ namespace phoxi_camera {
             std::string scannersIP = scannersInfo.at(1);
             scannersIPs.insert(std::pair<std::string, std::string>(scannerID, scannersIP));
         }
+
+        // SILENT avahi-browse warnings/errors
+        // we are terminating avahi-browse after 500ms (all available scanners provides their info under 500ms)
+//        if (!stderrOutput.empty()) {
+//            for (auto &err : stderrOutput) {
+//                if (err.find("Got SIGTERM, quitting") != std::string::npos) {
+//                    ROS_WARN("Avahi-browse terminated due to IPv4 retrieving long processing time");
+//                } else {
+//                    std::cout << err << std::endl;
+//                }
+//            }
+//        }
         return scannersIPs;
     }
-
 }

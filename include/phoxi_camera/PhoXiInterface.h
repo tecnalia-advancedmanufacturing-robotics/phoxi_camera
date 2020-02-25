@@ -88,7 +88,7 @@ namespace phoxi_camera {
         * \param stdoutPipe - avahi-browse call output
         * \return vector of all available scanners on network
         */
-        std::vector<std::string> getAvailableScanersID(const std::vector<std::string> &stdoutPipe);
+        std::vector<std::string> getAvailableScanersID(char type, const std::vector<std::string> &stdoutPipe);
 
         /**
         * Return content from avahi-browse output row between begin and end signs.
