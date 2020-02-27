@@ -39,6 +39,16 @@ namespace phoxi_camera {
         PhoXiInterface();
 
         /**
+        * Types of rows (chars representing starting sign of row) returned by avahi-browse call.
+        */
+        enum AvahiRowDataType : char {
+            available = '+',
+            disappeared = '-',
+            scannersInfo = '=',
+            other = ' '
+        };
+
+        /**
         * Return all PhoXi 3D Scanners ids connected on network with all informations about dcevice.
         *
         * \throw PhoXiControlNotRunning when PhoXi Control is not running
@@ -86,9 +96,10 @@ namespace phoxi_camera {
         * Return all available scanners on network from avahi-browse call output
         *
         * \param stdoutPipe - avahi-browse call output
+        * \param type - type of avahi-browse output row
         * \return vector of all available scanners on network
         */
-        std::vector<std::string> getAvailableScanersID(char type, const std::vector<std::string> &stdoutPipe);
+        std::vector<std::string> getAvailableScanersID(AvahiRowDataType type, const std::vector<std::string> &stdoutPipe);
 
         /**
         * Return content from avahi-browse output row between begin and end signs.

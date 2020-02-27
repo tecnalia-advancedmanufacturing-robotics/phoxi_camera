@@ -365,14 +365,13 @@ namespace phoxi_camera {
         return false;
     }
 
-    std::vector<std::string> PhoXiInterface::getAvailableScanersID(const char type, const std::vector<std::string> &stdoutPipe) {
+    std::vector<std::string> PhoXiInterface::getAvailableScanersID(AvahiRowDataType type, const std::vector<std::string> &stdoutPipe) {
         std::vector<std::string> scannersList;
         std::string scannerMark = "PhoXi3DScan-";
         std::string scriptMark = "_3d-camera._tcp";
-        const char *marker = &type;
 
         for (auto &row : stdoutPipe) {
-            if (row.front() == *marker) {
+            if (row.front() == type) {
                 std::size_t scannerMarkerPos = row.find(scannerMark);
                 if (scannerMarkerPos != std::string::npos) {
                     std::string scannerRow = row.substr(scannerMarkerPos);
@@ -411,22 +410,17 @@ namespace phoxi_camera {
             throw AvahiFailed("Avahi-browse operation failed");
         }
 
-        while (fgets(buffer, sizeof buffer, pipe) != nullptr) {
+        while (fgets(buffer, sizeof(buffer), pipe) != nullptr) {
             if (ferror(pipe)) {
                 pclose(pipe);
                 throw AvahiUnexpectedResults("Unexpected results from avahi-browse command!");
             }
-
-            // valid response row from avahi-bowse starts with these characters
             char startingSign = buffer[0];
-            const char *marker1 = "+";
-            const char *marker2 = "=";
-            const char *marker3 = " ";
-            const char *marker4 = "-";
 
-            if ((startingSign == *marker1) || (startingSign == *marker2) || (startingSign == *marker3)) {
+            if ((startingSign == AvahiRowDataType::available) || (startingSign == AvahiRowDataType::scannersInfo)
+                || (startingSign == AvahiRowDataType::other)) {
                 connectedScanners.emplace_back(buffer);
-            } else if (startingSign == *marker4) {
+            } else if (startingSign == AvahiRowDataType::disappeared) {
                 disappearedScanners.emplace_back(buffer);
             } else {
                 stderrOutput.emplace_back(buffer);
@@ -439,10 +433,10 @@ namespace phoxi_camera {
             return scannersIPs;
         }
 
-        std::vector<std::string> scannersList = getAvailableScanersID('+', connectedScanners);
-        std::vector<std::string> disappearedScannersList = getAvailableScanersID('-', disappearedScanners);
+        std::vector<std::string> scannersList = getAvailableScanersID(AvahiRowDataType::available, connectedScanners);
+        std::vector<std::string> disappearedScannersList = getAvailableScanersID(AvahiRowDataType::disappeared, disappearedScanners);
 
-        int numberRowsToDelete = countRowsWithStartingSign('+', connectedScanners);
+        int numberRowsToDelete = countRowsWithStartingSign(AvahiRowDataType::available, connectedScanners);
         connectedScanners.erase(connectedScanners.begin(), connectedScanners.begin() + numberRowsToDelete);
 
         for (std::string scannerID: scannersList) {
