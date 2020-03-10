@@ -331,13 +331,6 @@ namespace phoxi_camera {
         return PHOXI_API_VERSION;
     }
 
-    std::string PhoXiInterface::getFirmwareVersion() {
-        auto list = cameraList();
-        for (auto device : list) {
-
-        }
-    }
-
     int PhoXiInterface::countRowsWithStartingSign(char sign, std::vector<std::string> rowsVector){
         int signRowsCounter = 0;
         for(std::string row: rowsVector){

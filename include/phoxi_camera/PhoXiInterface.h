@@ -338,25 +338,10 @@ namespace phoxi_camera {
 
         std::string getApiVersion();
 
-        /**
-         * get PhoXi Scanner firmware Version
-         *
-         * \return connected PhoXi Scanner firmware Version
-         */
-        std::string getFirmwareVersion();
-
 #endif
     protected:
         pho::api::PPhoXi scanner;
         pho::api::PhoXiFactory phoXiFactory;
-
-        /**
-        * Return all PhoXi 3D Scanners ids connected on network.
-        *
-        * \note returned id can be passed to connectCamera method
-        * \throw PhoXiControlNotRunning when PhoXi Control is not running
-        */
-        std::vector<pho::api::PhoXiDeviceInformation> deviceInforamtionList();
 
     private:
         int last_frame_id = -1;
