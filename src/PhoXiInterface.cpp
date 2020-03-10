@@ -65,6 +65,7 @@ namespace phoxi_camera {
             throw PhoXiScannerNotFound("Scanner not found");
         }
         disconnectCamera();
+        scanner.Reset();    // This is needed before assign new instance
         if (!(scanner = phoXiFactory.CreateAndConnect(*it, 5000))) {
             disconnectCamera();
             throw UnableToStartAcquisition("Scanner was not able to connect. Disconnected.");
@@ -76,6 +77,7 @@ namespace phoxi_camera {
         if (scanner && scanner->isConnected()) {
             scanner->Disconnect(true);
         }
+        scanner.Reset();    // Scanner instance is not usable after disconnect, call destructor
         last_frame_id = -1;
     }
 
