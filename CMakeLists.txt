@@ -142,10 +142,10 @@ target_link_libraries(
   ${catkin_LIBRARIES}
 )
 
-target_link_libraries(
-  ${PROJECT_NAME}
-  ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_Ros_Interface
+target_link_libraries( ${PROJECT_NAME}
+    PRIVATE
+        ${catkin_LIBRARIES}
+        ${PROJECT_NAME}_Ros_Interface
 )
 
 install(TARGETS ${PROJECT_NAME}_Ros_Interface ${PROJECT_NAME}_PhoXi_Interface

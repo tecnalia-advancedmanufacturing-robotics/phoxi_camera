@@ -36,7 +36,7 @@ namespace phoxi_camera {
         /**
         * Default constructor.
         */
-        PhoXiInterface();
+        PhoXiInterface() = default;
 
         /**
         * Types of rows (chars representing starting sign of row) returned by avahi-browse call.

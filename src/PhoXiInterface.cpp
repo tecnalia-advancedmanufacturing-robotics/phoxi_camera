@@ -6,12 +6,6 @@
 #include <phoxi_camera/PhoXiConversions.h>
 
 namespace phoxi_camera {
-
-    PhoXiInterface::PhoXiInterface() {
-
-    }
-
-
     std::vector<PhoXiDeviceInformation> PhoXiInterface::deviceList() {
         if (!phoXiFactory.isPhoXiControlRunning()) {
             scanner.Reset();
@@ -26,9 +20,7 @@ namespace phoxi_camera {
         try {
             scannersIPs = PhoXiInterface::getScannersIPs();
         }
-        catch (PhoXiInterfaceException& e){
-            ROS_WARN_STREAM("Can not get scanner ip: " << e.what());
-        }
+        catch (PhoXiInterfaceException& e){}
 
         for (auto &device : deviceInfo) {
             if (scannersIPs.empty() || (scannersIPs.find(device.hwIdentification) == scannersIPs.end())) {
@@ -424,7 +416,6 @@ namespace phoxi_camera {
         pclose(pipe);
 
         if (connectedScanners.empty()) {
-            ROS_WARN("Avahi-browse does not see any scanners.");
             return scannersIPs;
         }
 
@@ -480,7 +471,6 @@ namespace phoxi_camera {
 //        if (!stderrOutput.empty()) {
 //            for (auto &err : stderrOutput) {
 //                if (err.find("Got SIGTERM, quitting") != std::string::npos) {
-//                    ROS_WARN("Avahi-browse terminated due to IPv4 retrieving long processing time");
 //                } else {
 //                    std::cout << err << std::endl;
 //                }
