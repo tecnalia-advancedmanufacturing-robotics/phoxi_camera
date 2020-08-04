@@ -161,7 +161,7 @@ TEST_F (PhoXiInterfaceTest, start_stopAcquisition) {
     ASSERT_THROW(phoxi_interface.stopAcquisition(), phoxi_camera::PhoXiScannerNotConnected);
 }
 
-TEST_F (PhoXiInterfaceTest, setTriggerMode) {
+TEST_F (PhoXiInterfaceTest, DISABLED_setTriggerMode) {
 
     // freerun
     phoxi_interface.startAcquisition();
@@ -223,7 +223,7 @@ TEST_F (PhoXiInterfaceTest, setTriggerMode) {
     ASSERT_THROW(phoxi_interface.setTriggerMode(pho::api::PhoXiTriggerMode::Software), phoxi_camera::PhoXiScannerNotConnected);
 }
 
-TEST_F (PhoXiInterfaceTest, setResolution) {
+TEST_F (PhoXiInterfaceTest, DISABLED_setResolution) {
 
     ASSERT_NO_THROW(phoxi_interface.setHighResolution());
     pho::api::PFrame f = phoxi_interface.getPFrame(-1);
@@ -333,7 +333,7 @@ TEST_F (PhoXiInterfaceTest, setTransformation) {
                                                    true, false), phoxi_camera::PhoXiScannerNotConnected);
 }
 
-TEST_F (PhoXiInterfaceTest, setCoordinateSpace) {
+TEST_F (PhoXiInterfaceTest, DISABLED_setCoordinateSpace) {
     // try to set some space and next trig
     EXPECT_NO_THROW(phoxi_interface.setCoordinateSpace(pho::api::PhoXiCoordinateSpace::CameraSpace));
     ASSERT_EQ(phoxi_interface.getCoordinateSpace(),pho::api::PhoXiCoordinateSpace::CameraSpace);
