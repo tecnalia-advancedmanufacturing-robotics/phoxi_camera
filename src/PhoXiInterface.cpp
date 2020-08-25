@@ -67,7 +67,7 @@ namespace phoxi_camera {
 
     void PhoXiInterface::disconnectCamera() {
         if (scanner && scanner->isConnected()) {
-            scanner->Disconnect(true);
+            scanner->Disconnect(false);
         }
         scanner.Reset();    // Scanner instance is not usable after disconnect, call destructor
         last_frame_id = -1;
