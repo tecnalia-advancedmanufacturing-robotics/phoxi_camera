@@ -207,7 +207,10 @@ class Test_phoxi_camera_ros_interface(TestCase):
 
         assert True == res.success
         assert "Ok" == res.message
-        assert published_topics_num == 4, "Some topic was not published after get_frame service"
+
+        # confidence map not available in the used data
+        assert published_topics_num == 3, "Some topic was not published after get_frame service"
+        # assert published_topics_num == 4, "Some topic was not published after get_frame service"
         # disconnected
         disconnect()
         res = srv_getFrame(-1)
