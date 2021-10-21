@@ -33,8 +33,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int main(int argc, char** argv) {
     ros::init(argc, argv, "phoxi_camera");
 
+    ros::AsyncSpinner spinner(0);
+    spinner.start();
     phoxi_camera::RosInterface interface;
+    ros::waitForShutdown();
 
-    ros::spin();
     return 0;
 }

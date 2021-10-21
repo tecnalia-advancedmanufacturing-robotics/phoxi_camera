@@ -8,7 +8,8 @@ namespace phoxi_camera {
     RosInterface::RosInterface() : nh("~"), dynamicReconfigureServer(dynamicReconfigureMutex, nh),
                                    PhoXi3DscannerDiagnosticTask("PhoXi3Dscanner",
                                                                 boost::bind(&RosInterface::diagnosticCallback, this,
-                                                                            _1)) {
+                                                                            _1)),
+                                   continuous_aquisition_thread_active(false) {
 
         //create service servers
         getDeviceListService = nh.advertiseService("get_device_list", &RosInterface::getDeviceList, this);
@@ -133,6 +134,10 @@ namespace phoxi_camera {
         } catch (PhoXiInterfaceException& e) {
             ROS_ERROR("%s", e.what());
         }
+        if (dynamicReconfigureConfig.trigger_mode == pho::api::PhoXiTriggerMode::Freerun &&
+            dynamicReconfigureConfig.start_acquisition && !continuous_aquisition_thread_active) {
+            continuous_aquisition_thread = std::thread{ &RosInterface::runContinuousAcquisition, this };
+        }
         return true;
     }
 
@@ -144,6 +149,10 @@ namespace phoxi_camera {
             diagnosticUpdater.force_update();
         } catch (PhoXiInterfaceException& e) {
             ROS_ERROR("%s", e.what());
+        }
+        if (continuous_aquisition_thread_active) {
+            continuous_aquisition_thread_active = false;
+            continuous_aquisition_thread.join();
         }
         return true;
     }
@@ -514,6 +523,10 @@ namespace phoxi_camera {
         } catch (PhoXiInterfaceException& e) {
             ROS_WARN("%s", e.what());
         }
+        if (config.trigger_mode == pho::api::PhoXiTriggerMode::Freerun && config.start_acquisition &&
+        !continuous_aquisition_thread_active) {
+            continuous_aquisition_thread = std::thread{ &RosInterface::runContinuousAcquisition, this };
+        }
     }
 
     pho::api::PFrame RosInterface::getPFrame(int id) {
@@ -733,6 +746,30 @@ namespace phoxi_camera {
     void RosInterface::getDefaultDynamicReconfigureConfig(phoxi_camera::phoxi_cameraConfig& config) {
         dynamicReconfigureServer.getConfigDefault(config);
         config.__fromServer__(nh);
+    }
+
+    void RosInterface::runContinuousAcquisition() {
+        continuous_aquisition_thread_active = true;
+        ros::Rate loop_rate(50);
+        while (ros::ok() && continuous_aquisition_thread_active) {
+            ROS_INFO_ONCE("Starting runContinuousAcquisition");
+            pho::api::PFrame frame = scanner->GetFrame(pho::api::PhoXiTimeout::Infinity);
+            publishFrame(frame);
+            loop_rate.sleep();
+        }
+        ROS_INFO("Stopped continuos acquisition");
+    }
+
+    RosInterface::~RosInterface() {
+        if (continuous_aquisition_thread_active) {
+            continuous_aquisition_thread_active = false;
+            continuous_aquisition_thread.join();
+        }
+        if (scanner && scanner->isConnected()) {
+            scanner->Disconnect(true);
+        }
+        scanner.Reset();  // Scanner instance is not usable after disconnect, call destructor
+        diagnosticUpdater.force_update();
     }
 }
 

@@ -48,6 +48,7 @@
 //std
 #include <vector>
 #include <algorithm>
+#include <thread>
 
 //others
 #include <phoxi_camera/PhoXiException.h>
@@ -58,6 +59,7 @@ namespace phoxi_camera {
     class RosInterface : protected PhoXiInterface {
     public:
         RosInterface();
+        ~RosInterface();
 
     protected:
         void publishFrame(pho::api::PFrame frame);
@@ -177,6 +179,9 @@ namespace phoxi_camera {
         diagnostic_updater::FunctionDiagnosticTask PhoXi3DscannerDiagnosticTask;
         ros::Timer diagnosticTimer;
 
+        std::thread continuous_aquisition_thread;
+        bool continuous_aquisition_thread_active;
+        void runContinuousAcquisition();
     };
 }
 
