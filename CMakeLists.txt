@@ -4,6 +4,7 @@ project(phoxi_camera)
 find_package(PhoXi REQUIRED CONFIG PATHS "$ENV{PHOXI_CONTROL_PATH}")
 find_package(Eigen3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system)
+find_package(PCL REQUIRED COMPONENTS common)
 
 find_package(catkin REQUIRED
   COMPONENTS
@@ -87,10 +88,11 @@ catkin_package(
     eigen_conversions
   DEPENDS
     PhoXi
+    PCL
 )
 
 add_compile_options(-w)
-add_compile_options(-std=c++11)
+add_compile_options(-std=c++14)
 add_compile_options(-fpermissive)
 add_compile_options(-pthread)
 add_compile_options(-O2)
