@@ -27,6 +27,8 @@
 #include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <sensor_msgs/fill_image.h>
+#include <sensor_msgs/CameraInfo.h>
+#include <sensor_msgs/distortion_models.h>
 #include <std_srvs/Empty.h>
 #include <phoxi_camera/PhoXiInterface.h>
 #include <phoxi_camera/GetDeviceList.h>
@@ -168,6 +170,7 @@ namespace phoxi_camera {
         ros::Publisher rawTexturePub;
         ros::Publisher rgbTexturePub;
         ros::Publisher depthMapPub;
+        ros::Publisher cameraInfoPub;
 
         //dynamic reconfigure
         boost::recursive_mutex dynamicReconfigureMutex;

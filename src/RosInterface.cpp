@@ -47,6 +47,9 @@ namespace phoxi_camera {
         rawTexturePub = nh.advertise<sensor_msgs::Image>("texture", topic_queue_size, latch_topics);
         rgbTexturePub = nh.advertise<sensor_msgs::Image>("rgb_texture", topic_queue_size, latch_topics);
         depthMapPub = nh.advertise<sensor_msgs::Image>("depth_map", topic_queue_size, latch_topics);
+        cameraInfoPub = nh.advertise<sensor_msgs::CameraInfo>("camera_info",
+                                                              topic_queue_size,
+                                                              latch_topics);
 
         //set diagnostic Hw id
         diagnosticUpdater.setHardwareID("none");
@@ -351,6 +354,7 @@ namespace phoxi_camera {
         if (frame->Texture.Empty()) {
             ROS_WARN("Empty texture!");
         } else {
+            // Raw Texture
             sensor_msgs::Image texture;
             texture.header = header;
             texture.encoding = sensor_msgs::image_encodings::TYPE_32FC1;
@@ -360,6 +364,8 @@ namespace phoxi_camera {
                                    frame->Texture.Size.Width * sizeof(float), // stepSize
                                    frame->Texture.operator[](0));
             rawTexturePub.publish(texture);
+
+            // RGB Texture
             cv::Mat cvGreyTexture(frame->Texture.Size.Height, frame->Texture.Size.Width, CV_32FC1,
                                   frame->Texture.operator[](0));
             cv::normalize(cvGreyTexture, cvGreyTexture, 0, 255, CV_MINMAX);
@@ -369,6 +375,28 @@ namespace phoxi_camera {
             cv::cvtColor(cvGreyTexture, cvRgbTexture, CV_GRAY2RGB);
             cv_bridge::CvImage rgbTexture(header, sensor_msgs::image_encodings::RGB8, cvRgbTexture);
             rgbTexturePub.publish(rgbTexture.toImageMsg());
+
+            // Camera info
+            sensor_msgs::CameraInfo info;
+            info.header = header;
+            info.width = texture.width;
+            info.height = texture.height;
+            info.distortion_model = sensor_msgs::distortion_models::RATIONAL_POLYNOMIAL;
+
+            // Camera matrix
+            for (std::size_t r = 0; r < 3; ++r)
+            {
+              for (std::size_t c = 0; c < 3; ++c)
+              {
+                info.K[c + r * 3] = scanner->CalibrationSettings->CameraMatrix.At(r, c);
+              }
+            }
+
+            // Distortion paramters
+            info.D = scanner->CalibrationSettings->DistortionCoefficients;
+
+            // Publish the camera info
+            cameraInfoPub.publish(info);
         }
         if (frame->ConfidenceMap.Empty()) {
             ROS_WARN("Empty confidence map!");
