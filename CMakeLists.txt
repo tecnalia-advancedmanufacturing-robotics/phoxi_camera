@@ -159,6 +159,10 @@ install(TARGETS ${PROJECT_NAME}_Ros_Interface ${PROJECT_NAME}_PhoXi_Interface
 install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
+install(DIRECTORY config launch meshes urdf
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)
+
 if (CATKIN_ENABLE_TESTING)
     find_package(rostest REQUIRED)
     add_rostest(test/launch/phoxi_camera_ros_interfaces_exist.test)
@@ -172,3 +176,4 @@ if (CATKIN_ENABLE_TESTING)
             ${catkin_LIBRARIES}
             ${PROJECT_NAME}_Ros_Interface)
 endif()
+
